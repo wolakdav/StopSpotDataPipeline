@@ -19,20 +19,23 @@ class _Notif(IOs):
 
     #######################################################
 
-    # TODO: allow msg to be a list of paragrpahs?
-    def email(self, msg="", subject=""):
+    # msg can be a list of strs which will be joined on double new lines
+    def email(self, subject="", msg=""):
         time = datetime.datetime.now()
-        if msg == "":
-            msg = self.msg
         if subject == "":
             subject = "Notification"
 
-        msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " at ", str(time), "\n\n", msg])
+        if msg == "":
+            msg = self.msg
+        elif isinstance(msg, list):
+            msg = "\n\n".join(msg)
+
+        msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
         password = self._update_email_data()
-        self._print("TO: ", self.user_email)
+        self._print("TO:   ", self.user_email)
         self._print("FROM: ", self.pipeline_email)
-        self._print("MSG:\n", msg)
+        self._print(msg)
 
         # TODO: catch smtplib exceptions
         #   smtplib.SMTPAuthenticationError
