@@ -37,13 +37,19 @@ class _Notif(IOs):
         self._print("FROM: ", self.pipeline_email)
         self._print(msg)
 
-        # TODO: catch smtplib exceptions
-        #   smtplib.SMTPAuthenticationError
+        try:
+            context = ssl.create_default_context() # Create a secure SSL context
+            server = smtplib.SMTP_SSL("smtp.gmail.com", self._port, context=context)
+            server.login(self.pipeline_email, password)
+            server.sendmail(self.pipeline_email, self.user_email, msg)
+        except smtplib.SMTPAuthenticationError:
+            print("ERROR: email authentication failed.")
+            return False
+        except smtplib.SMTPException:
+            print("ERROR: a general email error occured.")
+            return False
 
-        context = ssl.create_default_context() # Create a secure SSL context
-        server = smtplib.SMTP_SSL("smtp.gmail.com", self._port, context=context)
-        server.login(self.pipeline_email, password)
-        server.sendmail(self.pipeline_email, self.user_email, msg)
+        return True
 
     # This method will update self.sender_email and
     # self.pipeline_email, and it will password, as well as prompting for
