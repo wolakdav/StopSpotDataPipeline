@@ -24,6 +24,9 @@ Upon deployment, it is necessary to hardcode the password for the pipeline's ema
 
 
 ### Load config
+
+This method returns a boolean to reflect the success of the operation.
+
 ```
 from config import config
 from config import BoundsResult
