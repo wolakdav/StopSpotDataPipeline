@@ -1,5 +1,7 @@
 {
-  "email": "test@test.com",
+  "user_email": "test@test.com",
+  "pipeline_email": "pipeline.noreply@gmail.com",
+  "pipeline_email_passwd": "INVALID",
   "pipeline_user": "sw23",
   "pipeline_passwd": "fake",
   "pipeline_hostname": "localhost",
