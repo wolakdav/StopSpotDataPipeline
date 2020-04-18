@@ -5,8 +5,8 @@ from src.config import config
 
 class _Notif(IOs):
 
-    def __init__(self, config):
-        super().__init__(True)
+    def __init__(self, config, verbose=True):
+        super().__init__(verbose)
         self.msg = "A critical error has occured."
         self._port = 465  # For SSL
         self._config = config
@@ -19,7 +19,6 @@ class _Notif(IOs):
 
     #######################################################
 
-    # msg can be a list of strs which will be joined on double new lines
     def email(self, subject="", msg=""):
         time = datetime.datetime.now()
         if subject == "":
@@ -51,11 +50,8 @@ class _Notif(IOs):
 
         return True
 
-    # This method will update self.sender_email and
-    # self.pipeline_email, and it will password, as well as prompting for
-    # unavailable data.
-    # TODO: add this comment to the doc
-    # TODO: make the doc
+    # This method will update self.sender_email and self.pipeline_email,
+    # and it will password, as well as prompting for unavailable data.
     def _update_email_data(self):
         user_email = self._config.get_value("user_email")
         if user_email is None:
