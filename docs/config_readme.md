@@ -25,7 +25,7 @@ Upon deployment, it is necessary to hardcode the password for the pipeline's ema
 
 ### Load config
 
-This method returns a boolean to reflect the success of the operation.
+This method returns a boolean to reflect the success of the JSON parse.
 
 ```
 from config import config
