@@ -5,20 +5,21 @@ import pandas
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
+from src.ios import IOs
 
 
 """ Extending Table
 Subclasses should not alter self._engine in any capacity.
 For more, see docs/db_ops.md
 """
-class Table(abc.ABC):
+class Table(IOs, abc.ABC):
 
     ###########################################################################
     # Public Methods
 
     # passwd is not stored as member data, it is destroyed after use.
     def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
-        self.verbose = verbose
+        super().__init__(verbose)
         self._chunksize = 1000
         self._schema = "hive"
 
@@ -152,6 +153,16 @@ class Table(abc.ABC):
         self._print("Done.")
         return True
 
+    #######################################################
+
+    def print(self, string, obj=None, force=False):
+        raise AttributeError("AttributeError: " + self.__class__.__name__ + " has no attribute 'print'")
+
+    #######################################################
+
+    def prompt(self, prompt="", hide_input=False):
+        raise AttributeError("AttributeError: " + self.__class__.__name__ + " has no attribute 'prompt'")
+
     ###########################################################################
     # Protected Methods
 
@@ -162,34 +173,6 @@ class Table(abc.ABC):
             return False
 
         return True
-
-    #######################################################
-
-    def _prompt(self, prompt="", hide_input=False):
-        while True:
-            try:
-                value = None
-                if hide_input:
-                    value = getpass.getpass(prompt)
-                else:
-                    value = input(prompt)
-                return value
-            except EOFError:
-                print()
-
-    #######################################################
-
-    def _print(self, string, obj=None, force=False):
-        if not force:
-            if not self.verbose:
-                return
-
-        if obj is None:
-            print(string)
-
-        else:
-            print(string, end="")
-            print(obj)
 
     ###########################################################################
     # Private Methods

@@ -7,6 +7,8 @@ Database operations are handled by `Table` and its various subclasses in
 for the different tables, as well as creating and deleting the tables as well.
 Some subclasses of Table, such as `CTran_Data`, will fill the table with actual
 data.  
+`Table` inherits from IOs and removes access to `IOs.print()` and
+`IOs.prompt()`.
 These are the subclasses of Table:  
 
 - `CTran_Data`  
@@ -85,15 +87,3 @@ columns.
 
 This method will check that the columns of `sample_df` match the columns of
 self, and return a boolean reflecting this check.
-
-#### `str self._prompt(prompt="", hide_input=False)`
-
-This method will prompt STDOUT with `prompt` and read from STDIN the returned
-string. `hide_input` hides the input from appearing in the terminal as it is
-typed; this is necessary for sensitive data, such as passwords.
-
-#### `void self._print(string, obj=None, force=False)`
-
-This method will is used to support verbose dialog. If `obj` is supplied, it is
-printed after `string`. If `force` is `True`, then the message will print
-regardless of the value in `self.verbose`.
