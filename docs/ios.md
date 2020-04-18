@@ -17,8 +17,8 @@ self.__class__.__name__  has no attribute 'prompt'`.
 #### `str self.print(print="", hide_input=False)`
 
 This method is a public wrapper for `self._print`. Subclasses that do not want
-this available should override it to throw `AttributeError: '{subclass}' has no
-attribute 'print'`.
+this available should override it to throw `AttributeError:
+self.__class__.__name__  has no attribute 'prompt'`.
 
 #### `str self._prompt(prompt="", hide_input=False)`
 
