@@ -72,22 +72,33 @@ def test_update_email_data_no_pipeline_email(monkeypatch, instance_fixture):
     assert instance_fixture.pipeline_email == expected
 
 def test_email_happy(monkeypatch, instance_fixture):
-    # TODO: make sure to check that self.user_email and the like are set after the method call
-    # TODO: monkeypatch smtplib.SMTP_SSL to have login() and sendmail() methods
-    #   sendmail will probably need to globally set the args received
-    pass
+    expected_subject = "This is a test"
+    expected_msg = ["Hello,", "I am contacting you to perform a test.", "Best,", "Me"]
+    expected_data = instance_fixture._config._data
+
+    class Server:
+        def __init__(self, string, port, context):
+            assert string == "smtp.gmail.com"
+            assert port == 465
+
+        def login(self, sender_email, password):
+            assert sender_email == expected_data["pipeline_email"]
+            assert password == expected_data["pipeline_email_passwd"]
+
+        def sendmail(self, sender_email, recipient_email, msg):
+            assert sender_email == expected_data["pipeline_email"]
+            assert recipient_email == expected_data["user_email"]
+            assert expected_subject in msg
+            assert "\n\n".join(expected_msg) in msg
+
+    def create_server(string, port, context):
+        return Server(string, port, context)
+
+    monkeypatch.setattr("smtplib.SMTP_SSL", create_server)
+    assert instance_fixture.email(expected_subject, expected_msg) == True
 
 def test_email_auth_error(monkeypatch, instance_fixture):
     pass # TODO: have server.sendmail throw this exception
 
 def test_email_general_error(monkeypatch, instance_fixture):
     pass # TODO: have server.sendmail throw this exception
-
-def test_email_no_msg(instance_fixture):
-    pass
-
-def test_email_no_subject(instance_fixture):
-    pass
-
-def test_email_no_msg_no_subject(instance_fixture):
-    pass
