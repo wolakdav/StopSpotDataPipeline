@@ -41,14 +41,14 @@ def test_print_obj_forced(capsys, instance_fixture):
     instance_fixture._print("Hello!", obj, True)
     assert capsys.readouterr().out == "Hello!['Pizza', 'Pie']\n"
 
-def test_prompt_unhidden(capsys, monkeypatch, instance_fixture):
+def test_prompt_unhidden(monkeypatch, instance_fixture):
     expected = "sw23"
     prompt = "> "
     monkeypatch.setattr("sys.stdin", io.StringIO(expected + "\n"))
     result = instance_fixture._prompt(prompt)
     assert result == expected
 
-def test_prompt_hidden(capsys, monkeypatch, instance_fixture):
+def test_prompt_hidden(monkeypatch, instance_fixture):
     expected = "fake\n"
     prompt = "> "
     monkeypatch.setattr("getpass.getpass", lambda _: expected)
