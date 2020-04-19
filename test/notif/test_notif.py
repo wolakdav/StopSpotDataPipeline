@@ -22,6 +22,30 @@ def mock_config():
 def instance_fixture(mock_config):
     return _Notif(mock_config)
 
+@pytest.fixture
+def custom_server():
+    def create_server(expected_subject, expected_msg, expected_data):
+        class Server:
+            def __init__(self, string, port, context):
+                assert string == "smtp.gmail.com"
+                assert port == 465
+
+            def login(self, sender_email, password):
+                assert sender_email == expected_data["pipeline_email"]
+                assert password == expected_data["pipeline_email_passwd"]
+
+            def sendmail(self, sender_email, recipient_email, msg):
+                assert sender_email == expected_data["pipeline_email"]
+                assert recipient_email == expected_data["user_email"]
+                assert expected_subject in msg
+                assert "\n\n".join(expected_msg) in msg
+
+        def create(string, port, context):
+            return Server(string, port, context)
+
+        return create
+
+    return create_server
 
 def test_constructor(mock_config):
     dummy = _Notif(mock_config, True)
@@ -71,30 +95,13 @@ def test_update_email_data_no_pipeline_email(monkeypatch, instance_fixture):
     assert instance_fixture.user_email == data["user_email"]
     assert instance_fixture.pipeline_email == expected
 
-def test_email_happy(monkeypatch, instance_fixture):
+def test_email_happy(monkeypatch, custom_server, instance_fixture):
     expected_subject = "This is a test"
     expected_msg = ["Hello,", "I am contacting you to perform a test.", "Best,", "Me"]
     expected_data = instance_fixture._config._data
 
-    class Server:
-        def __init__(self, string, port, context):
-            assert string == "smtp.gmail.com"
-            assert port == 465
-
-        def login(self, sender_email, password):
-            assert sender_email == expected_data["pipeline_email"]
-            assert password == expected_data["pipeline_email_passwd"]
-
-        def sendmail(self, sender_email, recipient_email, msg):
-            assert sender_email == expected_data["pipeline_email"]
-            assert recipient_email == expected_data["user_email"]
-            assert expected_subject in msg
-            assert "\n\n".join(expected_msg) in msg
-
-    def create_server(string, port, context):
-        return Server(string, port, context)
-
-    monkeypatch.setattr("smtplib.SMTP_SSL", create_server)
+    server = custom_server(expected_subject, expected_msg, expected_data)
+    monkeypatch.setattr("smtplib.SMTP_SSL", server)
     assert instance_fixture.email(expected_subject, expected_msg) == True
 
 def test_email_auth_error(monkeypatch, instance_fixture):
