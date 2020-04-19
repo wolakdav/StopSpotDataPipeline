@@ -29,7 +29,10 @@ def loaded_config(tmp_path):
     config.load(p)
 
     return config
-    
+
+def test_load_filenotfound(empty_config):
+    assert empty_config.load("fake") == False
+
 def test_get_set_config(empty_config):
     empty_config.set_value("test", 5)
     assert empty_config.get_value("test") == 5
