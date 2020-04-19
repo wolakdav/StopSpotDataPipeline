@@ -50,12 +50,12 @@ class _Notif(IOs):
 
         return True
 
-    # This method will update self.sender_email and self.pipeline_email,
+    # This method will update self.user_email and self.pipeline_email,
     # and it will password, as well as prompting for unavailable data.
     def _update_email_data(self):
         user_email = self._config.get_value("user_email")
         if user_email is None:
-            user_email = self._prompt("Please enter the destination email: ")
+            user_email = self._prompt("Please enter the target email: ")
         self.user_email = user_email
 
         pipeline_email = self._config.get_value("pipeline_email")
@@ -65,7 +65,7 @@ class _Notif(IOs):
 
         pipeline_email_passwd = self._config.get_value("pipeline_email_passwd")
         if pipeline_email_passwd is None:
-            pipeline_email_passwd = self._prompt("Please enter this pipeline's email password: ")
+            pipeline_email_passwd = self._prompt("Please enter this pipeline's email password: ", hide_input=True)
 
         return pipeline_email_passwd
 
