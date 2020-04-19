@@ -94,6 +94,14 @@ def test_constructor_given_engine(dummy_engine):
     instance = Table_Dummy(engine=engine_url)
     assert instance._engine.url == engine.url
 
+def test_no_print(instance_fixture):
+    with pytest.raises(AttributeError):
+        assert instance_fixture.print("string")
+
+def test_no_prompt(instance_fixture):
+    with pytest.raises(AttributeError):
+        assert instance_fixture.prompt("string")
+
 def test_verbose(instance_fixture):
     verbose = instance_fixture.verbose
     assert isinstance(verbose, bool) and verbose == False
