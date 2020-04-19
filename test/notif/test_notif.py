@@ -1,5 +1,6 @@
 import io
 import pytest
+import smtplib
 from src.notif import _Notif
 
 @pytest.fixture
@@ -46,6 +47,7 @@ def custom_server():
         return create
 
     return create_server
+
 
 def test_constructor(mock_config):
     dummy = _Notif(mock_config, True)
@@ -105,7 +107,29 @@ def test_email_happy(monkeypatch, custom_server, instance_fixture):
     assert instance_fixture.email(expected_subject, expected_msg) == True
 
 def test_email_auth_error(monkeypatch, instance_fixture):
-    pass # TODO: have server.sendmail throw this exception
+    def create_server(string, port, context):
+        class Server:
+            def __init__(self, string, port, context):
+                pass
+            def login(self, sender_email, sender_password):
+                pass
+            def sendmail(self, sender_email, recipient_email, msg):
+                raise smtplib.SMTPAuthenticationError("code", "msg")
+        return Server(string, port, context)
+
+    monkeypatch.setattr("smtplib.SMTP_SSL", create_server)
+    assert instance_fixture.email() == False
 
 def test_email_general_error(monkeypatch, instance_fixture):
-    pass # TODO: have server.sendmail throw this exception
+    def create_server(string, port, context):
+        class Server:
+            def __init__(self, string, port, context):
+                pass
+            def login(self, sender_email, sender_password):
+                pass
+            def sendmail(self, sender_email, recipient_email, msg):
+                raise smtplib.SMTPException()
+        return Server(string, port, context)
+
+    monkeypatch.setattr("smtplib.SMTP_SSL", create_server)
+    assert instance_fixture.email() == False
