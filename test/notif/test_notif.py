@@ -37,7 +37,7 @@ def custom_server():
 
             def sendmail(self, sender_email, recipient_email, msg):
                 assert sender_email == expected_data["pipeline_email"]
-                assert recipient_email == expected_data["user_emails"]
+                assert recipient_email in expected_data["user_emails"]
                 assert expected_subject in msg
                 assert "\n\n".join(expected_msg) in msg
 
@@ -100,6 +100,17 @@ def test_update_email_data_no_pipeline_email(monkeypatch, instance_fixture):
 def test_email_happy(monkeypatch, custom_server, instance_fixture):
     expected_subject = "This is a test"
     expected_msg = ["Hello,", "I am contacting you to perform a test.", "Best,", "Me"]
+    expected_data = instance_fixture._config._data
+
+    server = custom_server(expected_subject, expected_msg, expected_data)
+    monkeypatch.setattr("smtplib.SMTP_SSL", server)
+    assert instance_fixture.email(expected_subject, expected_msg) == True
+
+def test_email_happy_list(monkeypatch, custom_server, instance_fixture):
+    emails = ["sw23@pdx.edu"]
+    expected_subject = "This is a test"
+    expected_msg = ["Hello,", "I am contacting you to perform a test.", "Best,", "Me"]
+    instance_fixture._config._data["user_emails"] = emails
     expected_data = instance_fixture._config._data
 
     server = custom_server(expected_subject, expected_msg, expected_data)
