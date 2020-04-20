@@ -20,3 +20,8 @@ class Service_Periods(Table):
                 ternary SMALLINT NOT NULL CHECK ( (ternary <= 3) AND (ternary >= 1) ),
                 UNIQUE (month, year, ternary)
             );"""])
+
+    
+    def write_table(self, dates, append=False):
+        pass
+        

@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 
 from src.tables import CTran_Data
 from src.tables import Flagged_Data
@@ -7,6 +8,7 @@ from src.tables import Flags
 from src.tables import Service_Periods
 from src.config import config
 from src.interface import ArgInterface
+import flaggers.flagger
 
 
 ##############################################################################
@@ -36,12 +38,43 @@ def cli(read_env_data=False):
 
     options = [
         _Option("(or ctrl-d) Exit.", lambda: "Exit"),
-        _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].", lambda: ctran.create_table()),
-        _Option("Create Hive, the output point of the Data Pipeline.", lambda: create_hive()),
-        _Option("Sub-menu: DB Operations", lambda: db_cli(ctran, flagged, flags, service_periods)),
+        _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].",
+                    lambda: ctran.create_table()),
+        _Option("Create Hive, the output point of the Data Pipeline.",
+                    lambda: create_hive())
+        _Option("Process data from Portal (Which currently is Aperture)",
+                    lambda: process_data(ctran, flagged, flags)),
+        _Option("Sub-menu: DB Operations",
+                    lambda: db_cli(ctran, flagged, flags, service_periods)),
     ]
 
     return _menu("Welcome to the CTran Data Marking Pipeline.", options)
+
+###############################################################################
+
+def process_data(ctran, flagged, flags):
+    date_range = (datetime(2019, 3, 1), datetime(2019, 3, 1))
+    ctran_df = ctran.query_date_range(*date_range)
+    if not ctran_df:
+        return False
+
+    flagged_rows = {}
+    for row in ctran_df.iterrows():
+        flags = []
+        for flagger in flagger.flaggers:
+            try:
+                if flagger.name == "Duplicate":
+                    flags.append(flagger.flag(row, ctran_df))
+                else:
+                    flags.append(flagger.flag(row))
+            except Exception as e:
+                print("WARNING: error in flagger {}. Skipping.\n{}"
+                      .format(flagger.name, e))
+
+        flagged_rows[row.row_id] = set(flags)
+
+    flagged.write_table(flags, append=True)
+
 
 ###########################################################
 
@@ -74,6 +107,7 @@ def db_cli(ctran, flagged, flags, service_periods):
 
 ###############################################################################
 # Private Functions
+
 
 def _create_instances(read_env_data):
     try:

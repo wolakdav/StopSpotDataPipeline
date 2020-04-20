@@ -18,6 +18,7 @@ class Table(abc.ABC):
 
     # passwd is not stored as member data, it is destroyed after use.
     def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
+        self._table_name = None
         self.verbose = verbose
         self._chunksize = 1000
         self._schema = "hive"
@@ -132,6 +133,7 @@ class Table(abc.ABC):
         return True
 
     #######################################################
+    
 
     def delete_table(self):
         if not isinstance(self._engine, Engine):
@@ -154,6 +156,40 @@ class Table(abc.ABC):
 
     ###########################################################################
     # Protected Methods
+
+    def _write_table(self, df, append):
+        # This method is meant to be called by a subclass.
+        # df should be a well formed DataFrame, the subclass should form
+        # the DataFrame.
+        if not self._table_name:
+            self._print("ERROR: _write_table not called by a subclass.")
+            return False
+
+        if not isinstance(self._engine, Engine):
+            self._print("ERROR: invalid engine.")
+            return False
+
+        if not self._check_cols(df):
+            self._print("ERROR: the columns of data does not match required columns.")
+            return False
+
+        self._print("Writing to table...")
+        try:
+            df.to_sql(
+                self._table_name,
+                self._engine,
+                if_exists = "append" if append else "replace",
+                index = False,
+                chunksize = self._chunksize,
+                schema = self._schema,
+            )
+        except SQLAlchemyError as error:
+            print("SQLAlchemyError: ", error)
+            return False
+        self._print("Done")
+        return True
+
+    #######################################################
 
     def _check_cols(self, sample_df):
         # You may be tempted to attempt to optimize this by doing list
