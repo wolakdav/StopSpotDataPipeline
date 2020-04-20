@@ -33,23 +33,23 @@ class _Notif(IOs):
         msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
         password = self._update_email_data()
-        print(self.user_email)
-        if isinstance(self.user_email, list):
-            for user_email in self.user_email:
+        print(self.user_emails)
+        if isinstance(self.user_emails, list):
+            for user_email in self.user_emails:
                 # Do not switch the order of this conditional expression,
                 # Python will short circuit and not execute the method.
                 result = self._email_user(user_email, msg, password) and result
         else:
-            result = self._email_user(self.user_email, msg, password)
+            result = self._email_user(self.user_emails, msg, password)
         return result
 
-    # This method will update self.user_email and self.pipeline_email,
+    # This method will update self.user_emails and self.pipeline_email,
     # and it will password, as well as prompting for unavailable data.
     def _update_email_data(self):
-        user_email = self._config.get_value("user_email")
-        if user_email is None:
-            user_email = self._prompt("Please enter the target email: ")
-        self.user_email = user_email
+        user_emails = self._config.get_value("user_emails")
+        if user_emails is None:
+            user_emails = self._prompt("Please enter the target email: ")
+        self.user_emails = user_emails
 
         pipeline_email = self._config.get_value("pipeline_email")
         if pipeline_email is None:

@@ -7,12 +7,12 @@ Can set config data in a JSON file that is passed to the config.load() as the fi
 Any arbitrary variables can be set at the top level of the object. There is also a "columns" attribute that contains a column name, and a "max" and "min" that can be an integer, date, float, or "NA" if it is not bounded in that direction.
 
 Upon deployment, it is necessary to hardcode the password for the pipeline's
-email into this file. Additionally, `user_email` may be a list of emails, or
-a singular email.
+email into this file. Additionally, `user_emails` may be a list of emails, or
+a singular email string.
 
 ```
 {
-  "user_email": "test@test.com",
+  "user_emails": ["test@test.com"],
   "pipeline_email": "pipeline.noreply@gmail.com",
   "pipeline_email_passwd": "INVALID",
   "something_else" : "some_value", 
@@ -47,7 +47,7 @@ except KeyError as err:
 
 ### Get value
 ```
-receiver_email = config.get_value('user_email')
+receiver_email = config.get_value('user_emails')
 ```
 
 ### Column bounds checking

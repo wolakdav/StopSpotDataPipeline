@@ -1,5 +1,5 @@
 {
-  "user_email": "test@test.com",
+  "user_emails": ["test@test.com"],
   "pipeline_email": "stopspot.noreply@gmail.com",
   "pipeline_email_passwd": "INVALID",
   "pipeline_user": "sw23",
