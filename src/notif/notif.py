@@ -21,6 +21,7 @@ class _Notif(IOs):
 
     def email(self, subject="", msg=""):
         time = datetime.datetime.now()
+        result = True
         if subject == "":
             subject = "Notification"
 
@@ -32,23 +33,15 @@ class _Notif(IOs):
         msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
         password = self._update_email_data()
-        self._print("TO:   ", self.user_email)
-        self._print("FROM: ", self.pipeline_email)
-        self._print(msg)
-
-        try:
-            context = ssl.create_default_context() # Create a secure SSL context
-            server = smtplib.SMTP_SSL("smtp.gmail.com", self._port, context=context)
-            server.login(self.pipeline_email, password)
-            server.sendmail(self.pipeline_email, self.user_email, msg)
-        except smtplib.SMTPAuthenticationError:
-            print("ERROR: email authentication failed.")
-            return False
-        except smtplib.SMTPException:
-            print("ERROR: a general email error occured.")
-            return False
-
-        return True
+        print(self.user_email)
+        if isinstance(self.user_email, list):
+            for user_email in self.user_email:
+                # Do not switch the order of this conditional expression,
+                # Python will short circuit and not execute the method.
+                result = self._email_user(user_email, msg, password) and result
+        else:
+            result = self._email_user(self.user_email, msg, password)
+        return result
 
     # This method will update self.user_email and self.pipeline_email,
     # and it will password, as well as prompting for unavailable data.
@@ -68,6 +61,26 @@ class _Notif(IOs):
             pipeline_email_passwd = self._prompt("Please enter this pipeline's email password: ", hide_input=True)
 
         return pipeline_email_passwd
+
+    def _email_user(self, user_email, msg, password):
+        self._print("TO:   ", user_email)
+        self._print("FROM: ", self.pipeline_email)
+        self._print(msg)
+
+        try:
+            context = ssl.create_default_context() # Create a secure SSL context
+            #server = smtplib.SMTP_SSL("smtp.gmail.com", self._port, context=context)
+            server = smtplib.SMTP_SSL("smtp.gmail.com", self._port, context=context)
+            server.login(self.pipeline_email, password)
+            server.sendmail(self.pipeline_email, user_email, msg)
+        except smtplib.SMTPAuthenticationError:
+            print("ERROR: email authentication failed.")
+            return False
+        except smtplib.SMTPException:
+            print("ERROR: a general email error occured.")
+            return False
+
+        return True
 
     #######################################################
 

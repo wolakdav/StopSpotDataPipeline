@@ -28,4 +28,5 @@ following syntax.
 `[StopSpot Pipeline] ${subject} on/at ${datetime.now()}`.  
 
 The parameter `msg` can be an empty string, a non-empty string, or a list of
-strings, where the list of strings is `join`ed on a double newline.
+strings, where the list of strings is `join`ed on a double newline. This method
+will return True iff every recipient is successfully emailed.
