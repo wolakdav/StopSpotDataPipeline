@@ -19,12 +19,6 @@ class Checkpoint:
         checkpoint_date = datetime.strptime(f.read(), "%Y-%m-%d")
         return checkpoint_date  # returns a datetime object
 
-    # This function will save a new checkpoint to the checkpoint file
-    # it will remove the current checkpoint and replace it
-    def save_new_checkpoint(self, new_checkpoint):
-        self.write_to_file(new_checkpoint)
-        return None
-
     # This function will rerun to enter all the data from the checkpoint date to the current date
     def rerun_from_checkpoint(self):
         checkpoint_date = self.read_from_file()
