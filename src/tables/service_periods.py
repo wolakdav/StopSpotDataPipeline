@@ -1,6 +1,4 @@
 from .table import Table
-from datetime import datetime
-from sqlalchemy.exc import SQLAlchemyError
 
 class Service_Periods(Table):
 
@@ -22,66 +20,3 @@ class Service_Periods(Table):
                 ternary SMALLINT NOT NULL CHECK ( (ternary <= 3) AND (ternary >= 1) ),
                 UNIQUE (month, year, ternary)
             );"""])
-
-    
-    def write_table(self, dates, append=False):
-        pass
-
-    def query_month_year(self, month, year):
-        if self._engine is None:
-            self._print("ERROR: No sql engine.")
-            return None
-        service_key = None
-
-        sql = "".join(["SELECT * FROM ", self._schema, ".", self._table_name,
-                       " WHERE month=", str(month), " AND year=", str(year), ";"
-                       ])
-        try:
-            with self._engine.connect() as con:
-                result = con.execute(sql)
-                if result.rowcount != 0:
-                    return result.first()['service_key']
-        except SQLAlchemyError as error:
-            print("SQLAlchemy: ", error)
-            return None
-
-
-    def insert_one(self, month, year):
-        # Insert a row and return the id.
-        if self._engine is None:
-            self._print("ERROR: No sql engine.")
-            return None
-
-        ternary = self._get_ternary(month)
-        sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
-                       " (month, year, ternary) VALUES (",
-                       str(month), ", ", str(year), ", ", str(ternary), ")",
-                       " RETURNING service_key"])
-        try:
-            with self._engine.connect() as con:
-                result = con.execute(sql)
-                return result.first()[0]
-        except SQLAlchemyError as error:
-            print("SQLAlchemy: ", error)
-            return None
-
-
-    def query_or_insert(self, month, year):
-        query = self.query_month_year(month, year)
-        if query:
-            return query
-        
-        return self.insert_one(month, year)
-        
-
-    def _get_ternary(self, month):
-        date = datetime(2000, month, 1)
-        if (date >= datetime(2000, 1, 1) and 
-            date <= datetime(2000, 4, 1)):
-            return 1
-        if (date >= datetime(2000, 5, 1) and 
-            date <= datetime(2000, 8, 1)):
-            return 2
-        else:
-            return 3
-        

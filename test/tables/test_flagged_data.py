@@ -44,7 +44,7 @@ def test_creation_sql(instance_fixture):
     expected = "".join(["""
             CREATE TABLE IF NOT EXISTS """, instance_fixture._schema, ".", instance_fixture._table_name, """
             (
-                flag_id INTEGER REFERENCES """, instance_fixture._schema, """.flags(flag_id) ON UPDATE CASCADE,
+                flag_id INTEGER REFERENCES """, instance_fixture._schema, """.flags(flag_id),
                 service_key INTEGER REFERENCES """, instance_fixture._schema, """.service_periods(service_key),
                 row_id INTEGER,
                 PRIMARY KEY (flag_id, service_key, row_id)
