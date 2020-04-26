@@ -30,13 +30,13 @@ def test_constructor_given_engine(dummy_engine):
     assert instance._engine.url == engine.url
 
 def test_index_col(instance_fixture):
-    assert instance_fixture._index_col == "flag_id"
+    assert instance_fixture._index_col == None
 
 def test_table_name(instance_fixture):
     assert instance_fixture._table_name == "flags"
 
 def test_expected_cols(instance_fixture):
-    expected_cols = set(["description"])
+    expected_cols = set(["flag_id", "description"])
     assert instance_fixture._expected_cols == expected_cols
 
 def test_creation_sql(instance_fixture):
