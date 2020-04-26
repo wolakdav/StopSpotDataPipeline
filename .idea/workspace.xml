@@ -19,7 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ae63204c-96c6-42f7-9b43-5a5f1727e0a4" name="Default Changelist" comment="" />
+    <list default="true" id="ae63204c-96c6-42f7-9b43-5a5f1727e0a4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/checkpointing/checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/checkpointing/checkpoint.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,7 +38,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="date-query-cli-w-args" />
+        <entry key="$PROJECT_DIR$" value="finish_pipeline" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -150,10 +153,24 @@
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="754" y="456" width="402" height="175" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587243395900" />
-    <state x="2589" y="135" width="581" height="782" key="find.popup" timestamp="1587437716631">
+    <state x="2589" y="135" width="581" height="782" key="find.popup" timestamp="1587865536264">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="669" y="159" width="581" height="762" key="find.popup/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587255782174" />
-    <state x="2589" y="135" width="581" height="782" key="find.popup/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587437716631" />
+    <state x="2589" y="135" width="581" height="782" key="find.popup/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587865536264" />
+    <state x="2576" y="259" width="597" height="596" key="git4idea.branch.GitSmartOperationDialog" timestamp="1587865177802">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2576" y="259" width="597" height="596" key="git4idea.branch.GitSmartOperationDialog/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587865177802" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/tables/__init__.py</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
