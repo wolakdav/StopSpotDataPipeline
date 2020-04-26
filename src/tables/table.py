@@ -157,37 +157,57 @@ class Table(abc.ABC):
     ###########################################################################
     # Protected Methods
 
-    def _write_table(self, df, append):
+    def _write_table(self, df, conflict_columns=None):
         # This method is meant to be called by a subclass.
         # df should be a well formed DataFrame, the subclass should form
         # the DataFrame.
+        # conflict_columns should be a list of str values used as primary keys.
+        #   if conflict_columns is None, will not do ON CONFLICT.
+        #   ON CONFLICT is always set to DO NOTHING. This is to ensure there
+        #   are no errors when inserting a duplicate row.
+        #
+        # TODO: Add an update option to ON CONFLICT.
+        # Currently ON CONFLICT only exists to stop postgres from
+        # throwing a fit whenever there's a duplicate insert. Would be useful
+        # to have an option to overwrite the duplicate data instead.
+        # Will be very useful for updating the flags table without dropping
+        # the whole thing.
+
         if not self._table_name:
             self._print("ERROR: _write_table not called by a subclass.")
-            return False
+            return None
 
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
-            return False
+            return None
 
         if not self._check_cols(df):
             self._print("ERROR: the columns of data does not match required columns.")
-            return False
+            return None
 
         self._print("Writing to table...")
+
+        import pdb; pdb.set_trace()
+        columns = ", ".join(list(df))
+        # (value1, value2, ...), (value1, value2, ...), ...
+        values = ", ".join(["{}".format(tuple(row)) 
+                            for row in df.values.tolist()])
+
+        sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
+                       " (", columns, ") VALUES ", values])
+        if conflict_columns:
+            conflict_columns = "({})".format(
+                               "".join([s for s in conflict_columns]))
+            sql += "".join([" ON CONFLICT ", conflict_columns, " DO NOTHING;"])
+
         try:
-            df.to_sql(
-                self._table_name,
-                self._engine,
-                if_exists = "append" if append else "replace",
-                index = False,
-                chunksize = self._chunksize,
-                schema = self._schema,
-            )
+            with self._engine.connect() as con:
+                result = con.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
-            return False
+            return None
         self._print("Done")
-        return True
+        return None
 
     #######################################################
 

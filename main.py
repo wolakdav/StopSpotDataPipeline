@@ -41,9 +41,9 @@ def cli(read_env_data=False):
         _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].",
                     lambda: ctran.create_table()),
         _Option("Create Hive, the output point of the Data Pipeline.",
-                    lambda: create_hive())
+                    lambda: create_hive()),
         _Option("Process data from Portal (Which currently is Aperture)",
-                    lambda: process_data(ctran, flagged, flags)),
+                    lambda: process_data(ctran, flagged, flags, service_periods)),
         _Option("Sub-menu: DB Operations",
                     lambda: db_cli(ctran, flagged, flags, service_periods)),
     ]
@@ -52,10 +52,10 @@ def cli(read_env_data=False):
 
 ###############################################################################
 
-def process_data(ctran, flagged, flags):
+def process_data(ctran, flagged, flags, service_periods):
     date_range = (datetime(2019, 3, 1), datetime(2019, 3, 1))
     ctran_df = ctran.query_date_range(*date_range)
-    if not ctran_df:
+    if ctran_df is None:
         return False
 
     flagged_rows = {}
@@ -71,9 +71,11 @@ def process_data(ctran, flagged, flags):
                 print("WARNING: error in flagger {}. Skipping.\n{}"
                       .format(flagger.name, e))
 
-        flagged_rows[row.row_id] = set(flags)
+        #flagged_rows[row.row_id] = set(flags)
+        flags = set(flags)
+        #for flag in flags:
+            
 
-    flagged.write_table(flags, append=True)
 
 
 ###########################################################

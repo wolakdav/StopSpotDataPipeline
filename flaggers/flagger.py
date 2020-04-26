@@ -1,7 +1,7 @@
 import abc
-from enum import Enum, auto
+from enum import IntEnum, auto
 
-class Flags(Enum):
+class Flags(IntEnum):
   ###################################################
   # Documentation of flags can be found in flags.md
   ###################################################

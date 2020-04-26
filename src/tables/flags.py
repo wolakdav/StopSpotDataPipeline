@@ -9,8 +9,12 @@ class Flags(Table):
     def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
         super().__init__(user, passwd, hostname, db_name, verbose, engine)
         self._table_name = "flags"
-        self._index_col = "flag_id"
+        self._index_col = None
+        # flag_id will be explicitly set by flag's enum values rather than
+        # auto increment. This prevents strange duplicate flags with different
+        # id when changing the flag enums.
         self._expected_cols = set([
+            "flag_id",
             "description"
         ])
         self._creation_sql = "".join(["""
@@ -21,10 +25,10 @@ class Flags(Table):
             );"""])
 
 
-    def write_table(self, flags, append=True):
-        # flags is a list of flag names
-        df = pandas.DataFrame(flags, columns=['description'])
-        return self._write_table(df, append)
+    def write_table(self, flags):
+        # flags is a list of [flag_id, flag_name]
+        df = pandas.DataFrame(flags, columns=['flag_id', 'description'])
+        return self._write_table(df, conflict_columns=["flag_id"])
 
 
     def create_table(self):
@@ -34,7 +38,7 @@ class Flags(Table):
 
         flags = []
         for flag in flagger.Flags:
-            flags.append(flagger.flag_descriptions[flag])
+            flags.append([flag.value, flagger.flag_descriptions[flag]])
 
-        self.write_table(flags, append=True)
+        self.write_table(flags)
         return True
