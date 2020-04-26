@@ -21,6 +21,6 @@ class Checkpoint:
 
     # This function will rerun to enter all the data from the checkpoint date to the current date
     def rerun_from_checkpoint(self):
-        checkpoint_date = self.read_from_file()
+        checkpoint_date = self.read_from_file()  # Date to run from
         # Need to figure out what function we need to call to rerun the stuffz
         return None

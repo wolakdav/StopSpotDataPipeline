@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ae63204c-96c6-42f7-9b43-5a5f1727e0a4" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="date-query-cli-w-args" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1abLag4wRXbFTUYsCIpiIQKvqB0" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ae63204c-96c6-42f7-9b43-5a5f1727e0a4" name="Default Changelist" comment="" />
+      <created>1586999411876</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1586999411876</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="655" y="65" width="886" height="675" key="#Vim_Emulation" timestamp="1587246772120">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="655" y="65" width="886" height="675" key="#Vim_Emulation/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587246772120" />
+    <state x="2020" y="127" width="1720" height="853" key="DiffContextDialog" timestamp="1587865083953">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2020" y="127" width="1720" height="853" key="DiffContextDialog/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587865083953" />
+    <state width="1899" height="352" key="GridCell.Tab.0.bottom" timestamp="1587260883957">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.0.bottom/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883957" />
+    <state width="1899" height="352" key="GridCell.Tab.0.center" timestamp="1587260883957">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.0.center/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883957" />
+    <state width="1899" height="352" key="GridCell.Tab.0.left" timestamp="1587260883957">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.0.left/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883957" />
+    <state width="1899" height="352" key="GridCell.Tab.0.right" timestamp="1587260883957">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.0.right/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883957" />
+    <state width="1899" height="352" key="GridCell.Tab.1.bottom" timestamp="1587260883958">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.1.bottom/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883958" />
+    <state width="1899" height="352" key="GridCell.Tab.1.center" timestamp="1587260883958">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.1.center/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883958" />
+    <state width="1899" height="352" key="GridCell.Tab.1.left" timestamp="1587260883957">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.1.left/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883957" />
+    <state width="1899" height="352" key="GridCell.Tab.1.right" timestamp="1587260883958">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1899" height="352" key="GridCell.Tab.1.right/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587260883958" />
+    <state x="2502" y="203" width="982" height="737" key="SettingsEditor" timestamp="1587435757370">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="582" y="225" width="982" height="737" key="SettingsEditor/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587246737940" />
+    <state x="2502" y="203" width="992" height="737" key="SettingsEditor/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587435757370" />
+    <state x="2028" y="146" width="1720" height="853" key="ShowDiffWithBranchDialog" timestamp="1587865083953">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2028" y="146" width="1720" height="853" key="ShowDiffWithBranchDialog/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587865083953" />
+    <state x="2020" y="127" width="1720" height="853" key="VCS.FileHistoryDialog" timestamp="1587330580494">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2020" y="127" width="1720" height="853" key="VCS.FileHistoryDialog/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587330580494" />
+    <state x="754" y="456" width="402" height="175" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1587243395900">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="754" y="456" width="402" height="175" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587243395900" />
+    <state x="2589" y="135" width="581" height="782" key="find.popup" timestamp="1587437716631">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="669" y="159" width="581" height="762" key="find.popup/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1587255782174" />
+    <state x="2589" y="135" width="581" height="782" key="find.popup/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1587437716631" />
+  </component>
+</project>
