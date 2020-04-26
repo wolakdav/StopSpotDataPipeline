@@ -10,5 +10,6 @@
     "vehicle_number": { "max": "NA", "min": 0 },
     "maximum_speed": { "max": 150, "min": 0 },
     "service_date": { "max": "NA", "min": "1990-01-01" }
-  }
+  },
+  "notif_django_path": "output/notif.txt"
 }

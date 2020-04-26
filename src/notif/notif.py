@@ -2,6 +2,7 @@ import datetime
 import smtplib, ssl
 from src.ios import IOs
 from src.config import config
+import os
 
 class _Notif(IOs):
 
@@ -25,10 +26,13 @@ class _Notif(IOs):
         if subject == "":
             subject = "Notification"
 
+        '''
         if msg == "":
             msg = self.msg
         elif isinstance(msg, list):
             msg = "\n\n".join(msg)
+        '''
+        msg = self._createMessage(msg)
 
         msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
@@ -84,5 +88,67 @@ class _Notif(IOs):
 
     #######################################################
 
-    def django(self, msg=""):
+    def django(self, msg):
+        '''
+        Function responsible to outputting notification to a specific file (default: output/notif.txt, found in assets/config.json)
+
+        Args: 
+            msg (Object): Message to be written to a notif.tt file [Can be a list of messages]
+        Yields: 
+            notif.txt: file which contains notification message(s)
+
+        Returns: 
+            (Boolean): successful write: True, unsuccessful write: False
+        '''
+
         time = datetime.datetime.now()
+        msg = self._createMessage(msg)
+        filePath = self._getConfigValue("notif_django_path", "Please enter this pipeline's django notification path: ", True)
+
+        try:
+            f = open(filePath, 'w')
+            f.write(msg)
+            f.close()
+            return True
+        except IOError: return False
+
+    #######################################################
+    '''Helper Functions'''
+    #######################################################
+
+    def _createMessage(self, msg):
+        '''
+        Helper function which returns a message that will be used as a notification
+
+        Args:
+            msg (String|List): Notification message (can be empty String, normal String, or List of Strings)
+        Returns: 
+            msg (String): message that will be seen by the user as a notification
+        '''
+
+        #Case 1: One empty notification was passed: use default notification
+        if msg == "": msg = self.msg
+        #Case 2: List of notification was passed: join together to create combined string
+        elif isinstance(msg, list): msg = "\n\n".join(msg)
+
+        return msg
+
+    def _getConfigValue(self, key, promptText, hidePromptInput):
+        '''
+        Helper function that returns a particular config value. Makes sure to return a valid value, my promting user if config
+        value doesn't exist, or there is any problem with it
+
+        Args: 
+            key (String): config key (must be in assets/config.json), value if which is returned
+            promptText (String): in case value is None, prompt user to enter value
+            hidePromptInput (Boolean): specifies whether text typed by user in the prompt will be displayed
+
+        Returns: 
+            value (String): value for config key
+        '''
+
+        value = self._config.get_value(key)
+        if value is None:
+            value = self._prompt(promptText, hidePromptInput)
+
+        return value
