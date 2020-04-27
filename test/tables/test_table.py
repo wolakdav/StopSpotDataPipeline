@@ -14,13 +14,13 @@ class Table_Dummy(Table):
         super().__init__(user, passwd, hostname, db_name, verbose, engine)
         self._table_name = "fake"
         self._index_col = "fake_key"
-        self._expected_cols = set([
+        self._expected_cols = [
             "this",
             "is",
             "a",
             "fake",
             "table"
-        ])
+        ]
         self._creation_sql = "".join(["""
             CREATE TABLE IF NOT EXISTS """, self._schema, ".", self._table_name, """
             (
@@ -112,7 +112,7 @@ def test_schema(instance_fixture):
     assert instance_fixture._schema == "hive"
 
 def test_expected_cols(instance_fixture):
-    expected_cols = set(["this", "is", "a", "fake", "table"])
+    expected_cols = ["this", "is", "a", "fake", "table"]
     assert instance_fixture._expected_cols == expected_cols
 
 def test_creation_sql(instance_fixture):

@@ -14,7 +14,7 @@ class CTran_Data(Table):
         self._schema = "aperture"
         self._table_name = "ctran_data"
         self._index_col = "row_id"
-        self._expected_cols = set([
+        self._expected_cols = [
             "service_date",
             "vehicle_number",
             "leave_time",
@@ -28,10 +28,10 @@ class CTran_Data(Table):
             "dwell",
             "location_id",
             "door",
+            "lift",
             "ons",
             "offs",
             "estimated_load",
-            "lift",
             "maximum_speed",
             "train_mileage",
             "pattern_distance",
@@ -41,7 +41,7 @@ class CTran_Data(Table):
             "data_source",
             "schedule_status",
             "trip_id"
-        ])
+        ]
 
         self._creation_sql = "".join(["""
             CREATE TABLE IF NOT EXISTS """, self._schema, ".", self._table_name, """

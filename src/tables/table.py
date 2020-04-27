@@ -187,7 +187,6 @@ class Table(abc.ABC):
 
         self._print("Writing to table...")
 
-        import pdb; pdb.set_trace()
         columns = ", ".join(list(df))
         # (value1, value2, ...), (value1, value2, ...), ...
         values = ", ".join(["{}".format(tuple(row)) 
@@ -197,7 +196,7 @@ class Table(abc.ABC):
                        " (", columns, ") VALUES ", values])
         if conflict_columns:
             conflict_columns = "({})".format(
-                               "".join([s for s in conflict_columns]))
+                               ", ".join([s for s in conflict_columns]))
             sql += "".join([" ON CONFLICT ", conflict_columns, " DO NOTHING;"])
 
         try:
@@ -212,9 +211,11 @@ class Table(abc.ABC):
     #######################################################
 
     def _check_cols(self, sample_df):
-        # You may be tempted to attempt to optimize this by doing list
-        # comparisons, but that can be weirdly unpredictable.
-        if set(list(sample_df)) != self._expected_cols:
+        # Check the columns of input df to make sure it matches what we expect.
+
+        # We may or may not care about the order of the columns. If not, then
+        # wrap both sides in set().
+        if set(list(sample_df)) != set(self._expected_cols):
             return False
 
         return True

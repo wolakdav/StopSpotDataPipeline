@@ -2,7 +2,7 @@ import importlib
 from os.path import dirname, basename, isfile, join
 from glob import glob
 
-_dont_import = ['__init__.py', 'boilerplate.py']
+_dont_import = ['__init__.py', 'boilerplate.py', 'duplicate.py']
 
 # Finds all *.py files in current directory except specified.
 # Note that this also includes flagger.py

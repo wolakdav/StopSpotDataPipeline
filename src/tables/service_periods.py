@@ -8,11 +8,11 @@ class Service_Periods(Table):
         super().__init__(user, passwd, hostname, db_name, verbose, engine)
         self._table_name = "service_periods"
         self._index_col = "service_key"
-        self._expected_cols = set([
+        self._expected_cols = [
             "month",
             "year",
             "ternary"
-        ])
+        ]
         self._creation_sql = "".join(["""
             CREATE TABLE IF NOT EXISTS """, self._schema, ".", self._table_name, """
             (
@@ -24,10 +24,21 @@ class Service_Periods(Table):
             );"""])
 
     
-    def write_table(self, dates, append=False):
-        pass
+    def write_table(self, dates):
+        # Dates: list of datetime dates. Only important value in the dates are
+        # month and year.
+        data = []
+        for date in dates:
+            data.append([date.month, date.year, self._get_ternary(date.month)])
+        df = pandas.DataFrame(data, columns=self._expected_cols)
+        # service_key is BIGSERIAL so there should never be a conflict.
+        return self._write_table(df)  
+
 
     def query_month_year(self, month, year):
+        # Find a service_periods row that matches the month and year.
+        # Note that ternary isn't included because that's derived from month.
+
         if self._engine is None:
             self._print("ERROR: No sql engine.")
             return None
@@ -48,6 +59,9 @@ class Service_Periods(Table):
 
     def insert_one(self, month, year):
         # Insert a row and return the id.
+        # Honestly should be using write_table() but the RETURNING
+        # functionality isn't built into write_table() and I'm too lazy to
+        # add that functionality right now so I'll save it for a TODO.
         if self._engine is None:
             self._print("ERROR: No sql engine.")
             return None
