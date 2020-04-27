@@ -175,15 +175,15 @@ class Table(abc.ABC):
 
         if not self._table_name:
             self._print("ERROR: _write_table not called by a subclass.")
-            return None
+            return False
 
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
-            return None
+            return False
 
         if not self._check_cols(df):
             self._print("ERROR: the columns of data does not match required columns.")
-            return None
+            return False
 
         self._print("Writing to table...")
 
@@ -201,12 +201,12 @@ class Table(abc.ABC):
 
         try:
             with self._engine.connect() as con:
-                result = con.execute(sql)
+                con.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
-            return None
+            return False
         self._print("Done")
-        return None
+        return True
 
     #######################################################
 

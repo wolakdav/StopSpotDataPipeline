@@ -281,3 +281,31 @@ def test_delete_table_sqlalchemy_error(instance_fixture):
     # Since this table is fake, SQLalchemy will not be able to find it, which
     # will cause this to fail.
     assert instance_fixture.delete_table() == False
+
+
+def test_write_table(monkeypatch, instance_fixture):
+    class mock_connection():
+        def __init__(self):
+            self.sql = None
+        def __enter__(self):
+            return self
+        def __exit__(self, type, value, traceback):
+            return
+        def execute(self, sql):
+            print(sql)
+            self.sql = sql
+
+    mock = mock_connection()
+    instance_fixture._expected_cols = ["col1", "col2"]
+    conflict_columns = ["col1"]
+    df = pandas.DataFrame([[1, 2], [3, 4]], columns=instance_fixture._expected_cols)
+
+    instance_fixture._engine.connect = lambda: mock
+    instance_fixture._check_cols = lambda _: True
+
+    expected = "".join(["INSERT INTO ", instance_fixture._schema, ".",
+                        instance_fixture._table_name, " (col1, col2)"\
+                        " VALUES (1, 2), (3, 4) ON CONFLICT (col1) DO NOTHING;"])
+
+    instance_fixture._write_table(df, conflict_columns=conflict_columns)
+    assert mock.sql == expected

@@ -70,7 +70,7 @@ class Service_Periods(Table):
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (month, year, ternary) VALUES (",
                        str(month), ", ", str(year), ", ", str(ternary), ")",
-                       " RETURNING service_key"])
+                       " RETURNING service_key;"])
         try:
             with self._engine.connect() as con:
                 result = con.execute(sql)
@@ -89,6 +89,8 @@ class Service_Periods(Table):
         
 
     def _get_ternary(self, month):
+        if month < 1 or month > 12:
+            return -1  # Invalid.
         date = datetime(2000, month, 1)
         if (date >= datetime(2000, 1, 1) and 
             date <= datetime(2000, 4, 1)):
