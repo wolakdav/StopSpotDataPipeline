@@ -12,6 +12,8 @@ class _Notif(IOs):
         self._port = 465  # For SSL
         self._config = config
 
+        self.pipeline_email = ""  #tests fail without including this in the constructor
+
     def print(self, string, obj=None, force=False):
         raise AttributeError("AttributeError: " + self.__class__.__name__ + " has no attribute 'print'")
 
@@ -32,7 +34,7 @@ class _Notif(IOs):
         elif isinstance(msg, list):
             msg = "\n\n".join(msg)
         '''
-        msg = self._createMessage(msg)
+        msg = self._create_message(msg)
 
         msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
@@ -55,14 +57,18 @@ class _Notif(IOs):
             user_emails = self._prompt("Please enter the target email: ")
         self.user_emails = user_emails
 
+        '''
         pipeline_email = self._config.get_value("pipeline_email")
         if pipeline_email is None:
             pipeline_email = self._prompt("Please enter this pipeline's email: ")
         self.pipeline_email = pipeline_email
 
-        pipeline_email_passwd = self._config.get_value("pipeline_email_passwd")
+        pipeline_email_passwd = self._config.get_value("pipeline_email_passwd", )
         if pipeline_email_passwd is None:
             pipeline_email_passwd = self._prompt("Please enter this pipeline's email password: ", hide_input=True)
+        '''
+        self.pipeline_email = self._get_config_value("pipeline_email", "Please enter this pipeline's email: ", False)
+        pipeline_email_passwd = self._get_config_value("pipeline_email_passwd", "Please enter this pipeline's email password: ", True)
 
         return pipeline_email_passwd
 
@@ -102,8 +108,8 @@ class _Notif(IOs):
         '''
 
         time = datetime.datetime.now()
-        msg = self._createMessage(msg)
-        filePath = self._getConfigValue("notif_django_path", "Please enter this pipeline's django notification path: ", True)
+        msg = self._create_message(msg)
+        filePath = self._get_config_value("notif_django_path", "Please enter this pipeline's django notification path: ", False)
 
         try:
             f = open(filePath, 'w')
@@ -116,7 +122,7 @@ class _Notif(IOs):
     '''Helper Functions'''
     #######################################################
 
-    def _createMessage(self, msg):
+    def _create_message(self, msg):
         '''
         Helper function which returns a message that will be used as a notification
 
@@ -127,13 +133,13 @@ class _Notif(IOs):
         '''
 
         #Case 1: One empty notification was passed: use default notification
-        if msg == "": msg = self.msg
+        if msg == " ": msg = self.msg
         #Case 2: List of notification was passed: join together to create combined string
         elif isinstance(msg, list): msg = "\n\n".join(msg)
 
         return msg
 
-    def _getConfigValue(self, key, promptText, hidePromptInput):
+    def _get_config_value(self, key, promptText, hidePromptInput):
         '''
         Helper function that returns a particular config value. Makes sure to return a valid value, my promting user if config
         value doesn't exist, or there is any problem with it
