@@ -158,6 +158,7 @@ class Table(abc.ABC):
     # Protected Methods
 
     def _write_table(self, df, conflict_columns=None):
+        # Write the given dataframe into the database.
         # This method is meant to be called by a subclass.
         # df should be a well formed DataFrame, the subclass should form
         # the DataFrame.

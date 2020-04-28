@@ -54,16 +54,16 @@ def test_creation_sql(instance_fixture):
     assert expected == instance_fixture._creation_sql
 
 def test_get_ternary(instance_fixture):
-    assert instance_fixture._get_ternary(1) == 1
-    assert instance_fixture._get_ternary(4) == 1
-    assert instance_fixture._get_ternary(5) == 2
-    assert instance_fixture._get_ternary(8) == 2
-    assert instance_fixture._get_ternary(9) == 3
-    assert instance_fixture._get_ternary(12) == 3
+    assert instance_fixture.get_ternary(1) == 1
+    assert instance_fixture.get_ternary(4) == 1
+    assert instance_fixture.get_ternary(5) == 2
+    assert instance_fixture.get_ternary(8) == 2
+    assert instance_fixture.get_ternary(9) == 3
+    assert instance_fixture.get_ternary(12) == 3
 
-    assert instance_fixture._get_ternary(0) == -1
-    assert instance_fixture._get_ternary(-12) == -1
-    assert instance_fixture._get_ternary(100) == -1
+    assert instance_fixture.get_ternary(0) == -1
+    assert instance_fixture.get_ternary(-12) == -1
+    assert instance_fixture.get_ternary(100) == -1
 
 def test_query_or_insert(monkeypatch, instance_fixture):
     monkeypatch.setattr(instance_fixture, "query_month_year", lambda x, y: 1)
