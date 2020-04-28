@@ -28,18 +28,11 @@ class _Notif(IOs):
         if subject == "":
             subject = "Notification"
 
-        '''
-        if msg == "":
-            msg = self.msg
-        elif isinstance(msg, list):
-            msg = "\n\n".join(msg)
-        '''
         msg = self._create_message(msg)
-
         msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
         password = self._update_email_data()
-        print(self.user_emails)
+        self._print(self.user_emails)
         if isinstance(self.user_emails, list):
             for user_email in self.user_emails:
                 # Do not switch the order of this conditional expression,
@@ -49,28 +42,10 @@ class _Notif(IOs):
             result = self._email_user(self.user_emails, msg, password)
         return result
 
-    # This method will update self.user_emails and self.pipeline_email,
-    # and it will password, as well as prompting for unavailable data.
     def _update_email_data(self):
-        user_emails = self._config.get_value("user_emails")
-        if user_emails is None:
-            user_emails = self._prompt("Please enter the target email: ")
-        self.user_emails = user_emails
-
-        '''
-        pipeline_email = self._config.get_value("pipeline_email")
-        if pipeline_email is None:
-            pipeline_email = self._prompt("Please enter this pipeline's email: ")
-        self.pipeline_email = pipeline_email
-
-        pipeline_email_passwd = self._config.get_value("pipeline_email_passwd", )
-        if pipeline_email_passwd is None:
-            pipeline_email_passwd = self._prompt("Please enter this pipeline's email password: ", hide_input=True)
-        '''
-        self.pipeline_email = self._get_config_value("pipeline_email", "Please enter this pipeline's email: ", False)
-        pipeline_email_passwd = self._get_config_value("pipeline_email_passwd", "Please enter this pipeline's email password: ", True)
-
-        return pipeline_email_passwd
+        self.user_emails = self._get_config_value("user_emails", "Please enter the target email: ")
+        self.pipeline_email = self._get_config_value("pipeline_email", "Please enter this pipeline's email: ")
+        return self._get_config_value("pipeline_email_passwd", "Please enter this pipeline's email password: ", True)
 
     def _email_user(self, user_email, msg, password):
         self._print("TO:   ", user_email)
@@ -139,7 +114,7 @@ class _Notif(IOs):
 
         return msg
 
-    def _get_config_value(self, key, promptText, hidePromptInput):
+    def _get_config_value(self, key, promptText, hidePromptInput=False):
         '''
         Helper function that returns a particular config value. Makes sure to return a valid value, my promting user if config
         value doesn't exist, or there is any problem with it
