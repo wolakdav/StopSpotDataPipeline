@@ -94,9 +94,13 @@ def test_constructor_given_engine(dummy_engine):
     instance = Table_Dummy(engine=engine_url)
     assert instance._engine.url == engine.url
 
-def test_verbose(instance_fixture):
-    verbose = instance_fixture.verbose
-    assert isinstance(verbose, bool) and verbose == False
+def test_no_print(instance_fixture):
+    with pytest.raises(AttributeError):
+        assert instance_fixture.print("string")
+
+def test_no_prompt(instance_fixture):
+    with pytest.raises(AttributeError):
+        assert instance_fixture.prompt("string")
 
 def test_chunksize(instance_fixture):
     chunksize = instance_fixture._chunksize
@@ -136,42 +140,6 @@ def test_print_unverbose(capsys, instance_fixture):
     instance_fixture.verbose = False
     instance_fixture._print("Hello!")
     assert capsys.readouterr().out == ""
-
-def test_print_no_obj(capsys, instance_fixture):
-    instance_fixture.verbose = True
-    instance_fixture._print("Hello!")
-    assert capsys.readouterr().out == "Hello!\n"
-
-def test_print_no_obj_forced(capsys, instance_fixture):
-    instance_fixture.verbose = False
-    instance_fixture._print("Hello!", force=True)
-    assert capsys.readouterr().out == "Hello!\n"
-
-def test_print_obj(capsys, instance_fixture):
-    instance_fixture.verbose = True
-    obj = ["Pizza", "Pie"]
-    instance_fixture._print("Hello!", obj)
-    assert capsys.readouterr().out == "Hello!['Pizza', 'Pie']\n"
-
-def test_print_obj_forced(capsys, instance_fixture):
-    instance_fixture.verbose = False
-    obj = ["Pizza", "Pie"]
-    instance_fixture._print("Hello!", obj, True)
-    assert capsys.readouterr().out == "Hello!['Pizza', 'Pie']\n"
-
-def test_prompt_unhidden(capsys, monkeypatch, instance_fixture):
-    expected = "sw23"
-    prompt = "> "
-    monkeypatch.setattr("sys.stdin", io.StringIO(expected + "\n"))
-    result = instance_fixture._prompt(prompt)
-    assert result == expected
-
-def test_prompt_hidden(capsys, monkeypatch, instance_fixture):
-    expected = "fake\n"
-    prompt = "> "
-    monkeypatch.setattr("getpass.getpass", lambda _: expected)
-    result = instance_fixture._prompt(prompt, True)
-    assert result == expected
 
 def test_check_cols_happy(sample_df, instance_fixture):
     assert instance_fixture._check_cols(sample_df) == True

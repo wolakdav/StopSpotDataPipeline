@@ -8,8 +8,8 @@ class Severity(Enum):
     WARNING = 3
     ERROR = 4
 
-class Logger:    
-    def start(self, filename='log.txt', debug=False):
+class Logger:
+    def start(self, filename='output/log.txt', debug=False):
         self.debug = debug
         self._f = open(filename,'a+')
 
@@ -28,7 +28,7 @@ class Logger:
         elif severity == Severity.DEBUG:
             if self.debug:
                 self._f.write('[DEBUG]  {}  {} \n'.format(timestamp, message))
-                
+
         self._f.flush()
         os.fsync(self._f)
 
