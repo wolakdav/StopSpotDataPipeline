@@ -1,8 +1,9 @@
+For viewing the database, the built-in postgres viewing software is pgadmin4.
 You can get pgadmin4 from here: https://www.pgadmin.org/download/
 
 If anyone is trying to install pgAdmin4 on ubuntu (think there’s some links to other based distros), I found this guide worked well: https://computingforgeeks.com/how-to-install-pgadmin-4-on-ubuntu/
 
-Or get datagrip:
+Or view the database with datagrip:
 https://www.jetbrains.com/datagrip/
 
 To add the server, in pgadmin4, go to "add new server" on the dashboard.
