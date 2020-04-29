@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 
 from src.tables import CTran_Data
 from src.tables import Flagged_Data
@@ -7,6 +8,7 @@ from src.tables import Flags
 from src.tables import Service_Periods
 from src.config import config
 from src.interface import ArgInterface
+from flaggers.flagger import flaggers
 
 
 ##############################################################################
@@ -36,12 +38,60 @@ def cli(read_env_data=False):
 
     options = [
         _Option("(or ctrl-d) Exit.", lambda: "Exit"),
-        _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].", lambda: ctran.create_table()),
-        _Option("Create Hive, the output point of the Data Pipeline.", lambda: create_hive()),
-        _Option("Sub-menu: DB Operations", lambda: db_cli(ctran, flagged, flags, service_periods)),
+        _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].",
+                    lambda: ctran.create_table()),
+        _Option("Create Hive, the output point of the Data Pipeline.",
+                    lambda: create_hive()),
+        _Option("Process data from Portal (Which currently is Aperture)",
+                    lambda: process_data(ctran, flagged, flags, service_periods)),
+        _Option("Sub-menu: DB Operations",
+                    lambda: db_cli(ctran, flagged, flags, service_periods)),
     ]
 
     return _menu("Welcome to the CTran Data Marking Pipeline.", options)
+
+###############################################################################
+
+def process_data(ctran, flagged, flags, service_periods):
+    # TODO: don't hardcode this date_range. I'll leave it to whoever handles UI
+    # to decide how they want to get date range input.
+    date_range = (datetime(2019, 3, 1), datetime(2019, 3, 1))
+    ctran_df = ctran.query_date_range(*date_range)
+    if ctran_df is None:
+        return False
+
+    flagged_rows = []
+    # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
+    # but i'll leave optimizing for later.
+    for row_id, row in ctran_df.iterrows():
+        
+        month = row.service_date.month
+        year = row.service_date.year
+        service_key = service_periods.query_or_insert(month, year)
+
+        # If this fails, it's very likely a sqlalchemy error.
+        # e.g. not able to connect to db.
+        if not service_key:
+            print("ERROR: cannot find or create new service_key, skipping.")
+            continue
+
+        flags = set()
+        for flagger in flaggers:
+            try:
+                # Duplicate flagger requires a special call.
+                if flagger.name == "Duplicate":
+                    flags.update(flagger.flag(row_id, ctran_df))
+                else:
+                    flags.update(flagger.flag(row))
+            except Exception as e:
+                print("WARNING: error in flagger {}. Skipping.\n{}"
+                      .format(flagger.name, e))
+
+        for flag in flags:
+            flagged_rows.append([row_id, service_key, int(flag)])
+
+    flagged.write_table(flagged_rows)
+            
 
 ###########################################################
 
@@ -74,6 +124,7 @@ def db_cli(ctran, flagged, flags, service_periods):
 
 ###############################################################################
 # Private Functions
+
 
 def _create_instances(read_env_data):
     try:

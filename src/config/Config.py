@@ -17,10 +17,16 @@ class Config:
         self._data = {}
     def load(self, filename=CONFIG_FILENAME, read_env_data=False, debug=False):
         self._filename = filename
-        with open(filename) as f:
-            self._data = json.load(f)
+        try:
+            with open(filename) as f:
+                self._data = json.load(f)
+        except (FileNotFoundError, ValueError):
+            return False
+
         if read_env_data:
             self._ingest_env()
+
+        return True
 
     def _ingest_env(self):
         if "PIPELINE_USER" in os.environ:

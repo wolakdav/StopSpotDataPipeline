@@ -10,7 +10,7 @@ g_expected = None
 
 @pytest.fixture
 def instance_fixture():
-    return CTran_Data("sw23", "invalid")
+    return CTran_Data("sw23", "invalid", verbose=True)
 
 @pytest.fixture
 def dummy_engine():
@@ -67,7 +67,7 @@ def test_schema(instance_fixture):
     assert instance_fixture._schema == "aperture"
 
 def test_expected_cols(instance_fixture):
-    expected_cols = set([
+    expected_cols = [
         "service_date",
         "vehicle_number",
         "leave_time",
@@ -81,10 +81,10 @@ def test_expected_cols(instance_fixture):
         "dwell",
         "location_id",
         "door",
+        "lift",
         "ons",
         "offs",
         "estimated_load",
-        "lift",
         "maximum_speed",
         "train_mileage",
         "pattern_distance",
@@ -94,7 +94,7 @@ def test_expected_cols(instance_fixture):
         "data_source",
         "schedule_status",
         "trip_id"
-    ])
+    ]
     assert instance_fixture._expected_cols == expected_cols
 
 def test_creation_sql(instance_fixture):
