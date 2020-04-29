@@ -112,8 +112,8 @@ class CTran_Data(Table):
     # NOTE: if there is no ctran_data table, this will not work, obviously.
     # TODO confer with Sawyer over testing
     def query_date_range(self, date_from, date_to):
-        if self._engine is None:
-            self._print("ERROR: self._engine is None, cannot continue.")
+        if not isinstance(self._engine, Engine):
+            self._print("ERROR: self._engine is not an Engine, cannot continue.")
             return None
 
         df = None
