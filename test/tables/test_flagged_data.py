@@ -36,7 +36,7 @@ def test_table_name(instance_fixture):
     assert instance_fixture._table_name == "flagged_data"
 
 def test_expected_cols(instance_fixture):
-    expected_cols = set(["flag_id", "row_id"])
+    expected_cols = ["row_id", "service_key", "flag_id"]
     assert instance_fixture._expected_cols == expected_cols
 
 def test_creation_sql(instance_fixture):
@@ -44,9 +44,9 @@ def test_creation_sql(instance_fixture):
     expected = "".join(["""
             CREATE TABLE IF NOT EXISTS """, instance_fixture._schema, ".", instance_fixture._table_name, """
             (
-                flag_id INTEGER REFERENCES """, instance_fixture._schema, """.flags(flag_id),
-                service_key INTEGER REFERENCES """, instance_fixture._schema, """.service_periods(service_key),
                 row_id INTEGER,
+                service_key INTEGER REFERENCES """, instance_fixture._schema, """.service_periods(service_key),
+                flag_id INTEGER REFERENCES """, instance_fixture._schema, """.flags(flag_id) ON UPDATE CASCADE,
                 PRIMARY KEY (flag_id, service_key, row_id)
             );"""])
     assert expected == instance_fixture._creation_sql

@@ -87,3 +87,27 @@ columns.
 
 This method will check that the columns of `sample_df` match the columns of
 self, and return a boolean reflecting this check.
+<<<<<<< HEAD
+
+#### `str self._prompt(prompt="", hide_input=False)`
+
+This method will prompt STDOUT with `prompt` and read from STDIN the returned
+string. `hide_input` hides the input from appearing in the terminal as it is
+typed; this is necessary for sensitive data, such as passwords.
+
+#### `void self._print(string, obj=None, force=False)`
+
+This method will is used to support verbose dialog. If `obj` is supplied, it is
+printed after `string`. If `force` is `True`, then the message will print
+regardless of the value in `self.verbose`.
+
+#### `bool self._write_table(df : DataFrame, conflict_columns=None : list of string)`
+
+Write the given dataframe into the database. The DataFrame is expected to
+be well formed by the subclass, and as such should only be called by a
+subclass.
+conflict_columns is a list of string which specifies which columns should
+trigger the ON CONFLICT condition. ON CONFLICT is triggered when values
+in the specified columns already exist on the table, and will do nothing
+(to avoid an error, as postgres will throw a fit when a duplicate row is
+written onto the table).
