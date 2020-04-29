@@ -1,5 +1,6 @@
 import sys
 from datetime import datetime
+from datetime import date
 
 class Checkpoint:
     def __init__(self):
@@ -15,13 +16,20 @@ class Checkpoint:
 
     # This function will read from the checkpoint file, it will get the last date that was checkpointed
     def read_from_file(self):
-        with open(self._file, "r") as fstream:
-            for line in fstream:
-                dates = line.split(",")
+        dates = None
+        try:
+            with open(self._file, "r") as fstream:
+                for line in fstream:
+                    dates = line.split(",")
 
-        # date_tuple is a tuple of datetime objects, this is to match the implementation within process_data() in main.py
-        date_tuple = (datetime.strptime(dates[0], '%Y-%m-%d'), datetime.strptime(dates[1], '%Y-%m-%d'))
-        return date_tuple
+            # date_tuple is a tuple of datetime objects, this is to match the implementation within process_data() in main.py
+            date_tuple = (datetime.strptime(dates[0], '%Y-%m-%d').date(), datetime.strptime(dates[1], '%Y-%m-%d').date())
+            return date_tuple
+        except EnvironmentError:  # found on stack overflow that EnvironmentError is the parent of IOError, OSError, and WindowsError
+            print("checkpoint.txt not found. Creating checkpoint.txt with today's date as a range")
+            today = date.today()
+            self.write_to_file(today.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d"))
+            return self.read_from_file()
 
     # This function will rerun to enter all the data from the checkpoint date to the current date
     def rerun_from_checkpoint(self):
