@@ -3,9 +3,9 @@ import os
 from src.checkpointing import Checkpoint
 
 @pytest.fixture
-def checkpoint():
+def checkpoint(tmp_path):
     checkpoint = Checkpoint()
-    checkpoint._file = "checkpoint.txt"  # Kinda gross but should make it easy to determine the output
+    checkpoint._file = tmp_path / "checkpoint.txt"  # Kinda gross but should make it easy to determine the output
     return checkpoint
 
 # This test displays that if the checkpoint.txt file is not found while reading, todays date will be the range for
