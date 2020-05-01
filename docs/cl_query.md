@@ -5,9 +5,9 @@ TODO Complete when flag command gets refactored.
 <p>main.py --select --flag=10 --limit=50</p>
 <p>main.py --select --row=57 --year=2019 --service_period=1</p>
 
-###Querying the Database
+### Querying the Database
 
-####From ctran_data.py
+#### From ctran_data.py
 
 ##### `DataFrame query_date_range`
 
@@ -22,7 +22,7 @@ current calendar date will **not** be collected, while data belonging to
 the current service date that took place in the following calendar date
 will be collected.
 
-####From flagged_data.py
+#### From flagged_data.py
 
 ##### `DataFrame query_flags_by_row_id`
 

@@ -234,17 +234,17 @@ class Table(IOs, abc.ABC):
 
     #######################################################
 
-    '''
+    """
     Queries the C-Tran data table using the given SQL query.
 
     :argument   a SQL query string
     :returns    a DataFrame containing query results, or
                 None if an exception occurred.
-    '''
+    """
     def _query_table(self, sql):
-        if self._engine is None:
-            self._print("ERROR: self._engine is None, cannot continue.")
-            return None
+        if not isinstance(self._engine, Engine):
+            self._print("ERROR: invalid engine.")
+            return False
 
         df = None
         self._print(sql)

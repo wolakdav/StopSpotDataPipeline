@@ -30,7 +30,7 @@ class Flagged_Data(Table):
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
 
-# SELECT fd.flag_id
+# SELECT *
 # FROM
 #      aperture.flagged_data AS fd,
 #      aperture.service_periods AS sp
@@ -42,8 +42,8 @@ class Flagged_Data(Table):
 #       sp.ternary = '1'
 # AND
 #       fd.service_key = sp.service_key;
-    def query_flags_by_row_id(self, sp_table, row_id, service_year, service_period):
-        sql = "".join(["SELECT flag_id FROM ",
+    def query_by_row_id(self, sp_table, row_id, service_year, service_period):
+        sql = "".join(["SELECT * FROM ",
                        self._schema,
                        ".",
                        self._table_name,
@@ -62,8 +62,8 @@ class Flagged_Data(Table):
 
         return self._query_table(sql)
 
-    def query_flags_by_flag_id(self, flag_id, limit):
-        sql = "".join(["SELECT flag_id, row_id FROM ",
+    def query_by_flag_id(self, flag_id, limit):
+        sql = "".join(["SELECT * FROM ",
                        self._schema,
                        ".",
                        self._table_name,

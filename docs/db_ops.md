@@ -83,11 +83,15 @@ columns.
 
 ### Protected Methods
 
-### `bool self._check_cols(sample_df)`
+#### `bool self._check_cols(sample_df)`
 
 This method will check that the columns of `sample_df` match the columns of
 self, and return a boolean reflecting this check.
-<<<<<<< HEAD
+
+#### `DataFrame self._query_table(sql)`
+
+This method will query the associated table using the SQL String argument. It
+will return the query results in a `Pandas.DataFrame`.
 
 #### `str self._prompt(prompt="", hide_input=False)`
 
