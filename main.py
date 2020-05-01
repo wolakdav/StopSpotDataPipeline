@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 
+from src.ios import IOs
 from src.tables import CTran_Data
 from src.tables import Flagged_Data
 from src.tables import Flags
@@ -53,18 +54,16 @@ def cli(read_env_data=False):
 ###############################################################################
 
 def process_data(ctran, flagged, flags, service_periods):
-    # TODO: don't hardcode this date_range. I'll leave it to whoever handles UI
-    # to decide how they want to get date range input.
-    date_range = (datetime(2019, 3, 1), datetime(2019, 3, 1))
+    date_range = _get_date_range()
     ctran_df = ctran.query_date_range(*date_range)
     if ctran_df is None:
+        print("ERROR: the supplied dates were unable to be gathered from CTran data.")
         return False
 
     flagged_rows = []
     # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
     # but i'll leave optimizing for later.
     for row_id, row in ctran_df.iterrows():
-        
         month = row.service_date.month
         year = row.service_date.year
         service_key = service_periods.query_or_insert(month, year)
@@ -199,6 +198,31 @@ def _get_int(min_value, max_value, cli_symbol="> "):
             print("Please enter an integer.")
 
     return option
+
+###########################################################
+
+# If the user inputs the start and end dates backwards, this will flip them on
+# return.
+def _get_date_range():
+    def _get_valid_date(criteria):
+        stdin = IOs()
+        while True:
+            date = stdin.prompt("Please enter the " + criteria + " date (YYYY-MM-DD): ")
+            try:
+                date = datetime.strptime(date, "%Y-%m-%d")
+            except ValueError:
+                print("\tThe input date is malformed; please use the YYYY-MM-DD format.")
+            else:
+                return date
+
+
+    start_date = _get_valid_date("start")
+    end_date   = _get_valid_date("end  ")
+
+    if start_date < end_date:
+        return (start_date, end_date)
+    else:
+        return (end_date, start_date)
 
 
 ###############################################################################
