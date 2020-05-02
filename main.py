@@ -7,6 +7,7 @@ from src.tables import CTran_Data
 from src.tables import Flagged_Data
 from src.tables import Flags
 from src.tables import Service_Periods
+from src.tables import Processed_Days
 from src.config import config
 from src.interface import ArgInterface
 from flaggers.flagger import flaggers
@@ -29,8 +30,9 @@ def cli(read_env_data=False):
         flags.create_table()
         service_periods.create_table()
         flagged.create_table()
+        processed_days.create_table()
 
-    ctran, flagged, flags, service_periods = _create_instances(read_env_data)
+    ctran, flagged, flags, service_periods, processed_days = _create_instances(read_env_data)
 
     if len(sys.argv) > 1:
         ai = ArgInterface()
@@ -44,9 +46,9 @@ def cli(read_env_data=False):
         _Option("Create Hive, the output point of the Data Pipeline.",
                     lambda: create_hive()),
         _Option("Process data from Portal (Which currently is Aperture)",
-                    lambda: process_data(ctran, flagged, flags, service_periods)),
+                    lambda: process_data(ctran, flagged, flags, service_periods, processed_days)),
         _Option("Sub-menu: DB Operations",
-                    lambda: db_cli(ctran, flagged, flags, service_periods)),
+                    lambda: db_cli(ctran, flagged, flags, service_periods, processed_days)),
     ]
 
     return _menu("Welcome to the CTran Data Marking Pipeline.", options)
@@ -94,7 +96,7 @@ def process_data(ctran, flagged, flags, service_periods):
 
 ###########################################################
 
-def db_cli(ctran, flagged, flags, service_periods):
+def db_cli(ctran, flagged, flags, service_periods, processed_days):
     def ctran_info():
         query = ctran.get_full_table()
         if query is None:
@@ -114,8 +116,10 @@ def db_cli(ctran, flagged, flags, service_periods):
         _Option("Create flagged_data table.", flagged.create_table),
         _Option("Create flags table.", flags.create_table),
         _Option("Create service_periods table.", service_periods.create_table),
+        _Option("Create processed_days table.", processed_days.create_table),
         _Option("Delete flagged_data table.", flagged.delete_table),
         _Option("Delete service_periods table.", flags.delete_table),
+        _Option("Delete processed_days table.", processed_days.delete_table),
         _Option("Query ctran_data and print ctran_data.info().", ctran_info)
     ]
 
@@ -150,7 +154,8 @@ def _create_instances(read_env_data):
     flagged = Flagged_Data(verbose=True, engine=engine_url)
     flags = Flags(verbose=True, engine=engine_url)
     service_periods = Service_Periods(verbose=True, engine=engine_url)
-    return ctran, flagged, flags, service_periods
+    processed_days = Processed_Days(verbose=True, engine=engine_url)
+    return ctran, flagged, flags, service_periods, processed_days
 
 ###########################################################
 
