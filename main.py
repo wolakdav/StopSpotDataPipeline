@@ -1,3 +1,10 @@
+# NOTE: This file will have the below available to work if the file is ran with
+# $ python3 -i main.py
+# ctran
+# flagged
+# flags
+# service_periods
+# processed_days
 import os
 import sys
 from datetime import datetime
@@ -51,7 +58,8 @@ def cli(read_env_data=False):
                     lambda: db_cli(ctran, flagged, flags, service_periods, processed_days)),
     ]
 
-    return _menu("Welcome to the CTran Data Marking Pipeline.", options)
+    _menu("Welcome to the CTran Data Marking Pipeline.", options)
+    return ctran, flagged, flags, service_periods, processed_days
 
 ###############################################################################
 
@@ -127,7 +135,6 @@ def db_cli(ctran, flagged, flags, service_periods, processed_days):
 
 ###############################################################################
 # Private Functions
-
 
 def _create_instances(read_env_data):
     try:
@@ -234,4 +241,4 @@ def _get_date_range():
 # Main
 
 if __name__ == "__main__":
-    cli()
+    ctran, flagged, flags, service_periods, processed_days = cli()
