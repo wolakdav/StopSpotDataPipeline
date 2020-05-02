@@ -8,13 +8,14 @@ for the different tables, as well as creating and deleting the tables as well.
 Some subclasses of Table, such as `CTran_Data`, will fill the table with actual
 data.  
 `Table` inherits from IOs and removes access to `IOs.print()` and
-`IOs.prompt()`.
+`IOs.prompt()`.  
 These are the subclasses of Table:  
 
 - `CTran_Data`  
 - `Flagged_Data`  
 - `Flags`  
 - `Service_Periods`
+- `Processed_Days`
 
 **WARNING**: Flags, Flagged_Data, and Service_Periods are assumed to be in the
 same schema. Additionally, check _creation_sql of these classes when renaming
