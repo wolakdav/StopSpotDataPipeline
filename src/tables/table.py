@@ -20,6 +20,7 @@ class Table(IOs, abc.ABC):
     # passwd is not stored as member data, it is destroyed after use.
     def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
         self._table_name = None
+        self._index_col = None
         super().__init__(verbose)
         self._chunksize = 1000
         self._schema = "hive"
@@ -249,7 +250,7 @@ class Table(IOs, abc.ABC):
         df = None
         self._print(sql)
         try:
-            df = pandas.read_sql(sql, self._engine)
+            df = pandas.read_sql(sql, self._engine, index_col=self._index_col)
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
