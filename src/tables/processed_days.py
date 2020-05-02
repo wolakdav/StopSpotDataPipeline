@@ -33,8 +33,8 @@ class Processed_Days(Table):
 
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (", self._index_col, ") VALUES ('",
-                        str(date.year), "/", str(date.month), "/", str(date.day),
-                        "');"])
+                       str(date.year), "/", str(date.month), "/", str(date.day),
+                       "');"])
         self._print(sql)
         try:
             self._print("Connecting to DB.")
@@ -64,7 +64,7 @@ class Processed_Days(Table):
 
         sql = "".join(["DELETE FROM ", self._schema, ".", self._table_name,
                        " WHERE day='", str(date.year), "/", str(date.month), "/", str(date.day),
-                        "';"])
+                       "';"])
         self._print(sql)
         try:
             self._print("Connecting to DB.")
