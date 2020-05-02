@@ -1,3 +1,5 @@
+import pandas
+
 from .table import Table
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
