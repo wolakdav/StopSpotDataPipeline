@@ -69,4 +69,4 @@ This is the general purpose log file.
 ##### `output/notif.txt`
 
 This is the default output location for critical error messages capable of
-being picked-up by a Django application.
+being picked up by a Django application.
