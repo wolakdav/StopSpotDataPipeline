@@ -36,7 +36,7 @@ Again, this does require the First Time Execution to have already occurred.
 
 ## Adjusting and Utilizing Endpoints
 
-#### `assets/config.json`
+### `assets/config.json`
 
 This configuration file controls various data about the Pipeline. Some notable
 settings controlled here are as follows.
@@ -52,7 +52,7 @@ critical email notifications. For obvious reasons, this is not supplied by defau
 
 For more, see `docs/config_readme.md`.
 
-#### `bin/env_data.sh`
+### `bin/env_data.sh`
 
 This file is an alternate way to set the relevant output database data by
 configuring environment variables. These environment variables will take
