@@ -19,7 +19,7 @@ class Processed_Days(Table):
 
     # This method will take string `day` in format YYYY/MM/DD and insert it to
     # table processed_days.
-    def add_day(self, day):
+    def insert(self, day):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
             return False
@@ -50,7 +50,7 @@ class Processed_Days(Table):
     # from table processed_days.
     # NOTE: This will only return False on a botched SQL, not as to the delete
     # operation.
-    def delete_day(self, day):
+    def delete(self, day):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
             return False
