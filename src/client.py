@@ -30,6 +30,7 @@ class _Option():
 """ Members:
 self.config
 self. tables
+self._transaction_in_progress
 """
 class _Client(IOs):
     def __init__(self, read_env_data=True, verbose=True):
@@ -42,6 +43,7 @@ class _Client(IOs):
 
         self.config = config
         self.config.load(read_env_data=read_env_data)
+        self._transaction_in_progress = False
 
         user = config.get_value('pipeline_user')
         passwd = config.get_value('pipeline_passwd')
@@ -88,6 +90,7 @@ class _Client(IOs):
 
     ###########################################################
 
+    # TODO: make this more descriptive
     # YYYY/MM/DD
     # Missing date(s) -> prompt for dates
     def process_data(self, start_date="", end_date=""):
@@ -138,6 +141,16 @@ class _Client(IOs):
 
         self.flagged.write_table(flagged_rows)
         self.processed_days.insert(start_date, end_date)
+
+    ###########################################################
+
+    def process_since_checkpoint(self):
+        pass # TODO: this
+
+    ###########################################################
+    
+    def process_next_day(self):
+        pass # TODO: this
 
     ###########################################################
 
@@ -240,6 +253,16 @@ class _Client(IOs):
             return (start_date, end_date)
         else:
             return (end_date, start_date)
+
+    ###########################################################
+
+    def _begin_transaction(self):
+        pass # TODO: this
+
+    ###########################################################
+
+    def _commit_transaction(self):
+        pass # TODO: this
 
 ###############################################################################
 
