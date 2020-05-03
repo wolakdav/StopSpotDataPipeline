@@ -90,7 +90,7 @@ class Processed_Days(Table):
 
     #######################################################
 
-    # Return the latest day stored, None if no days are stored.
+    # Return the latest day (as datetime) stored, None if no days are stored.
     def get_latest_day(self):
         value = None
         sql = "".join(["SELECT MAX(", self._index_col, ")",
