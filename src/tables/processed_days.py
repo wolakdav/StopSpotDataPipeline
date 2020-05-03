@@ -27,11 +27,20 @@ class Processed_Days(Table):
             self._print("ERROR: invalid engine.")
             return False
 
-        values_sql = self._create_insert_values(day, end_date)
+        values_sql = []
+        dates = self._get_date_range(day, end_date)
+        if dates is None:
+            self._print("ERROR: could not determine the date(s).")
+            return False
+
+        for date in dates:
+            values_sql.append(
+                "".join(["('", str(date.year), "/", str(date.month), "/", str(date.day), "')"])
+            )
+        values_sql = ", ".join(values_sql)
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (", self._index_col, ") VALUES ",
-                       values_sql,
-                       ";"])
+                       values_sql, ";"])
         self._print(sql)
         try:
             self._print("Connecting to DB.")
@@ -50,21 +59,24 @@ class Processed_Days(Table):
     # Deleting the various dates will be a single transaction.
     # NOTE: This will only return False on a botched SQL, not as to the delete
     # operation.
-    def delete(self, day):
+    def delete(self, day, end_date=None):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
             return False
 
-        date = None
-        try:
-            date = datetime.datetime.strptime(day, "%Y-%m-%d")
-        except ValueError:
-            self._print("Error: The input date is malformed; please use the YYYY-MM-DD format.")
+        values_sql = []
+        dates = self._get_date_range(day, end_date)
+        if dates is None:
+            self._print("ERROR: could not determine the date(s).")
             return False
 
+        for date in dates:
+            values_sql.append(
+                "".join(["'", str(date.year), "/", str(date.month), "/", str(date.day), "'"])
+            )
+        values_sql = ", ".join(values_sql)
         sql = "".join(["DELETE FROM ", self._schema, ".", self._table_name,
-                       " WHERE day='", str(date.year), "/", str(date.month), "/", str(date.day),
-                       "';"])
+                       " WHERE ", self._index_col, " IN (", values_sql, ");"])
         self._print(sql)
         try:
             self._print("Connecting to DB.")
@@ -78,7 +90,8 @@ class Processed_Days(Table):
 
     #######################################################
 
-    def _create_insert_values(self, day, end_date):
+    # Get a list of date value(s) b/w day and end_date .
+    def _get_date_range(self, day, end_date=None):
         dates = []
         try:
             dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
@@ -93,11 +106,6 @@ class Processed_Days(Table):
                 dates.append(end_date)
         except ValueError:
             self._print("Error: The input date is malformed; please use the YYYY-MM-DD format.")
-            return False
+            return None
 
-        values_sql = []
-        for date in dates:
-            values_sql.append(
-                "".join(["('", str(date.year), "/", str(date.month), "/", str(date.day), "')"])
-            )
-        return ", ".join(values_sql)
+        return dates
