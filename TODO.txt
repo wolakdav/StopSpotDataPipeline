@@ -5,6 +5,6 @@ goal: Update Checkpointer/main.py with the changes made by processed_days.py in 
 
 2) To preserve the ability to re/run based off checkpoints, update main.py to be a class Client.
         Notably, it should have process_since_checkpoint() and process_next_day().
-a) Helpful code:
-    df = processed_days.get_full_table()
-    df.index.max() # get the most future processed day.
+    a) Helpful code:
+        df = processed_days.get_full_table()
+        df.index.max() # get the most future processed day.
