@@ -27,7 +27,7 @@ class Processed_Days(Table):
             self._print("ERROR: invalid engine.")
             return False
 
-        values_sql = self._create_values_sql(day, end_date)
+        values_sql = self._create_insert_values(day, end_date)
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (", self._index_col, ") VALUES ",
                        values_sql,
@@ -78,7 +78,7 @@ class Processed_Days(Table):
 
     #######################################################
 
-    def _create_values_sql(self, day, end_date):
+    def _create_insert_values(self, day, end_date):
         dates = []
         try:
             dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
