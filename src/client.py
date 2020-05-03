@@ -137,7 +137,7 @@ class _Client(IOs):
                 flagged_rows.append([row_id, service_key, int(flag)])
 
         self.flagged.write_table(flagged_rows)
-                
+        self.processed_days.insert(start_date, end_date)
 
     ###########################################################
 
