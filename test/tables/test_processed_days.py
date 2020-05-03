@@ -73,7 +73,7 @@ def test_insert_happy(custom_connect, instance_fixture):
     g_expected = "".join(["INSERT INTO ", instance_fixture._schema, ".", instance_fixture._table_name,
                     " (", instance_fixture._index_col, ") VALUES ('",
                     str(date.year), "/", str(date.month), "/", str(date.day),
-                    "');"])
+                    "') ON CONFLICT DO NOTHING;"])
     instance_fixture._engine.connect = custom_connect
     assert instance_fixture.insert(day) == True
     assert g_is_valid == True
