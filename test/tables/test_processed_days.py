@@ -96,8 +96,7 @@ def test_delete_happy(custom_connect, instance_fixture):
     day = "2020-02-02"
     date = datetime.datetime.strptime(day, "%Y-%m-%d")
     g_expected = "".join(["DELETE FROM ", instance_fixture._schema, ".", instance_fixture._table_name,
-                    " WHERE day='", str(date.year), "/", str(date.month), "/", str(date.day),
-                    "';"])
+                       " WHERE ", instance_fixture._index_col, " IN ('", str(date.year), "/", str(date.month), "/", str(date.day), "');"])
     instance_fixture._engine.connect = custom_connect
     assert instance_fixture.delete(day) == True
     assert g_is_valid == True
