@@ -90,6 +90,29 @@ class Processed_Days(Table):
 
     #######################################################
 
+    # Return the latest day stored, None if no days are stored.
+    def get_latest_day(self):
+        value = None
+        sql = "".join(["SELECT MAX(", self._index_col, ")",
+                       "FROM ", self._schema, ".", self._table_name,
+                       ";"])
+        self._print(sql)
+        try:
+            self._print("Connecting to DB.")
+            conn = self._engine.connect()
+            value = conn.execute(sql)
+        except SQLAlchemyError as error:
+            print("SQLAlchemyError: ", error)
+            return None
+        
+        if value is not None:
+            self._print("Done")
+            return value.first()[0]
+        else:
+            return None
+
+    #######################################################
+
     # Get a list of date value(s) b/w day and end_date .
     def _get_date_range(self, day, end_date=None):
         dates = []
