@@ -245,7 +245,7 @@ class Table(IOs, abc.ABC):
     def _query_table(self, sql):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
-            return False
+            return None
 
         df = None
         self._print(sql)

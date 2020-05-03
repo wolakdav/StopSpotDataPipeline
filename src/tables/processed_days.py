@@ -114,12 +114,17 @@ class Processed_Days(Table):
     #######################################################
 
     # Get a list of date value(s) b/w day and end_date .
+    # day and end_date can be strings in YYYY/MM/DD or datetime instances.
     def _get_date_range(self, day, end_date=None):
         dates = []
         try:
-            dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
+            if not isinstance(day, datetime.date):
+                dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
+            else:
+                dates.append(day)
             if end_date is not None:
-                end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+                if not isinstance(end_date, datetime.date):
+                    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
                 delta = datetime.timedelta(days=1)
                 curr_date = dates[0]
                 curr_date += delta
@@ -128,7 +133,7 @@ class Processed_Days(Table):
                     curr_date += delta
                 dates.append(end_date)
         except ValueError:
-            self._print("Error: The input date is malformed; please use the YYYY-MM-DD format.")
+            self._print("ERROR: The input date is malformed; please use the YYYY-MM-DD format.")
             return None
 
         return dates

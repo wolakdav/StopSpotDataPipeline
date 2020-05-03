@@ -26,6 +26,9 @@ class Flagged_Data(Table):
 
     def write_table(self, data):
         # data is list of [row_id, flag_id, service_key].
+        if data == []:
+            self._print("ERROR: write_table recieved no data to write, cancelling.")
+            return False
         df = pandas.DataFrame(data, columns=self._expected_cols)
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
