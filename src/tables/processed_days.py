@@ -17,6 +17,8 @@ class Processed_Days(Table):
                 day DATE PRIMARY KEY
             );"""])
 
+    #######################################################
+
     # This method will take string(s) day and end_date (optional) in YYYY/MM/DD
     # as well as inserting all the dates between the two if end_date is used.
     # Inserting the various dates will be a single transaction.
@@ -25,28 +27,7 @@ class Processed_Days(Table):
             self._print("ERROR: invalid engine.")
             return False
 
-        dates = []
-        try:
-            dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
-            if end_date is not None:
-                end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-                delta = datetime.timedelta(days=1)
-                curr_date = dates[0]
-                curr_date += delta
-                while curr_date < end_date:
-                    dates.append(curr_date)
-                    curr_date += delta
-                dates.append(end_date)
-        except ValueError:
-            self._print("Error: The input date is malformed; please use the YYYY-MM-DD format.")
-            return False
-
-        values_sql = []
-        for date in dates:
-            values_sql.append(
-                "".join(["('", str(date.year), "/", str(date.month), "/", str(date.day), "')"])
-            )
-        values_sql = ", ".join(values_sql)
+        values_sql = self._create_values_sql(day, end_date)
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (", self._index_col, ") VALUES ",
                        values_sql,
@@ -62,11 +43,13 @@ class Processed_Days(Table):
         self._print("Done")
         return True
 
-    # This method will take string `day` in format YYYY/MM/DD and remove it
-    # from table processed_days.
+    #######################################################
+
+    # This method will take string(s) day and end_date (optional) in YYYY/MM/DD
+    # as well as deleting all the dates between the two if end_date is used.
+    # Deleting the various dates will be a single transaction.
     # NOTE: This will only return False on a botched SQL, not as to the delete
     # operation.
-    # TODO: update delete just like insert
     def delete(self, day):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
@@ -92,3 +75,29 @@ class Processed_Days(Table):
             return False
         self._print("Done")
         return True
+
+    #######################################################
+
+    def _create_values_sql(self, day, end_date):
+        dates = []
+        try:
+            dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
+            if end_date is not None:
+                end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+                delta = datetime.timedelta(days=1)
+                curr_date = dates[0]
+                curr_date += delta
+                while curr_date < end_date:
+                    dates.append(curr_date)
+                    curr_date += delta
+                dates.append(end_date)
+        except ValueError:
+            self._print("Error: The input date is malformed; please use the YYYY-MM-DD format.")
+            return False
+
+        values_sql = []
+        for date in dates:
+            values_sql.append(
+                "".join(["('", str(date.year), "/", str(date.month), "/", str(date.day), "')"])
+            )
+        return ", ".join(values_sql)
