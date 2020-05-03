@@ -1,6 +1,6 @@
 # TODO: for testing begin/commit, try having a wait b/w this and commit, and
 # then cancel before can commit to see if it did not commit.
-# TODO: adjust all remaining print lines to use self.print() .
+# TODO: test this class.
 import os
 import sys
 from datetime import datetime
@@ -98,7 +98,7 @@ class _Client(IOs):
             ctran_df = self.ctran.query_date_range(start_date, end_date)
 
         if ctran_df is None:
-            print("ERROR: the supplied dates were unable to be gathered from CTran data.")
+            self.print("ERROR: the supplied dates were unable to be gathered from CTran data.")
             return False
 
         flagged_rows = []
@@ -117,7 +117,7 @@ class _Client(IOs):
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
             if not service_key:
-                print("ERROR: cannot find or create new service_key, skipping.")
+                self.print("ERROR: cannot find or create new service_key, skipping.")
                 continue
 
             flags = set()
@@ -129,7 +129,7 @@ class _Client(IOs):
                     else:
                         flags.update(flagger.flag(row))
                 except Exception as e:
-                    print("WARNING: error in flagger {}. Skipping.\n{}"
+                    self.print("WARNING: error in flagger {}. Skipping.\n{}"
                         .format(flagger.name, e))
 
             for flag in flags:
@@ -166,7 +166,7 @@ class _Client(IOs):
         def ctran_info():
             query = ctran.get_full_table()
             if query is None:
-                print("WARNING: no data returned.")
+                self.print("WARNING: no data returned.")
             else:
                 query.info()
 
