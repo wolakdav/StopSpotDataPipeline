@@ -1,14 +1,10 @@
-# NOTE: This file will have the below available to work if the file is ran with
-# $ python3 -i main.py
-# ctran
-# flagged
-# flags
-# service_periods
-# processed_days
-# TODO: support this ^^ comment in main; yes, all public members of _Client
+# TODO: for testing begin/commit, try having a wait b/w this and commit, and
+# then cancel before can commit to see if it did not commit.
+# TODO: adjust all remaining print lines to use self.print() .
 import os
 import sys
 from datetime import datetime
+from datetime import timedelta
 
 from src.ios import IOs
 from src.tables import CTran_Data
@@ -90,9 +86,9 @@ class _Client(IOs):
 
     ###########################################################
 
-    # TODO: make this more descriptive
-    # YYYY/MM/DD
-    # Missing date(s) -> prompt for dates
+    # Process data between start_date and end_date, inclusive. These parameters
+    # can be date instances or strings in format "YYYY/MM/DD". If no dates are
+    # supplied, this will prompt the user for them.
     def process_data(self, start_date="", end_date=""):
         ctran_df = None
         if start_date == "" or end_date == "":
@@ -139,18 +135,30 @@ class _Client(IOs):
             for flag in flags:
                 flagged_rows.append([row_id, service_key, int(flag)])
 
+        self._begin_transaction()
         self.flagged.write_table(flagged_rows)
         self.processed_days.insert(start_date, end_date)
+        self._commit_transaction()
 
     ###########################################################
 
+    # This method will process all days since the latest processed day.
     def process_since_checkpoint(self):
-        pass # TODO: this
+        start_date = self.processed_days.get_latest_day()
+        self._print("Last processed day: " + str(start_date))
+        end_date = datetime.now().date()
+        self._print("Processing until: ", end_date)
+        return self.process_data(start_date, end_date)
 
     ###########################################################
     
+    # This method will process the next day after the latest processed day.
     def process_next_day(self):
-        pass # TODO: this
+        start_date = self.processed_days.get_latest_day()
+        self._print("Last processed day: " + str(start_date))
+        end_date = start_date + timedelta(days=1)
+        self._print("Processing until: ", end_date)
+        return self.process_data(start_date, end_date)
 
     ###########################################################
 

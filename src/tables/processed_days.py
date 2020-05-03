@@ -40,7 +40,7 @@ class Processed_Days(Table):
         values_sql = ", ".join(values_sql)
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (", self._index_col, ") VALUES ",
-                       values_sql, ";"])
+                       values_sql, " ON CONFLICT DO NOTHING;"])
         self._print(sql)
         try:
             self._print("Connecting to DB.")
