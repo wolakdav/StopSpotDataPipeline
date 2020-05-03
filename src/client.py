@@ -5,6 +5,8 @@ import os
 import sys
 from datetime import datetime
 from datetime import timedelta
+from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 
 from src.ios import IOs
 from src.tables import CTran_Data
@@ -26,6 +28,7 @@ class _Option():
 """ Members:
 self.config
 self. tables
+self._hive_engine
 self._transaction_in_progress
 """
 class _Client(IOs):
@@ -56,6 +59,7 @@ class _Client(IOs):
         self.flags = Flags(verbose=True, engine=engine_url)
         self.service_periods = Service_Periods(verbose=True, engine=engine_url)
         self.processed_days = Processed_Days(verbose=True, engine=engine_url)
+        self._hive_engine = create_engine(engine_url)
 
     #######################################################
 
@@ -137,27 +141,34 @@ class _Client(IOs):
 
         self._begin_transaction()
         self.flagged.write_table(flagged_rows)
+        self.prompt("@sawyer: now kill the job and see if flagged is updated by processed_days isn't")
         self.processed_days.insert(start_date, end_date)
         self._commit_transaction()
 
     ###########################################################
 
+    # TODO: increment start_date by one b/f making end_date
     # This method will process all days since the latest processed day.
     def process_since_checkpoint(self):
         start_date = self.processed_days.get_latest_day()
         self._print("Last processed day: " + str(start_date))
+        start_date = start_date + timedelta(days=1)
+        self._print("Processing from: " + str(start_date))
         end_date = datetime.now().date()
-        self._print("Processing until: ", end_date)
+        self._print("\tUntil: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
     
+    # TODO: increment start_date by one b/f making end_date
     # This method will process the next day after the latest processed day.
     def process_next_day(self):
         start_date = self.processed_days.get_latest_day()
         self._print("Last processed day: " + str(start_date))
+        start_date = start_date + timedelta(days=1)
+        self._print("Processing from: " + str(start_date))
         end_date = start_date + timedelta(days=1)
-        self._print("Processing until: ", end_date)
+        self._print("\tUntil: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
@@ -264,13 +275,45 @@ class _Client(IOs):
 
     ###########################################################
 
+    # Begin a transaction if there is already not one occurring. This method
+    # will return true iff there is not a transaction in progress and the BEGIN
+    # has no issues caused during execution.
     def _begin_transaction(self):
-        pass # TODO: this
+        if self._transaction_in_progress:
+            return False
+
+        if self._execute_sql("BEGIN;"):
+            self._transaction_in_progress = True
+            return True
+        else:
+            return False
 
     ###########################################################
 
+    # Commit a transaction if there is already one occurring. This method
+    # will return true iff there is a transaction in progress and the COMMIT
+    # has no issues caused during execution.
     def _commit_transaction(self):
-        pass # TODO: this
+        if not self._transaction_in_progress:
+            return False
+
+        if self._execute_sql("COMMIT;"):
+            return True
+        else:
+            return False
+
+    #######################################################
+
+    # Return true iff no SQLAlchemy error occurs.
+    def _execute_sql(self, sql):
+        try:
+            conn = self._hive_engine.connect()
+            self._print(sql)
+            conn.execute(sql)
+        except SQLAlchemyError as error:
+            self.print("SQLAclchemy:", error)
+            return False
+        return True
 
 ###############################################################################
 
