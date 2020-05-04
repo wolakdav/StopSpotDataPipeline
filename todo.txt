@@ -1,10 +1,6 @@
 
-code
-    add process_next_day() and process_until_checkpoint() and reprocess() to _Client.cli()
-
 documentation
     update reqs diagram to have flagged_data(service_date)
-
 
 testing
     write tests for Client

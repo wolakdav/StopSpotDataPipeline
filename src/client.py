@@ -81,6 +81,12 @@ class _Client(IOs):
                         self.create_hive),
             _Option("Process data from Portal (Which currently is Aperture)",
                         self.process_data),
+            _Option("Process the next unproccessed service date from Portal (Which currently is Aperture)",
+                        self.process_next_day),
+            _Option("Process the all following unproccessed service dates from Portal (Which currently is Aperture)",
+                        self.process_since_checkpoint),
+            _Option("Reprocess service date(s)",
+                        self.reprocess),
             _Option("Sub-menu: DB Operations",
                         self._db_menu),
         ]
@@ -110,7 +116,11 @@ class _Client(IOs):
         flagged_rows = []
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
+        i = 0 # TODO: elete
         for row_id, row in ctran_df.iterrows():
+            i+=1 # TODO: elete
+            print(i) # TODO: elete
+            if i > 20: break # TODO: elete
             month = row.service_date.month
             year = row.service_date.year
             service_key = self.service_periods.query_or_insert(month, year)
@@ -179,7 +189,7 @@ class _Client(IOs):
 
     ###########################################################
 
-    def reprocess(self, start_date, end_date=None):
+    def reprocess(self, start_date=None, end_date=None):
         start_date, end_date = self._get_date_range(start_date, end_date)
         if not self.flagged.delete_date_range(start_date, end_date):
             self.print()
