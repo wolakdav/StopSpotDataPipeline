@@ -155,7 +155,6 @@ class _Client(IOs):
 
     ###########################################################
 
-    # TODO: increment start_date by one b/f making end_date
     # This method will process all days since the latest processed day.
     def process_since_checkpoint(self):
         start_date = self.processed_days.get_latest_day()

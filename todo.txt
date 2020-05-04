@@ -1,0 +1,8 @@
+src/tables/flagged_data.py:101:    # TODO: update
+src/tables/flagged_data.py:127:        pass # TODO: this
+src/client.py:1:# TODO: test this class.
+src/client.py:103:    # TODO: update parameter default values
+src/client.py:109:            # TODO: ctran_df needs Dates
+src/client.py:184:        pass # TODO: this
+
+delete process_days.py
