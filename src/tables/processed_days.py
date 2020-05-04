@@ -3,19 +3,6 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
 
-# TODO
-# add a field for row_id, so you know what was made when, and use these as a combo key
-# this will allow for easy deletion of data by getting the rows in a date(s), removing them here,
-# and then removing them in flagged
-#
-# also write a method to get the row_ids in a range of dates
-#
-# better idea: add the date processed to flagged_data
-#   get_latest_day
-#   _get_date_range
-#   delete_date_range(start_date, end_date=None) - if none, use end_date=start_date
-#   and I'll need to add the current date to the df b/f it gets to _write_table
-
 class Processed_Days(Table):
 
     def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):

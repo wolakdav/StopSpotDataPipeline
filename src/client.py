@@ -79,7 +79,7 @@ class _Client(IOs):
             _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].",
                         self.ctran.create_table),
             _Option("Create Hive, the output point of the Data Pipeline.",
-                        create_hive),
+                        self.create_hive),
             _Option("Process data from Portal (Which currently is Aperture)",
                         self.process_data),
             _Option("Sub-menu: DB Operations",
@@ -100,10 +100,13 @@ class _Client(IOs):
     # Process data between start_date and end_date, inclusive. These parameters
     # can be date instances or strings in format "YYYY/MM/DD". If no dates are
     # supplied, this will prompt the user for them.
+    # TODO: update parameter default values
     def process_data(self, start_date="", end_date=""):
+        self.print("Starting data processing pipeline.")
         ctran_df = None
         if start_date == "" or end_date == "":
             date_range = self._get_date_range()
+            # TODO: ctran_df needs Dates
             ctran_df = self.ctran.query_date_range(*date_range)
         else:
             ctran_df = self.ctran.query_date_range(start_date, end_date)
@@ -115,12 +118,12 @@ class _Client(IOs):
         flagged_rows = []
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
-        i = 0
+        i = 0 # TODO: delete this
         for row_id, row in ctran_df.iterrows():
-            i += 1
-            print(i)
-            if i > 100:
-                break
+            i += 1 # TODO: delete this
+            print(i) # TODO: delete this
+            if i > 100: # TODO: delete this
+                break # TODO: delete this
             month = row.service_date.month
             year = row.service_date.year
             service_key = self.service_periods.query_or_insert(month, year)
@@ -146,18 +149,7 @@ class _Client(IOs):
             for flag in flags:
                 flagged_rows.append([row_id, service_key, int(flag)])
 
-        try:
-            with self._hive_engine.connect() as conn:
-                with conn.begin():
-                    self.print("Starting transaction.")
-                    self.flagged.write_table(flagged_rows, conn)
-                    #self.prompt("@sawyer: now kill the job and see if flagged is updated by processed_days isn't") # TODO: delete this
-                    self.processed_days.insert(start_date, end_date, conn)
-        except SQLAlchemyError as error:
-            self.print("SQLAclchemy:", error)
-            self.print("Failed to complete transaction: insert to flagged_data and processed_days")
-            return False
-
+        self.flagged.write_table(flagged_rows)
         self.print("Done.")
         return True
 
@@ -185,6 +177,11 @@ class _Client(IOs):
         end_date = start_date
         self._print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date)
+
+    ###########################################################
+
+    def reprocess(self, start_date, end_date=None):
+        pass # TODO: this
 
     ###########################################################
 
