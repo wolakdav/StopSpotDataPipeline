@@ -37,7 +37,7 @@ def test_table_name(instance_fixture):
     assert instance_fixture._table_name == "service_periods"
 
 def test_expected_cols(instance_fixture):
-    expected_cols = ["month", "year", "ternary"]
+    expected_cols = ["start_date", "end_date"]
     assert instance_fixture._expected_cols == expected_cols
 
 def test_creation_sql(instance_fixture):
@@ -46,32 +46,31 @@ def test_creation_sql(instance_fixture):
             CREATE TABLE IF NOT EXISTS """, instance_fixture._schema, ".", instance_fixture._table_name, """
             (
                 service_key BIGSERIAL PRIMARY KEY,
-                month SMALLINT NOT NULL CHECK ( (month <= 12) AND (month >= 1) ),
-                year SMALLINT NOT NULL CHECK (year > 1700),
-                ternary SMALLINT NOT NULL CHECK ( (ternary <= 3) AND (ternary >= 1) ),
-                UNIQUE (month, year, ternary)
+                start_date DATE NOT NULL,
+                end_date DATE NOT NULL,
+                UNIQUE (start_date, end_date)
             );"""])
     assert expected == instance_fixture._creation_sql
 
-def test_get_ternary(instance_fixture):
-    assert instance_fixture.get_ternary(1) == 1
-    assert instance_fixture.get_ternary(4) == 1
-    assert instance_fixture.get_ternary(5) == 2
-    assert instance_fixture.get_ternary(8) == 2
-    assert instance_fixture.get_ternary(9) == 3
-    assert instance_fixture.get_ternary(12) == 3
-
-    assert instance_fixture.get_ternary(0) == -1
-    assert instance_fixture.get_ternary(-12) == -1
-    assert instance_fixture.get_ternary(100) == -1
+def test_get_service_period(instance_fixture):
+    assert instance_fixture.get_service_period(datetime(2019, 1, 1)) == \
+               (datetime(2018, 9, 10), datetime(2019, 1, 9))
+    assert instance_fixture.get_service_period(datetime(2019, 1, 10)) == \
+               (datetime(2019, 1, 10), datetime(2019, 5, 9))
+    assert instance_fixture.get_service_period(datetime(2019, 5, 10)) != \
+               (datetime(2019, 1, 10), datetime(2019, 5, 9))
+    assert instance_fixture.get_service_period(datetime(2019, 5, 10)) == \
+               (datetime(2019, 5, 10), datetime(2019, 9, 9))
+    assert instance_fixture.get_service_period(datetime(2010, 12, 25)) == \
+               (datetime(2010, 9, 10), datetime(2011, 1, 9))
 
 def test_query_or_insert(monkeypatch, instance_fixture):
-    monkeypatch.setattr(instance_fixture, "query_month_year", lambda x, y: 1)
-    monkeypatch.setattr(instance_fixture, "insert_one", lambda x, y: 2)
-    assert instance_fixture.query_or_insert(1, 1) == 1
+    monkeypatch.setattr(instance_fixture, "query", lambda _: 1)
+    monkeypatch.setattr(instance_fixture, "insert_one", lambda _: 2)
+    assert instance_fixture.query_or_insert(datetime(2000, 1, 1)) == 1
 
-    monkeypatch.setattr(instance_fixture, "query_month_year", lambda x, y: None)
-    assert instance_fixture.query_or_insert(1, 1) == 2
+    monkeypatch.setattr(instance_fixture, "query", lambda _: None)
+    assert instance_fixture.query_or_insert(datetime(2000, 1, 1)) == 2
     
 
 def test_insert_one(instance_fixture):
@@ -85,7 +84,7 @@ def test_insert_one(instance_fixture):
     instance_fixture._engine.connect = lambda: mock_connection()
 
     expected = "".join(["INSERT INTO ", instance_fixture._schema, ".",
-                        instance_fixture._table_name, " (month, year, ternary)"\
-                        " VALUES (1, 2020, 1) RETURNING service_key;"])
+                        instance_fixture._table_name, " (start_date, end_date)"\
+                        " VALUES ('2019-01-10', '2019-05-09') RETURNING service_key;"])
 
-    assert instance_fixture.insert_one(1, 2020) == expected
+    assert instance_fixture.insert_one(datetime(2019, 3, 1)) == expected

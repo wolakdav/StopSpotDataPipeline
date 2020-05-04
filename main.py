@@ -64,9 +64,10 @@ def process_data(ctran, flagged, flags, service_periods):
     # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
     # but i'll leave optimizing for later.
     for row_id, row in ctran_df.iterrows():
-        month = row.service_date.month
-        year = row.service_date.year
-        service_key = service_periods.query_or_insert(month, year)
+        date = datetime(row.service_date.year, 
+                        row.service_date.month,
+                        row.service_date.day)
+        service_key = service_periods.query_or_insert(date)
 
         # If this fails, it's very likely a sqlalchemy error.
         # e.g. not able to connect to db.
