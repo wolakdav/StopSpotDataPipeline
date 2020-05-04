@@ -1,5 +1,9 @@
-from .table import Table
+import datetime
+from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import SQLAlchemyError
 import pandas
+from .table import Table
+
 
 class Flagged_Data(Table):
 
@@ -11,6 +15,7 @@ class Flagged_Data(Table):
             "row_id",
             "service_key",
             "flag_id",
+            "date_computed"
         ]
         # flag_id is ON UPDATE CASCADE to anticipate flags table changing.
         # service_key shouldn't change.
@@ -20,18 +25,28 @@ class Flagged_Data(Table):
                 row_id INTEGER,
                 service_key INTEGER REFERENCES """, self._schema, """.service_periods(service_key),
                 flag_id INTEGER REFERENCES """, self._schema, """.flags(flag_id) ON UPDATE CASCADE,
+                date_computed DATE NOT NULL,
                 PRIMARY KEY (flag_id, service_key, row_id)
             );"""])
 
+    #######################################################
 
     def write_table(self, data):
         # data is list of [row_id, flag_id, service_key].
         if data == []:
             self._print("ERROR: write_table recieved no data to write, cancelling.")
             return False
-        df = pandas.DataFrame(data, columns=self._expected_cols)
+        df = pandas.DataFrame(data, columns=[
+            "row_id",
+            "service_key",
+            "flag_id",
+            ])
+        df["date_computed"] = datetime.datetime.now().date().strftime("%Y/%m/%d")
+        print(df)
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
+
+    #######################################################
 
 # SELECT *
 # FROM
@@ -65,6 +80,8 @@ class Flagged_Data(Table):
 
         return self._query_table(sql)
 
+    #######################################################
+
     def query_by_flag_id(self, flag_id, limit):
         sql = "".join(["SELECT * FROM ",
                        self._schema,
@@ -77,3 +94,61 @@ class Flagged_Data(Table):
                        "';"])
 
         return self._query_table(sql)
+
+    #######################################################
+
+    # Return the latest day (as datetime) stored, None if no days are stored.
+    # TODO: update
+    def get_latest_day(self):
+        value = None
+        sql = "".join(["SELECT MAX(", self._index_col, ")",
+                       "FROM ", self._schema, ".", self._table_name,
+                       ";"])
+        self._print(sql)
+        try:
+            self._print("Connecting to DB.")
+            conn = self._engine.connect()
+            value = conn.execute(sql)
+        except SQLAlchemyError as error:
+            print("SQLAlchemyError: ", error)
+            return None
+        
+        if value is not None:
+            self._print("Done")
+            return value.first()[0]
+        else:
+            return None
+
+    #######################################################
+
+    def delete_date_range(self, start_date, end_date=None):
+        if end_date is None:
+            end_date = start_date
+        pass # TODO: this
+
+    #######################################################
+
+    # Get a list of date value(s) b/w day and end_date.
+    # day and end_date can be strings in YYYY/MM/DD or datetime instances.
+    def _get_date_range(self, day, end_date=None):
+        dates = []
+        try:
+            if not isinstance(day, datetime.date):
+                dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
+            else:
+                dates.append(day)
+            if end_date is not None:
+                if not isinstance(end_date, datetime.date):
+                    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+                delta = datetime.timedelta(days=1)
+                curr_date = dates[0]
+                curr_date += delta
+                while curr_date < end_date:
+                    dates.append(curr_date)
+                    curr_date += delta
+                dates.append(end_date)
+        except ValueError:
+            self._print("ERROR: The input date is malformed; please use the YYYY-MM-DD format.")
+            return None
+
+        return dates
