@@ -154,40 +154,29 @@ class Flagged_Data(Table):
     #######################################################
 
     # start_date and end_date can be string dates in YYYY/MM/DD, datetimes, or
-    # None. If start_date is none, the user will be prompted for the start and
-    # end dates. If end_date is none, the start_date will be used for that
-    # value. If dates are backwards, they will be flipped.
-    # This returns: start_date, end_date
-    def _process_dates(self, start_date=None, end_date=None):
-        def _convert_str_to_date(string, criteria):
+    # None. If end_date is none, the start_date will be used for that value. If
+    # dates are backwards, they will be flipped.
+    # On success, this returns: start_date, end_date; on failure, this returns
+    # None, None.
+    def _process_dates(self, start_date, end_date=None):
+        def _convert_to_date(string, criteria):
             try:
                 if isinstance(string, str):
                     string = datetime.strptime(string, "%Y/%m/%d")
+                elif not isinstance(string, datetime.datetime):
+                    raise ValueError
+                elif not isinstance(string, datetime.date):
+                    raise ValueError
             except ValueError:
-                string = _get_valid_date(criteria)
+                return None, None
             return string
 
-        def _get_valid_date(criteria):
-            while True:
-                date = self.prompt("Please enter the " + criteria + " date (YYYY/MM/DD): ")
-                try:
-                    date = datetime.strptime(date, "%Y/%m/%d")
-                except ValueError:
-                    print("\tThe input date is malformed; please use the YYYY/MM/DD format.")
-                else:
-                    return date
+        start_date = _convert_to_date(start_date, "start")
 
-        if start_date is None:
-            start_date = _get_valid_date("start")
-            end_date   = _get_valid_date("end  ")
-
+        if end_date is None:
+            end_date = start_date
         else:
-            start_date = _convert_str_to_date(start_date, "start")
-
-            if end_date is None:
-                end_date = start_date
-            else:
-                end_date = _convert_str_to_date(end_date, "end  ")
+            end_date = _convert_to_date(end_date, "end  ")
 
         if start_date < end_date:
             return start_date, end_date
