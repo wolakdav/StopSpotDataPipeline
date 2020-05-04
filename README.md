@@ -37,6 +37,85 @@ Alternatively, place the below into the system's crontab to automatically proces
 Again, this does require the First Time Execution to have already occurred.  
 `TODO: place the crontab line here.`
 
+### Using the Client
+
+The main program is handled by `client_instance`, a singleton client. To load
+the basic CLI menu, use this line in the shell.
+
+    $ python3 main.py
+    
+To access all of the members and methods described below via the Python
+interpreter, as well as booting the CLI menu, use this line in the shell.
+
+    $ python3 -i main.py
+
+To see all of the available commands, use this line in the shell.
+
+    $ python3 main.py --help
+
+#### `client_instance.main(read_env_data=True)`
+
+This method is called in main.py and it is the main control unit of the Client.
+`read_env_data` determines if the program will read environment data to
+determine where the Pipeline database credentials are (for more, see below).
+
+#### `bool client_instance.process_data(start_date=None, end_date=None)`
+
+This method will process C-Tran data between `start_date` and `end_date`,
+**inclusive**. These parameters can be datetime or date instances, or strings
+in the format of "YYYY/MM/DD". If no dates are supplied, this will prompt the
+user for them. If `end_date` is not supplied, then it will be set to
+`start_date`.
+
+#### `bool client_instance.process_next_day()`
+
+This method will process the day after the latest processed service day.  
+
+Be aware that this will not work if First Time Execution has not occurred.
+
+#### `bool client_instance.process_since_checkpoint()`
+
+This method will process all unprocessed service dates after the latest
+processed service date.  
+
+Be aware that this will not work if First Time Execution has not occurred.
+
+#### `client_instance.create_hive()`
+
+This method will create the Hive schema, which is the collection of tables
+flags, flagged_data, and service_periods.
+
+#### `CTran_Data client_instance.ctran`
+
+This member is used to query the C-Tran database.  
+
+For more, see `docs/db_ops.md`.
+
+#### `Flagged_Data client_instance.flagged`
+
+This member is used to work with the flagged_data table in Hive.  
+
+For more, see `docs/db_ops.md`.
+
+#### `Flags client_instance.flags`
+
+This member is used to work with the flags table in Hive.  
+
+For more, see `docs/db_ops.md`.
+
+#### `Service_Periods client_instance.service_periods`
+
+This member is used to work with the service_periods table in Hive.  
+
+For more, see `docs/db_ops.md`.
+
+#### `Config client_instance.config`
+
+This member is the instance of Config.  
+
+For more, see below in Adjusting and Utilizing Endpoints, and
+`docs/config_readme.md`.
+
 ## Adjusting and Utilizing Endpoints
 
 ### `assets/config.json`
