@@ -105,7 +105,6 @@ class _Client(IOs):
         ctran_df = None
         if start_date == "" or end_date == "":
             date_range = self._get_date_range()
-            # TODO: ctran_df needs Dates
             ctran_df = self.ctran.query_date_range(*date_range)
         else:
             ctran_df = self.ctran.query_date_range(start_date, end_date)
@@ -159,7 +158,7 @@ class _Client(IOs):
         start_date = self.processed_days.get_latest_day()
         self._print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self._print("Processing from: " + str(start_date))
+        self._print("Processing from:  " + str(start_date))
         end_date = datetime.now().date()
         self._print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date)
@@ -171,7 +170,7 @@ class _Client(IOs):
         start_date = self.processed_days.get_latest_day()
         self._print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self._print("Processing from: " + str(start_date))
+        self._print("Processing from:  " + str(start_date))
         end_date = start_date
         self._print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date)

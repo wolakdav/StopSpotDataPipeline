@@ -98,10 +98,9 @@ class Flagged_Data(Table):
     #######################################################
 
     # Return the latest day (as datetime) stored, None if no days are stored.
-    # TODO: update
     def get_latest_day(self):
         value = None
-        sql = "".join(["SELECT MAX(", self._index_col, ")",
+        sql = "".join(["SELECT MAX(date_computed) ",
                        "FROM ", self._schema, ".", self._table_name,
                        ";"])
         self._print(sql)

@@ -1,6 +1,4 @@
 coding
-    update Flagged_Data.get_latest_day()
-
     finish Flagged_Data.delete_date_range()
 
     have _Client.process_data()'s args behave correctly
