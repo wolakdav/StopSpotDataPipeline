@@ -158,7 +158,7 @@ class Flagged_Data(Table):
     # end dates. If end_date is none, the start_date will be used for that
     # value. If dates are backwards, they will be flipped.
     # This returns: start_date, end_date
-    def _get_date_range(self, start_date=None, end_date=None):
+    def _process_dates(self, start_date=None, end_date=None):
         def _convert_str_to_date(string, criteria):
             try:
                 if isinstance(string, str):

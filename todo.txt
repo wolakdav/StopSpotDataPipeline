@@ -1,3 +1,4 @@
+
 coding
     finish Flagged_Data.delete_date_range()
 
@@ -19,7 +20,11 @@ documentation
 
 
 testing
-    update flagged_data tests
+    write flagged_data tests
+        get_last_date
+        delete_date_range
+        _get_date_range
+        _process_dates
 
     write tests for Client
 
