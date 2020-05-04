@@ -1,8 +1,31 @@
-src/tables/flagged_data.py:101:    # TODO: update
-src/tables/flagged_data.py:127:        pass # TODO: this
-src/client.py:1:# TODO: test this class.
-src/client.py:103:    # TODO: update parameter default values
-src/client.py:109:            # TODO: ctran_df needs Dates
-src/client.py:184:        pass # TODO: this
+coding
+    update Flagged_Data.get_latest_day()
 
-delete process_days.py
+    finish Flagged_Data.delete_date_range()
+
+    have _Client.process_data()'s args behave correctly
+        ctran.query_date_range needs Date instances
+
+    finish _Client.reprocess()
+
+
+when done coding
+    delete process_days.py
+
+
+documentation
+    Write client documentation
+
+    check over db_ops.md
+
+    update reqs diagram to have flagged_data(date_computed)
+
+
+testing
+    update flagged_data tests
+
+    write tests for Client
+
+
+other
+    Tin is updated the Table tests about the changed default arguments, so keep an eye on that

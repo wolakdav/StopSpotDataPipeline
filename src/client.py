@@ -1,4 +1,3 @@
-# TODO: test this class.
 import os
 import sys
 from datetime import datetime
