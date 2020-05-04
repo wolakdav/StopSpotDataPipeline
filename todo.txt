@@ -1,21 +1,5 @@
 
-coding
-    finish Flagged_Data.delete_date_range()
-
-    finish _Client.reprocess()
-
-
-when done coding
-    delete process_days.py
-
-    delete todos in _Client.process_data()
-
-
 documentation
-    Write client documentation
-
-    check over db_ops.md
-
     update reqs diagram to have flagged_data(service_date)
 
 
@@ -27,7 +11,3 @@ testing
         _process_dates
 
     write tests for Client
-
-
-other
-    Tin is updated the Table tests about the changed default arguments, so keep an eye on that
