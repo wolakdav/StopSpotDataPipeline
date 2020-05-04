@@ -9,7 +9,7 @@ class CTran_Data(Table):
     ###########################################################################
     # Public Methods
 
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):
         super().__init__(user, passwd, hostname, db_name, verbose, engine)
         self._schema = "aperture"
         self._table_name = "ctran_data"

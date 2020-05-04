@@ -10,7 +10,7 @@ g_expected = None
 
 # Test_Dummy is used to allow for easy and precise tests of Table.
 class Table_Dummy(Table):
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):
         super().__init__(user, passwd, hostname, db_name, verbose, engine)
         self._table_name = "fake"
         self._index_col = "fake_key"

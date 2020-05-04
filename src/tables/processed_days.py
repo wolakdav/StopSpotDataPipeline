@@ -5,7 +5,7 @@ import datetime
 
 class Processed_Days(Table):
 
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):
         super().__init__(user, passwd, hostname, db_name, verbose, engine)
         self._table_name = "processed_days"
         self._index_col = "day"
