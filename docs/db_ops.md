@@ -15,7 +15,6 @@ These are the subclasses of Table:
 - `Flagged_Data`  
 - `Flags`  
 - `Service_Periods`
-- `Processed_Days`
 
 **WARNING**: Flags, Flagged_Data, and Service_Periods are assumed to be in the
 same schema. Additionally, check _creation_sql of these classes when renaming
