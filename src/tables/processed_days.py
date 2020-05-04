@@ -3,18 +3,35 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
 
+# TODO
+# add a field for row_id, so you know what was made when, and use these as a combo key
+# this will allow for easy deletion of data by getting the rows in a date(s), removing them here,
+# and then removing them in flagged
+#
+# also write a method to get the row_ids in a range of dates
+#
+# better idea: add the date processed to flagged_data
+#   get_latest_day
+#   _get_date_range
+#   delete_date_range(start_date, end_date=None) - if none, use end_date=start_date
+#   and I'll need to add the current date to the df b/f it gets to _write_table
+
 class Processed_Days(Table):
 
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):
         super().__init__(user, passwd, hostname, db_name, verbose, engine)
         self._table_name = "processed_days"
-        self._index_col = "day"
+        self._index_col = ""
         self._expected_cols = [
+            "day",
+            "row_id"
         ]
         self._creation_sql = "".join(["""
             CREATE TABLE IF NOT EXISTS """, self._schema, ".", self._table_name, """
             (
-                day DATE PRIMARY KEY
+                day DATE PRIMARY KEY,
+                row_id INTEGER,
+                service_
             );"""])
 
     #######################################################
@@ -22,6 +39,7 @@ class Processed_Days(Table):
     # This method will take string(s) day and end_date (optional) in YYYY/MM/DD
     # as well as inserting all the dates between the two if end_date is used.
     # Inserting the various dates will be a single transaction.
+    # This will not adjust the flagged table.
     def insert(self, day, end_date=None):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
@@ -57,6 +75,7 @@ class Processed_Days(Table):
     # This method will take string(s) day and end_date (optional) in YYYY/MM/DD
     # as well as deleting all the dates between the two if end_date is used.
     # Deleting the various dates will be a single transaction.
+    # This will not adjust the flagged table.
     # NOTE: This will only return False on a botched SQL, not as to the delete
     # operation.
     def delete(self, day, end_date=None):

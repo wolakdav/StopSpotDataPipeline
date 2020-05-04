@@ -11,7 +11,6 @@ from src.tables import CTran_Data
 from src.tables import Flagged_Data
 from src.tables import Flags
 from src.tables import Service_Periods
-from src.tables import Processed_Days
 from src.config import config
 from src.interface import ArgInterface
 from flaggers.flagger import flaggers
@@ -70,10 +69,6 @@ class _Client(IOs):
     #######################################################
 
     def main(self, read_env_data=False):
-        def create_hive():
-            self.flags.create_table()
-            self.service_periods.create_table()
-            self.flagged.create_table()
 
         if len(sys.argv) > 1:
             ai = ArgInterface()
@@ -92,6 +87,13 @@ class _Client(IOs):
         ]
 
         self._menu("Welcome to the CTran Data Marking Pipeline.", options)
+
+    #######################################################
+
+    def create_hive(self):
+        self.flags.create_table()
+        self.service_periods.create_table()
+        self.flagged.create_table()
 
     ###########################################################
 
@@ -144,7 +146,20 @@ class _Client(IOs):
             for flag in flags:
                 flagged_rows.append([row_id, service_key, int(flag)])
 
-        self.flagged.write_table(flagged_rows)
+        try:
+            with self._hive_engine.connect() as conn:
+                with conn.begin():
+                    self.print("Starting transaction.")
+                    self.flagged.write_table(flagged_rows, conn)
+                    #self.prompt("@sawyer: now kill the job and see if flagged is updated by processed_days isn't") # TODO: delete this
+                    self.processed_days.insert(start_date, end_date, conn)
+        except SQLAlchemyError as error:
+            self.print("SQLAclchemy:", error)
+            self.print("Failed to complete transaction: insert to flagged_data and processed_days")
+            return False
+
+        self.print("Done.")
+        return True
 
     ###########################################################
 
@@ -156,27 +171,26 @@ class _Client(IOs):
         start_date = start_date + timedelta(days=1)
         self._print("Processing from: " + str(start_date))
         end_date = datetime.now().date()
-        self._print("\tUntil: " + str(end_date))
+        self._print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
     
-    # TODO: increment start_date by one b/f making end_date
     # This method will process the next day after the latest processed day.
     def process_next_day(self):
         start_date = self.processed_days.get_latest_day()
         self._print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
         self._print("Processing from: " + str(start_date))
-        end_date = start_date + timedelta(days=1)
-        self._print("\tUntil: " + str(end_date))
+        end_date = start_date
+        self._print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
 
     def _db_menu(self):
         def ctran_info():
-            query = ctran.get_full_table()
+            query = self.ctran.get_full_table()
             if query is None:
                 self.print("WARNING: no data returned.")
             else:
@@ -272,47 +286,6 @@ class _Client(IOs):
         else:
             return (end_date, start_date)
 
-    ###########################################################
-
-    # Begin a transaction if there is already not one occurring. This method
-    # will return true iff there is not a transaction in progress and the BEGIN
-    # has no issues caused during execution.
-    def _begin_transaction(self):
-        if self._transaction_in_progress:
-            return False
-
-        if self._execute_sql("BEGIN;"):
-            self._transaction_in_progress = True
-            return True
-        else:
-            return False
-
-    ###########################################################
-
-    # Commit a transaction if there is already one occurring. This method
-    # will return true iff there is a transaction in progress and the COMMIT
-    # has no issues caused during execution.
-    def _commit_transaction(self):
-        if not self._transaction_in_progress:
-            return False
-
-        if self._execute_sql("COMMIT;"):
-            return True
-        else:
-            return False
-
-    #######################################################
-
-    # Return true iff no SQLAlchemy error occurs.
-    def _execute_sql(self, sql):
-        try:
-            conn = self._hive_engine.connect()
-            self._print(sql)
-            conn.execute(sql)
-        except SQLAlchemyError as error:
-            self.print("SQLAclchemy:", error)
-            return False
-        return True
 
 ###############################################################################
 

@@ -48,8 +48,8 @@ class Table(IOs, abc.ABC):
     #######################################################
     
     def get_full_table(self):
-        if self._engine is None:
-            self._print("ERROR: self._engine is None, cannot continue.")
+        if not isinstance(self._engine, Engine):
+            self._print("ERROR: self._engine is not an Engine, cannot continue.")
             return None
 
         df = None
@@ -216,8 +216,8 @@ class Table(IOs, abc.ABC):
             sql += "".join([" ON CONFLICT ", conflict_columns, " DO NOTHING;"])
 
         try:
-            with self._engine.connect() as con:
-                con.execute(sql)
+            con = self._engine.connect()
+            con.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
             return False
