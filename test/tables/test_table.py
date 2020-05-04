@@ -35,7 +35,7 @@ class Table_Dummy(Table):
 
 @pytest.fixture
 def instance_fixture():
-    return Table_Dummy("sw23", "invalid")
+    return Table_Dummy("sw23", "invalid", "localhost", "aperture")
 
 @pytest.fixture
 def dummy_engine():

@@ -6,7 +6,7 @@ from src.tables import Flagged_Data
 
 @pytest.fixture
 def instance_fixture():
-    return Flagged_Data("sw23", "invalid")
+    return Flagged_Data("sw23", "invalid", "localhost", "aperture")
 
 @pytest.fixture
 def dummy_engine():
