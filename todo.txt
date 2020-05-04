@@ -1,4 +1,7 @@
 coding
+    add the service date to each row of flagged_rows in process_data()
+        line 143
+
     finish Flagged_Data.delete_date_range()
 
     have _Client.process_data()'s args behave correctly
@@ -10,13 +13,15 @@ coding
 when done coding
     delete process_days.py
 
+    delete todos in _Client.process_data()
+
 
 documentation
     Write client documentation
 
     check over db_ops.md
 
-    update reqs diagram to have flagged_data(date_computed)
+    update reqs diagram to have flagged_data(service_date)
 
 
 testing

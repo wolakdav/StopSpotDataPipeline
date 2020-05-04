@@ -97,18 +97,12 @@ class _Client(IOs):
     ###########################################################
 
     # Process data between start_date and end_date, inclusive. These parameters
-    # can be date instances or strings in format "YYYY/MM/DD". If no dates are
+    # can be Date instances or strings in format "YYYY/MM/DD". If no dates are
     # supplied, this will prompt the user for them.
-    # TODO: update parameter default values
-    def process_data(self, start_date="", end_date=""):
+    def process_data(self, start_date=None, end_date=None):
         self.print("Starting data processing pipeline.")
-        ctran_df = None
-        if start_date == "" or end_date == "":
-            date_range = self._get_date_range()
-            ctran_df = self.ctran.query_date_range(*date_range)
-        else:
-            ctran_df = self.ctran.query_date_range(start_date, end_date)
-
+        start_date, end_date = self._get_date_range(start_date, end_date)
+        ctran_df = self.ctran.query_date_range(start_date, end_date)
         if ctran_df is None:
             self.print("ERROR: the supplied dates were unable to be gathered from CTran data.")
             return False
@@ -146,6 +140,9 @@ class _Client(IOs):
 
             for flag in flags:
                 flagged_rows.append([row_id, service_key, int(flag)])
+                # TODO: adjust ^^ to also put the service date in
+                # df["service_date"] = datetime.datetime.now().date().strftime("%Y/%m/%d")
+                # maybe use row_id to get the service_date ?
 
         self.flagged.write_table(flagged_rows)
         self.print("Done.")
@@ -155,7 +152,10 @@ class _Client(IOs):
 
     # This method will process all days since the latest processed day.
     def process_since_checkpoint(self):
-        start_date = self.processed_days.get_latest_day()
+        start_date = self.flagged.get_latest_day()
+        if start_date is None:
+            self.print("ERROR: no prior date processed; cannot continue from the last processed day.")
+            return False
         self._print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
         self._print("Processing from:  " + str(start_date))
@@ -167,7 +167,10 @@ class _Client(IOs):
     
     # This method will process the next day after the latest processed day.
     def process_next_day(self):
-        start_date = self.processed_days.get_latest_day()
+        start_date = self.flagged.get_latest_day()
+        if start_date is None:
+            self.print("ERROR: no prior date processed; cannot continue from the last processed day.")
+            return False
         self._print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
         self._print("Processing from:  " + str(start_date))
@@ -258,27 +261,46 @@ class _Client(IOs):
 
     ###########################################################
 
-    # If the user inputs the start and end dates backwards, this will flip them on
-    # return.
-    def _get_date_range(self):
+    # start_date and end_date can be string dates in YYYY/MM/DD, datetimes, or
+    # None. If start_date is none, the user will be prompted for the start and
+    # end dates. If end_date is none, the start_date will be used for that
+    # value. If dates are backwards, they will be flipped.
+    # This returns: start_date, end_date
+    def _get_date_range(self, start_date=None, end_date=None):
+        def _convert_str_to_date(string, criteria):
+            try:
+                if isinstance(string, str):
+                    string = datetime.strptime(string, "%Y/%m/%d")
+            except ValueError:
+                string = _get_valid_date(criteria)
+            return string
+
         def _get_valid_date(criteria):
             while True:
-                date = self.prompt("Please enter the " + criteria + " date (YYYY-MM-DD): ")
+                date = self.prompt("Please enter the " + criteria + " date (YYYY/MM/DD): ")
                 try:
-                    date = datetime.strptime(date, "%Y-%m-%d")
+                    date = datetime.strptime(date, "%Y/%m/%d")
                 except ValueError:
-                    print("\tThe input date is malformed; please use the YYYY-MM-DD format.")
+                    print("\tThe input date is malformed; please use the YYYY/MM/DD format.")
                 else:
                     return date
 
+        if start_date is None:
+            start_date = _get_valid_date("start")
+            end_date   = _get_valid_date("end  ")
 
-        start_date = _get_valid_date("start")
-        end_date   = _get_valid_date("end  ")
+        else:
+            start_date = _convert_str_to_date(start_date, "start")
+
+            if end_date is None:
+                end_date = start_date
+            else:
+                end_date = _convert_str_to_date(end_date, "end  ")
 
         if start_date < end_date:
-            return (start_date, end_date)
+            return start_date, end_date
         else:
-            return (end_date, start_date)
+            return end_date, start_date
 
 
 ###############################################################################

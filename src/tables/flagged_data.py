@@ -15,7 +15,7 @@ class Flagged_Data(Table):
             "row_id",
             "service_key",
             "flag_id",
-            "date_computed"
+            "service_date"
         ]
         # flag_id is ON UPDATE CASCADE to anticipate flags table changing.
         # service_key shouldn't change.
@@ -25,7 +25,7 @@ class Flagged_Data(Table):
                 row_id INTEGER,
                 service_key INTEGER REFERENCES """, self._schema, """.service_periods(service_key),
                 flag_id INTEGER REFERENCES """, self._schema, """.flags(flag_id) ON UPDATE CASCADE,
-                date_computed DATE NOT NULL,
+                service_date DATE NOT NULL,
                 PRIMARY KEY (flag_id, service_key, row_id)
             );"""])
 
@@ -41,8 +41,7 @@ class Flagged_Data(Table):
             "service_key",
             "flag_id",
             ])
-        df["date_computed"] = datetime.datetime.now().date().strftime("%Y/%m/%d")
-        print(df)
+        df["service_date"] = datetime.datetime.now().date().strftime("%Y/%m/%d")
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
 
@@ -100,7 +99,7 @@ class Flagged_Data(Table):
     # Return the latest day (as datetime) stored, None if no days are stored.
     def get_latest_day(self):
         value = None
-        sql = "".join(["SELECT MAX(date_computed) ",
+        sql = "".join(["SELECT MAX(service_date) ",
                        "FROM ", self._schema, ".", self._table_name,
                        ";"])
         self._print(sql)
