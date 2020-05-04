@@ -110,12 +110,7 @@ class _Client(IOs):
         flagged_rows = []
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
-        i = 0 # TODO: delete this
         for row_id, row in ctran_df.iterrows():
-            i += 1 # TODO: delete this
-            print(i) # TODO: delete this
-            if i > 100: # TODO: delete this
-                break # TODO: delete this
             month = row.service_date.month
             year = row.service_date.year
             service_key = self.service_periods.query_or_insert(month, year)
