@@ -119,6 +119,9 @@ class Flagged_Data(Table):
 
     #######################################################
 
+    # start_date and end_date can be string dates in YYYY/MM/DD, datetimes, or
+    # None. If end_date is none, the start_date will be used for that value. If
+    # dates are backwards, they will be flipped.
     def delete_date_range(self, start_date, end_date=None):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
@@ -162,12 +165,12 @@ class Flagged_Data(Table):
         dates = []
         try:
             if not isinstance(day, datetime.date):
-                dates.append(datetime.datetime.strptime(day, "%Y-%m-%d"))
+                dates.append(datetime.datetime.strptime(day, "%Y/%m/%d"))
             else:
                 dates.append(day)
             if end_date is not None:
                 if not isinstance(end_date, datetime.date):
-                    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+                    end_date = datetime.datetime.strptime(end_date, "%Y/%m/%d")
                 delta = datetime.timedelta(days=1)
                 curr_date = dates[0]
                 curr_date += delta
@@ -176,7 +179,7 @@ class Flagged_Data(Table):
                     curr_date += delta
                 dates.append(end_date)
         except ValueError:
-            self._print("ERROR: The input date is malformed; please use the YYYY-MM-DD format.")
+            self._print("ERROR: The input date is malformed; please use the YYYY/MM/DD format.")
             return None
 
         return dates
@@ -186,8 +189,8 @@ class Flagged_Data(Table):
     # start_date and end_date can be string dates in YYYY/MM/DD, datetimes, or
     # None. If end_date is none, the start_date will be used for that value. If
     # dates are backwards, they will be flipped.
-    # On success, this returns: start_date, end_date; on failure, this returns
-    # None, None.
+    # On success, this returns: start_date, end_date as datetimes; on failure,
+    # this returns None, None.
     def _process_dates(self, start_date, end_date=None):
         def _convert_to_date(string, criteria):
             try:

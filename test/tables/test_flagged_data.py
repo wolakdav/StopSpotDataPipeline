@@ -1,4 +1,5 @@
 import io
+import datetime
 import pytest
 import pandas
 from sqlalchemy import create_engine
@@ -16,6 +17,21 @@ def dummy_engine():
     db_name = "idk_something"
     engine_info = "".join(["postgresql://", user, ":", passwd, "@", hostname, "/", db_name])
     return create_engine(engine_info), user, passwd, hostname, db_name
+
+@pytest.fixture
+def mock_connection():
+    class mock_connection():
+        def __init__(self):
+            self.sql = None
+        def __enter__(self):
+            return self
+        def __exit__(self, type, value, traceback):
+            return
+        def execute(self, sql):
+            print(sql)
+            self.sql = sql
+
+    return mock_connection()
 
 
 def test_constructor_build_engine(dummy_engine):
@@ -51,3 +67,57 @@ def test_creation_sql(instance_fixture):
                 PRIMARY KEY (flag_id, service_key, row_id)
             );"""])
     assert expected == instance_fixture._creation_sql
+
+def test_get_latest_day(mock_connection, instance_fixture):
+    instance_fixture._engine.connect = lambda: mock_connection
+
+    expected = "".join(["SELECT MAX(service_date) ",
+                       "FROM ", instance_fixture._schema, ".", instance_fixture._table_name,
+                       ";"])
+    instance_fixture.get_latest_day()
+    assert mock_connection.sql == expected
+
+def test_delete_date_range_happy(mock_connection, instance_fixture):
+    instance_fixture._engine.connect = lambda: mock_connection
+    input_date = "2020/1/1"
+    expected = "".join(["DELETE FROM ", instance_fixture._schema, ".", instance_fixture._table_name,
+                       " WHERE service_date IN ('", input_date, "', '", input_date, "');"])
+    instance_fixture.delete_date_range(input_date)
+    assert mock_connection.sql == expected
+
+def test_delete_date_range_bad_engine(instance_fixture):
+    instance_fixture._engine = None
+    assert instance_fixture.delete_date_range("2020/1/1") == False
+
+def test_delete_date_range_invalid_inputs(instance_fixture):
+    def custom_process_dates(start_date, end_date):
+        return None, None
+    instance_fixture._process_dates = custom_process_dates
+    assert instance_fixture.delete_date_range("2020/1/1") == False
+
+def test_delete_date_range_bad_connection(instance_fixture):
+    # Since the default engine is already terrible, no changes are needed.
+    assert instance_fixture.delete_date_range("2020/1/1") == False
+
+def test_get_date_range(instance_fixture):
+    assert instance_fixture._get_date_range("2020/1/1") == [datetime.datetime(2020, 1, 1, 0, 0)]
+    assert instance_fixture._get_date_range("2020/1/28", "2020/2/2") == \
+            [datetime.datetime(2020, 1, 28, 0, 0),
+            datetime.datetime(2020, 1, 29, 0, 0),
+            datetime.datetime(2020, 1, 30, 0, 0),
+            datetime.datetime(2020, 1, 31, 0, 0),
+            datetime.datetime(2020, 2, 1, 0, 0),
+            datetime.datetime(2020, 2, 2, 0, 0)]
+
+def test_process_dates(instance_fixture):
+    assert instance_fixture._process_dates(None) == \
+        (None, None)
+
+    assert instance_fixture._process_dates("2020/1/1") == \
+        (datetime.datetime(2020, 1, 1, 0, 0), datetime.datetime(2020, 1, 1, 0, 0))
+
+    assert instance_fixture._process_dates("2020/1/1", "2019/12/31") == \
+        (datetime.datetime(2019, 12, 31, 0, 0), datetime.datetime(2020, 1, 1, 0, 0))
+
+    assert instance_fixture._process_dates(datetime.datetime(2019, 12, 31, 0, 0)) == \
+        (datetime.datetime(2019, 12, 31, 0, 0), datetime.datetime(2019, 12, 31, 0, 0))

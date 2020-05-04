@@ -1,13 +1,10 @@
 
+code
+    add process_next_day() and process_until_checkpoint() and reprocess() to _Client.cli()
+
 documentation
     update reqs diagram to have flagged_data(service_date)
 
 
 testing
-    write flagged_data tests
-        get_last_date
-        delete_date_range
-        _get_date_range
-        _process_dates
-
     write tests for Client
