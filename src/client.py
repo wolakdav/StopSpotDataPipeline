@@ -138,11 +138,15 @@ class _Client(IOs):
                     self.print("WARNING: error in flagger {}. Skipping.\n{}"
                         .format(flagger.name, e))
 
+            date = row["service_date"]
+            date = "".join([str(date.year), "/", str(date.month), "/", str(date.day)])
             for flag in flags:
-                flagged_rows.append([row_id, service_key, int(flag)])
-                # TODO: adjust ^^ to also put the service date in
-                # df["service_date"] = datetime.datetime.now().date().strftime("%Y/%m/%d")
-                # maybe use row_id to get the service_date ?
+                flagged_rows.append([
+                    row_id,
+                    service_key,
+                    int(flag),
+                    date
+                ])
 
         self.flagged.write_table(flagged_rows)
         self.print("Done.")

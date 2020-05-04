@@ -40,8 +40,8 @@ class Flagged_Data(Table):
             "row_id",
             "service_key",
             "flag_id",
+            "service_date"
             ])
-        df["service_date"] = datetime.datetime.now().date().strftime("%Y/%m/%d")
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
 
@@ -150,3 +150,46 @@ class Flagged_Data(Table):
             return None
 
         return dates
+
+    #######################################################
+
+    # start_date and end_date can be string dates in YYYY/MM/DD, datetimes, or
+    # None. If start_date is none, the user will be prompted for the start and
+    # end dates. If end_date is none, the start_date will be used for that
+    # value. If dates are backwards, they will be flipped.
+    # This returns: start_date, end_date
+    def _get_date_range(self, start_date=None, end_date=None):
+        def _convert_str_to_date(string, criteria):
+            try:
+                if isinstance(string, str):
+                    string = datetime.strptime(string, "%Y/%m/%d")
+            except ValueError:
+                string = _get_valid_date(criteria)
+            return string
+
+        def _get_valid_date(criteria):
+            while True:
+                date = self.prompt("Please enter the " + criteria + " date (YYYY/MM/DD): ")
+                try:
+                    date = datetime.strptime(date, "%Y/%m/%d")
+                except ValueError:
+                    print("\tThe input date is malformed; please use the YYYY/MM/DD format.")
+                else:
+                    return date
+
+        if start_date is None:
+            start_date = _get_valid_date("start")
+            end_date   = _get_valid_date("end  ")
+
+        else:
+            start_date = _convert_str_to_date(start_date, "start")
+
+            if end_date is None:
+                end_date = start_date
+            else:
+                end_date = _convert_str_to_date(end_date, "end  ")
+
+        if start_date < end_date:
+            return start_date, end_date
+        else:
+            return end_date, start_date

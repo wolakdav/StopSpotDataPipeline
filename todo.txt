@@ -1,11 +1,5 @@
 coding
-    add the service date to each row of flagged_rows in process_data()
-        line 143
-
     finish Flagged_Data.delete_date_range()
-
-    have _Client.process_data()'s args behave correctly
-        ctran.query_date_range needs Date instances
 
     finish _Client.reprocess()
 
