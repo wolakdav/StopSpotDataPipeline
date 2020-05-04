@@ -120,9 +120,39 @@ class Flagged_Data(Table):
     #######################################################
 
     def delete_date_range(self, start_date, end_date=None):
-        if end_date is None:
-            end_date = start_date
-        pass # TODO: this
+        if not isinstance(self._engine, Engine):
+            self._print("ERROR: invalid engine.")
+            return False
+
+        start_date, end_date = self._process_dates(start_date, end_date)
+        if start_date is None:
+            self._print("ERROR: could not determine the date(s).")
+            return False
+
+        values_sql = []
+        dates = self._get_date_range(start_date, end_date)
+        if dates is None:
+            self._print("ERROR: could not determine the date(s).")
+            return False
+
+        for date in dates:
+            values_sql.append(
+                "".join(["'", str(date.year), "/", str(date.month), "/", str(date.day), "'"])
+            )
+        values_sql = ", ".join(values_sql)
+        sql = "".join(["DELETE FROM ", self._schema, ".", self._table_name,
+                       " WHERE service_date IN (", values_sql, ");"])
+        self._print(sql)
+        try:
+            self._print("Connecting to DB.")
+            conn = self._engine.connect()
+            conn.execute(sql)
+        except SQLAlchemyError as error:
+            print("SQLAlchemyError: ", error)
+            return False
+
+        self._print("Done")
+        return True
 
     #######################################################
 
@@ -162,16 +192,16 @@ class Flagged_Data(Table):
         def _convert_to_date(string, criteria):
             try:
                 if isinstance(string, str):
-                    string = datetime.strptime(string, "%Y/%m/%d")
-                elif not isinstance(string, datetime.datetime):
-                    raise ValueError
-                elif not isinstance(string, datetime.date):
+                    string = datetime.datetime.strptime(string, "%Y/%m/%d")
+                elif not isinstance(string, datetime.datetime) or not isinstance(string, datetime.date):
                     raise ValueError
             except ValueError:
-                return None, None
+                return None
             return string
 
         start_date = _convert_to_date(start_date, "start")
+        if start_date is None:
+            return None, None
 
         if end_date is None:
             end_date = start_date
