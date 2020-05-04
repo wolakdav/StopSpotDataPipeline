@@ -160,11 +160,11 @@ class _Client(IOs):
         if start_date is None:
             self.print("ERROR: no prior date processed; cannot continue from the last processed day.")
             return False
-        self._print("Last processed day: " + str(start_date))
+        self.print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self._print("Processing from:  " + str(start_date))
+        self.print("Processing from:  " + str(start_date))
         end_date = datetime.now().date()
-        self._print("\t   until: " + str(end_date))
+        self.print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
@@ -175,17 +175,21 @@ class _Client(IOs):
         if start_date is None:
             self.print("ERROR: no prior date processed; cannot continue from the last processed day.")
             return False
-        self._print("Last processed day: " + str(start_date))
+        self.print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self._print("Processing from:  " + str(start_date))
+        self.print("Processing from:  " + str(start_date))
         end_date = start_date
-        self._print("\t   until: " + str(end_date))
+        self.print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
 
     def reprocess(self, start_date, end_date=None):
-        pass # TODO: this
+        start_date, end_date = self._get_date_range(start_date, end_date)
+        if not self.flagged.delete_date_range(start_date, end_date):
+            self.print()
+            return False
+        return self.process_data(start_date, end_date)
 
     ###########################################################
 
