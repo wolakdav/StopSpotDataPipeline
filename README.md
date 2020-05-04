@@ -20,7 +20,10 @@ as appropriate (for more, see below).
 If the output database has not been generated or used, then it is required to
 first boot the CLI menu to build the output database's schema, and then
 manually execute this program. This is possible via the same CLI menu or via
-the command arguments (for more, see below).
+the command arguments (for more, see below).  
+
+It is recommended to adjust `assets/config.json` for ease of use. For more, see
+below.
 
 ## General Usage
 
@@ -44,21 +47,21 @@ settings controlled here are as follows.
 1) `user_emails`: The list of email(s) to send critical error messages to.
 2) `pipeline_email_passwd`: The password to the Pipeline's email, used for
 critical email notifications. For obvious reasons, this is not supplied by default.
-3) `pipeline_user`: The username for the Pipeline to use to access the output database.
-4) `pipeline_passwd`: The password for the Pipeline to use to access the output database.
-5) `pipeline_hostname`: The hostname for the Pipeline to use to access the output database.
-6) `pipeline_db_name`: The database name for the Pipeline to use to access the output database.
-7) `notif_django_path`: The output of the Django file (see `output/notif.txt` for more).
+3) `pipeline_*`: These are credentials for the Hive database.
+4) `portal*`: These are credentials for the Portal database.
+5) `notif_django_path`: The output of the Django file (see `output/notif.txt` for more).
 
 For more, see `docs/config_readme.md`.
 
 ### `bin/env_data.sh`
 
-This file is an alternate way to set the relevant output database data by
+This file is an alternate way to set the Hive database credentials by
 configuring environment variables. These environment variables will take
-priority over the data in `assets/config.json`.
+priority over the corresponding data in `assets/config.json`.
 
-For more, see `docs/env_data.md`.
+To easily apply these variables, use the below from the root of this project.
+
+     $ source bin/env_data.sh
 
 ### `output/`
 

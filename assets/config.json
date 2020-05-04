@@ -1,11 +1,15 @@
 {
+  "portal_user": "sw23",
+  "portal_passwd": "fake",
+  "portal_hostname": "localhost",
+  "portal_db_name": "aperture",
   "user_emails": ["test@test.com"],
   "pipeline_email": "stopspot.noreply@gmail.com",
   "pipeline_email_passwd": "INVALID",
   "pipeline_user": "sw23",
   "pipeline_passwd": "fake",
   "pipeline_hostname": "localhost",
-  "pipeline_db_name": "aperature",
+  "pipeline_db_name": "aperture",
   "columns": {
     "vehicle_number": { "max": "NA", "min": 0 },
     "maximum_speed": { "max": 150, "min": 0 },

@@ -1,5 +1,3 @@
-# TODO: for testing begin/commit, try having a wait b/w this and commit, and
-# then cancel before can commit to see if it did not commit.
 # TODO: test this class.
 import os
 import sys
@@ -29,7 +27,7 @@ class _Option():
 self.config
 self. tables
 self._hive_engine
-self._transaction_in_progress
+self._portal_engine
 """
 class _Client(IOs):
     def __init__(self, read_env_data=True, verbose=True):
@@ -42,24 +40,32 @@ class _Client(IOs):
 
         self.config = config
         self.config.load(read_env_data=read_env_data)
-        self._transaction_in_progress = False
 
-        user = config.get_value('pipeline_user')
-        passwd = config.get_value('pipeline_passwd')
-        hostname = config.get_value('pipeline_hostname')
-        db_name = config.get_value('pipeline_db_name')
-
-        if user and passwd and hostname and db_name:
-            self.ctran = CTran_Data(user, passwd, hostname, db_name, verbose=True)
+        portal_user = config.get_value('portal_user')
+        portal_passwd = config.get_value('portal_passwd')
+        portal_hostname = config.get_value('portal_hostname')
+        portal_db_name = config.get_value('portal_db_name')
+        if portal_user and portal_passwd and portal_hostname and portal_db_name:
+            self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, verbose=verbose)
         else:
-            self.ctran = CTran_Data(verbose=True)
+            print("Please enter credentials for Portal's database with the C-Tran table.")
+            self.ctran = CTran_Data(verbose=verbose)
+        self._portal_engine = self.ctran.get_engine()
 
-        engine_url = self.ctran.get_engine().url
-        self.flagged = Flagged_Data(verbose=True, engine=engine_url)
-        self.flags = Flags(verbose=True, engine=engine_url)
-        self.service_periods = Service_Periods(verbose=True, engine=engine_url)
-        self.processed_days = Processed_Days(verbose=True, engine=engine_url)
-        self._hive_engine = create_engine(engine_url)
+        pipe_user = config.get_value('pipeline_user')
+        pipe_passwd = config.get_value('pipeline_passwd')
+        pipe_hostname = config.get_value('pipeline_hostname')
+        pipe_db_name = config.get_value('pipeline_db_name')
+        if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name:
+            self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, verbose=verbose)
+        else:
+            print("Please enter credentials for Hive's Database.")
+            self.flagged = Flagged_Data(verbose=verbose)
+
+        self._hive_engine = self.flagged.get_engine()
+        engine_url = self._hive_engine.url
+        self.flags = Flags(verbose=verbose, engine=engine_url)
+        self.service_periods = Service_Periods(verbose=verbose, engine=engine_url)
 
     #######################################################
 
@@ -68,7 +74,6 @@ class _Client(IOs):
             self.flags.create_table()
             self.service_periods.create_table()
             self.flagged.create_table()
-            self.processed_days.create_table()
 
         if len(sys.argv) > 1:
             ai = ArgInterface()
@@ -139,11 +144,7 @@ class _Client(IOs):
             for flag in flags:
                 flagged_rows.append([row_id, service_key, int(flag)])
 
-        self._begin_transaction()
         self.flagged.write_table(flagged_rows)
-        self.prompt("@sawyer: now kill the job and see if flagged is updated by processed_days isn't")
-        self.processed_days.insert(start_date, end_date)
-        self._commit_transaction()
 
     ###########################################################
 
@@ -193,10 +194,8 @@ class _Client(IOs):
             _Option("Create flagged_data table.", self.flagged.create_table),
             _Option("Create flags table.", self.flags.create_table),
             _Option("Create service_periods table.", self.service_periods.create_table),
-            _Option("Create processed_days table.", self.processed_days.create_table),
             _Option("Delete flagged_data table.", self.flagged.delete_table),
             _Option("Delete service_periods table.", self.flags.delete_table),
-            _Option("Delete processed_days table.", self.processed_days.delete_table),
             _Option("Query ctran_data and print ctran_data.info().", ctran_info)
         ]
 

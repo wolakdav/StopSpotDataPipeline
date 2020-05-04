@@ -18,7 +18,7 @@ class Table(IOs, abc.ABC):
     # Public Methods
 
     # passwd is not stored as member data, it is destroyed after use.
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):
         self._table_name = None
         self._index_col = None
         super().__init__(verbose)
@@ -31,9 +31,12 @@ class Table(IOs, abc.ABC):
         else:
             if user is None:
                 user = self._prompt("Enter username: ")
-
             if passwd is None:
                 passwd = self._prompt("Enter password: ", hide_input=True)
+            if hostname is None:
+                hostname = self._prompt("Enter hostname: ")
+            if db_name is None:
+                db_name = self.prompt("Enter the database's name: ")
 
             self._build_engine(user, passwd, hostname, db_name)
 
