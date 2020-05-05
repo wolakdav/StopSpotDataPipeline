@@ -1,3 +1,0 @@
-
-documentation
-    update reqs diagram to have flagged_data(service_date)
