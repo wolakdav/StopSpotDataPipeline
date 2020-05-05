@@ -39,21 +39,21 @@ class _Client(IOs):
         self.config = config
         self.config.load(read_env_data=read_env_data)
 
-        portal_user = config.get_value('portal_user')
-        portal_passwd = config.get_value('portal_passwd')
-        portal_hostname = config.get_value('portal_hostname')
-        portal_db_name = config.get_value('portal_db_name')
+        portal_user = config.get_value("portal_user")
+        portal_passwd = config.get_value("portal_passwd")
+        portal_hostname = config.get_value("portal_hostname")
+        portal_db_name = config.get_value("portal_db_name")
         if portal_user and portal_passwd and portal_hostname and portal_db_name:
             self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, verbose=verbose)
         else:
-            print("Please enter credentials for Portal's database with the C-Tran table.")
+            print("Please enter credentials for Portals database with the C-Tran table.")
             self.ctran = CTran_Data(verbose=verbose)
         self._portal_engine = self.ctran.get_engine()
 
-        pipe_user = config.get_value('pipeline_user')
-        pipe_passwd = config.get_value('pipeline_passwd')
-        pipe_hostname = config.get_value('pipeline_hostname')
-        pipe_db_name = config.get_value('pipeline_db_name')
+        pipe_user = config.get_value("pipeline_user")
+        pipe_passwd = config.get_value("pipeline_passwd")
+        pipe_hostname = config.get_value("pipeline_hostname")
+        pipe_db_name = config.get_value("pipeline_db_name")
         if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name:
             self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, verbose=verbose)
         else:

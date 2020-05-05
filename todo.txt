@@ -1,6 +1,3 @@
 
 documentation
     update reqs diagram to have flagged_data(service_date)
-
-testing
-    write tests for Client

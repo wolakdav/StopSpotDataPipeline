@@ -43,7 +43,7 @@ The main program is handled by `client_instance`, a singleton client. To load
 the basic CLI menu, use this line in the shell.
 
     $ python3 main.py
-    
+
 To access all of the members and methods described below via the Python
 interpreter, as well as booting the CLI menu, use this line in the shell.
 
