@@ -36,7 +36,7 @@ class Table(IOs, abc.ABC):
             if hostname is None:
                 hostname = self._prompt("Enter hostname: ")
             if db_name is None:
-                db_name = self.prompt("Enter the database's name: ")
+                db_name = self._prompt("Enter the database's name: ")
 
             self._build_engine(user, passwd, hostname, db_name)
 
