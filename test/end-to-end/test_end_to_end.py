@@ -14,9 +14,10 @@ def instance():
     passwd = config.get_value('pipeline_passwd')
     hostname = config.get_value('pipeline_hostname')
     db_name = config.get_value('pipeline_db_name')
+    db_schema = config.get_value('portal_schema')
 
     if user and passwd and hostname and db_name:
-        ctran = CTran_Data(user, passwd, hostname, db_name, verbose=True)
+        ctran = CTran_Data(user, passwd, hostname, db_name, db_schema, verbose=True)
     
     return ctran
 
