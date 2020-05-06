@@ -133,7 +133,7 @@ def test_creation_sql(instance_fixture):
     assert expected == instance_fixture._creation_sql
 
 def test_create_table_assets_file_check(instance_fixture):
-    instance_fixture._create_table_helper = lambda _: True
+    instance_fixture._create_table_helper = lambda data, exists_action="replace": True
     assert instance_fixture.create_table() == True
 
 def test_create_table_bad_engine(instance_fixture):
@@ -156,7 +156,7 @@ def test_create_table_invalid_cols(monkeypatch, instance_fixture):
 def test_create_table_helper_fails(monkeypatch, instance_fixture):
     monkeypatch.setattr("pandas.read_csv", lambda _, parse_dates: pandas.DataFrame)
     instance_fixture._check_cols = lambda _: True
-    instance_fixture._create_table_helper = lambda _: False
+    instance_fixture._create_table_helper = lambda data, exists_action="replace": False
     assert instance_fixture.create_table() == False
 
 def test_create_table_helper_super_fails(monkeypatch, custom_connect, instance_fixture):

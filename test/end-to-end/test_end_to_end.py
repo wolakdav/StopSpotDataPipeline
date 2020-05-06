@@ -25,13 +25,15 @@ def instance():
 @pytest.fixture
 def save_test_data(instance):
 	if instance != None: 
-		return instance.create_table(ctran_sample_name = "/ctran_ete_test.csv")
+		return instance.create_table(ctran_sample_name = "/ctran_ete_test.csv", exists_action="replace")
 	else: return False
 
 '''
 #Helper function that fetches test data from test aperture
 @pytest.fixture
 def pull_test_data(instance):
+	instance.
+
 
 #Helper function that runs analyzers and returns analyzed data that will be saved
 @pytest.fixture
@@ -63,6 +65,7 @@ def run_analyzers():
 
         for flag in flags:
             flagged_rows.append([row_id, service_key, int(flag)])
+
 
 #Helper function that saves analyzed data
 @pytest.fixture()
