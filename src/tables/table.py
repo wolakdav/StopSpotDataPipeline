@@ -18,12 +18,16 @@ class Table(IOs, abc.ABC):
     # Public Methods
 
     # passwd is not stored as member data, it is destroyed after use.
-    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
         self._table_name = None
         self._index_col = None
         super().__init__(verbose)
         self._chunksize = 1000
-        self._schema = "hive"
+
+        if schema is None:
+            self._schema = self._prompt("Enter the table's schema: ")
+        else:
+            self._schema = schema
 
         if engine is not None:
             self._engine = create_engine(engine)

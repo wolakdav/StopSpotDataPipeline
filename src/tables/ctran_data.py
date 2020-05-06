@@ -9,9 +9,8 @@ class CTran_Data(Table):
     ###########################################################################
     # Public Methods
 
-    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, verbose, engine)
-        self._schema = "aperture"
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="aperture", verbose=False, engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
         self._table_name = "ctran_data"
         self._index_col = "row_id"
         self._expected_cols = [

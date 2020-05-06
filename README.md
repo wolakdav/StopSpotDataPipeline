@@ -139,7 +139,8 @@ settings controlled here are as follows.
 critical email notifications. For obvious reasons, this is not supplied by default.
 3) `pipeline_*`: These are credentials for the Hive database.
 4) `portal*`: These are credentials for the Portal database.
-5) `notif_django_path`: The output of the Django file (see `output/notif.txt` for more).
+5) `notif_django_path`: The output of the Django file (see section
+`output/notif.txt` for more).
 
 For more, see `docs/config_readme.md`.
 
