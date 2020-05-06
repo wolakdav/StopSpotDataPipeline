@@ -18,12 +18,16 @@ class Table(IOs, abc.ABC):
     # Public Methods
 
     # passwd is not stored as member data, it is destroyed after use.
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
         self._table_name = None
         self._index_col = None
         super().__init__(verbose)
         self._chunksize = 1000
-        self._schema = "hive"
+
+        if schema is None:
+            self._schema = self._prompt("Enter the table's schema: ")
+        else:
+            self._schema = schema
 
         if engine is not None:
             self._engine = create_engine(engine)
@@ -31,9 +35,12 @@ class Table(IOs, abc.ABC):
         else:
             if user is None:
                 user = self._prompt("Enter username: ")
-
             if passwd is None:
                 passwd = self._prompt("Enter password: ", hide_input=True)
+            if hostname is None:
+                hostname = self._prompt("Enter hostname: ")
+            if db_name is None:
+                db_name = self._prompt("Enter the database's name: ")
 
             self._build_engine(user, passwd, hostname, db_name)
 
@@ -45,8 +52,8 @@ class Table(IOs, abc.ABC):
     #######################################################
     
     def get_full_table(self):
-        if self._engine is None:
-            self._print("ERROR: self._engine is None, cannot continue.")
+        if not isinstance(self._engine, Engine):
+            self._print("ERROR: self._engine is not an Engine, cannot continue.")
             return None
 
         df = None
@@ -213,8 +220,8 @@ class Table(IOs, abc.ABC):
             sql += "".join([" ON CONFLICT ", conflict_columns, " DO NOTHING;"])
 
         try:
-            with self._engine.connect() as con:
-                con.execute(sql)
+            con = self._engine.connect()
+            con.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
             return False
@@ -245,7 +252,7 @@ class Table(IOs, abc.ABC):
     def _query_table(self, sql):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
-            return False
+            return None
 
         df = None
         self._print(sql)
