@@ -7,18 +7,19 @@ from src.tables import CTran_Data
 
 # @pytest.fixture
 # def ctran():
-#     return CTran_Data(verbose=True)
-#
-# def test_db(ctran):
-#     ai = ArgInterface()
-#     df = ai.query_with_args(ctran, ['--date-start=2019-03-01', '--date-end=2019-03-01'])
-#     assert len(df.index) == 71084
+#     return CTran_Data(user="sw23", passwd="fake", hostname="localhost", db_name="aperture", schema="aperture", verbose=True)
+
 @pytest.fixture
 def ai():
     return ArgInterface()
 
 # TEST RANGE QUERYING
 
+# def test_db(ctran):
+#     ai = ArgInterface()
+#     df = ai.query_with_args(ctran, None, ['--date-start=2019-03-01', '--date-end=2019-03-01'])
+#     assert df is not None
+#     assert len(df.index) == 71084
 
 def test_range_no_cl_args_fails(ai):
     with pytest.raises(SystemExit) as sys_ext:
