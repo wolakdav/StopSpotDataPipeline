@@ -257,7 +257,7 @@ class Table(IOs, abc.ABC):
         df = None
         self._print(sql)
         try:
-            df = pandas.read_sql(sql, self._engine, index_col=self._index_col)
+            df = pandas.read_sql(sql, self._engine)
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
