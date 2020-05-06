@@ -1,0 +1,2 @@
+service_date,vehicle_number,leave_time,train,route_number,direction,service_key,trip_number,stop_time,arrive_time,dwell,location_id,door,lift,ons,offs,estimated_load,maximum_speed,train_mileage,pattern_distance,location_distance,x_coordinate,y_coordinate,data_source,schedule_status,trip_id
+2019-03-01,4005,19209,3702,37,1.0,W,123370244,,19209,0,6091.0,0,0,0,0,1,,1.6628,1.6280000000000001,153.828705,-122.47808166666668,45.59868666666666,2,2,123370244
