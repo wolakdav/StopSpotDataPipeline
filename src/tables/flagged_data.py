@@ -36,9 +36,6 @@ class Flagged_Data(Table):
         if data == []:
             self._print("ERROR: write_table recieved no data to write, cancelling.")
             return False
-        if not super().create_table():
-            self._print("ERROR: failed to create the table; cannot proceed.")
-            return False
             
         df = pandas.DataFrame(data, columns=[
             "row_id",

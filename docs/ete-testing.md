@@ -4,13 +4,12 @@ StopSpot includes a variety of tests. Though most of them are unit tests that do
 **WARNING**: All the configurations must be prior to running pytest, and all of them are in `assets/config.json`. 
 
 ## Overview
-End-to-end test verifies correct output by the program. Thus, test file does the following:
+End-to-end test verifies correct output by the program. Thus, test file does the following (besides small checks):
 `Step 1: ` - Read test data from csv and upload into test schema
-`Step 2: ` - Pull data that was uploaded in the previous step
-`Step 3: ` - Run all data through analyzers
-`Step 4: ` - Save data to output database (into test schema)
-`Step 5: ` - Pull data from the previous step
-`Step 6: ` - Validate that output from the program matches desired output
+`Step 2: ` - Create hive (schema and tables) for output data
+`Step 3: ` - Run all data through analyzers and save data (use client process_data function)
+`Step 4: ` - Pull data from the previous step
+`Step 5: ` - Validate that output from the program matches desired output
 
 ## Must have
 *Note*: 

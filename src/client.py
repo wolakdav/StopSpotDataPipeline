@@ -70,8 +70,9 @@ class _Client(IOs):
 
         self._hive_engine = self.flagged.get_engine()
         engine_url = self._hive_engine.url
-        self.flags = Flags(verbose=verbose, engine=engine_url)
-        self.service_periods = Service_Periods(verbose=verbose, engine=engine_url)
+        self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+        #self.service_periods = Service_Periods(verbose=verbose, engine=engine_url)
+        self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
 
     #######################################################
 

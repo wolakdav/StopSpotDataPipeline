@@ -70,6 +70,7 @@ class Service_Periods(Table):
             self._print("ERROR: invalid engine.")
             return None
 
+
         ternary = self.get_ternary(month)
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (month, year, ternary) VALUES (",
