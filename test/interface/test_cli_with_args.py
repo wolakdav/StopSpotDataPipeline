@@ -1,8 +1,9 @@
 import argparse
 
 import pytest
+
+from src.client import _Client
 from src.interface import ArgInterface
-from src.tables import CTran_Data
 
 
 # @pytest.fixture
@@ -13,6 +14,12 @@ from src.tables import CTran_Data
 #     ai = ArgInterface()
 #     df = ai.query_with_args(ctran, ['--date-start=2019-03-01', '--date-end=2019-03-01'])
 #     assert len(df.index) == 71084
+
+@pytest.fixture
+def cl():
+    return _Client()
+
+
 @pytest.fixture
 def ai():
     return ArgInterface()
@@ -132,7 +139,9 @@ def test_row_two_period_arg_with_value_out_of_upper_range_fails(ai):
 def test_row_proper_cl_args_succeeds(ai):
     ai._parse_cl_args(['-s', '-r=1', '-y=2019', "-p=1"])
 
+
 # TEST FLAG QUERYING
+
 
 def test_flag_only_select_arg_fails(ai):
     with pytest.raises(SystemExit) as sys_ext:
@@ -170,3 +179,10 @@ def test_flag_limit_arg_with_value_0_fails(ai):
 
 def test_flag_with_limit_arg_succeeds(ai):
     ai._parse_cl_args(['-s', '-f=1', '-l=10'])
+
+
+# TEST DAILY
+
+
+def test_daily_succeeds(ai):
+    ai._parse_cl_args(['--daily'])
