@@ -7,8 +7,8 @@ from sqlalchemy.engine.base import Engine
 
 class Service_Periods(Table):
 
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, verbose, engine)
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
         self._table_name = "service_periods"
         self._index_col = "service_key"
         self._expected_cols = [

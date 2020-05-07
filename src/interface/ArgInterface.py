@@ -14,7 +14,7 @@ class ArgInterface:
 
             if args.select:
                 df = self._handle_flag_query(flagged, args)
-            elif args.start_date:
+            elif args.date_start:
                 df = self._handle_range_query(ctran, args)
             else:
                 print("Insufficient arguments.")
