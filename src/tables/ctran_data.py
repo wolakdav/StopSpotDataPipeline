@@ -137,7 +137,6 @@ class CTran_Data(Table):
 
             self._print("Writing sample data to table. This will take a few minutes.")
 
-
             sample_data.to_sql(
                     self._table_name,
                     self._engine,

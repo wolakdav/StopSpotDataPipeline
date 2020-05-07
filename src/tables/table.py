@@ -214,6 +214,8 @@ class Table(IOs, abc.ABC):
 
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (", columns, ") VALUES ", values])
+
+        print("Writing to: ", self._schema, '.', self._table_name)
         if conflict_columns:
             conflict_columns = "({})".format(
                                ", ".join([s for s in conflict_columns]))
