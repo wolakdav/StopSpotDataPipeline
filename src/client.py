@@ -95,6 +95,8 @@ class _Client(IOs):
                         self.process_since_checkpoint),
             _Option("Reprocess service date(s)",
                         self.reprocess),
+            _Option("Create all views",
+                        self.create_all_views),
             _Option("Sub-menu: DB Operations",
                         self._db_menu),
         ]
@@ -199,6 +201,11 @@ class _Client(IOs):
             self.print()
             return False
         return self.process_data(start_date, end_date)
+
+    ###########################################################
+
+    def create_all_views(self):
+        self.flagged.create_views_all_flags()
 
     ###########################################################
 
