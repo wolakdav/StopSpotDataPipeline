@@ -8,7 +8,7 @@ from src.logger import Severity
 
 class ArgInterface:
 
-    def query_with_args(self, ctran, flagged, args):
+    def query_with_args(self, client, ctran, flagged, args):
         try:
             args = self._parse_cl_args(args)
 
@@ -16,6 +16,9 @@ class ArgInterface:
                 df = self._handle_flag_query(flagged, args)
             elif args.date_start:
                 df = self._handle_range_query(ctran, args)
+            elif args.daily:
+                client.process_next_day()
+                return None
             else:
                 print("Insufficient arguments.")
                 return None
@@ -93,16 +96,21 @@ class ArgInterface:
             raise SystemExit(2)
 
         parser = argparse.ArgumentParser()
+        daily = self._is_present(args, None, "--daily")
         query = self._is_present(args, "-s", "--select")
         flag = self._is_present(args, "-f", "--flag")
         row = self._is_present(args, "-r", "--row_id")
+        parser.add_argument("--daily",
+                            help="Process data of the next unprocessed day. No arguments.",
+                            required=not query and not flag and not row and not self._is_present(args, None, "--date-start"),
+                            action="store_true")
         parser.add_argument("--date-start",
                             help="Format: --date-start=YYYY-MM-DD (ex. 2020-01-01)",
-                            required=not query and self._is_present(args, None, "--date-end"),
+                            required=not daily and not query and self._is_present(args, None, "--date-end"),
                             type=self._service_date)
         parser.add_argument("--date-end",
                             help="Format: --date-end=YYYY-MM-DD (ex. 2020-01-01)",
-                            required=not query and self._is_present(args, None, "--date-start"),
+                            required=not daily and not query and self._is_present(args, None, "--date-start"),
                             type=self._service_date)
         parser.add_argument("-s",
                             "--select",
@@ -112,7 +120,7 @@ class ArgInterface:
         parser.add_argument("-f",
                             "--flag",
                             help="Placeholder",
-                            required=query and not row,
+                            required=not daily and query and not row,
                             type=int)
         parser.add_argument("-l",
                             "--limit",
@@ -122,17 +130,17 @@ class ArgInterface:
         parser.add_argument("-r",
                             "--row",
                             help="Specify the row_id of the row you wish to query flags for.",
-                            required=query and not flag,
+                            required=not daily and query and not flag,
                             type=int)
         parser.add_argument("-y",
                             "--year",
                             help="Specify the service year of the row you wish to query flags for.",
-                            required=query and row and not flag,
+                            required=not daily and query and row and not flag,
                             type=self._service_year)
         parser.add_argument("-p",
                             "--service-period",
                             help="Specify the service period of the row you wish to query flags for.",
-                            required=query and row and not flag,
+                            required=not daily and query and row and not flag,
                             type=self._service_period)
         return parser
 
