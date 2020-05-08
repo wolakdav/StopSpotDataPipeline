@@ -3,15 +3,9 @@ Please note, for successfull passing of this test, config.json must be correctly
 '''
 
 import pytest
-import os
-from src.tables import CTran_Data
-from src.tables import Flagged_Data
-from src.tables import Service_Periods
-from src.config import config
-from datetime import datetime
-from flaggers.flagger import flaggers
-
 from src.client import _Client
+from src.tables import CTran_Data
+from datetime import datetime
 
 #############################################################################################################
 
@@ -80,4 +74,3 @@ def test_process_and_save(process_and_save):
 def test_pull_processed_data(processed_data):
 	assert not type(processed_data) is bool
 	assert processed_data.shape[0] > 0
-	
