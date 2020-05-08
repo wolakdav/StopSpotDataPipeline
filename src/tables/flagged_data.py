@@ -239,5 +239,9 @@ class Flagged_Data(Table):
 
 
     def create_views_all_flags(self):
+        # Create a view for all available flag, return false if any failed.
+        status = True
         for flag in flagger.Flags:
-            self.create_view_for_flag(flag)
+            if not self.create_view_for_flag(flag):
+                status = False
+        return status

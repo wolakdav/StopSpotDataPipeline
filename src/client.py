@@ -205,7 +205,7 @@ class _Client(IOs):
     ###########################################################
 
     def create_all_views(self):
-        self.flagged.create_views_all_flags()
+        return self.flagged.create_views_all_flags()
 
     ###########################################################
 
