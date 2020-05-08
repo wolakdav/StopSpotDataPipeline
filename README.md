@@ -85,16 +85,16 @@ Be aware that this will not work if First Time Execution has not occurred.
 Delete the data between the input dates and run
 `client_instance.process_data(start_date, end_date)`.  
 
-#### `bool client_instance.create_all_views()`
-
-Create all views for the Hive schema. Currently only create views for each
-flags that queries all data rows with that flag.
-
 This method will process C-Tran data between `start_date` and `end_date`,
 **inclusive**. These parameters can be datetime or date instances, or strings
 in the format of "YYYY/MM/DD". If no dates are supplied, this will prompt the
 user for them. If `end_date` is not supplied, then it will be set to
 `start_date`.
+
+#### `bool client_instance.create_all_views()`
+
+Create all views for the Hive schema. Currently only create views for each
+flags that queries all data rows with that flag.
 
 #### `client_instance.create_hive()`
 
