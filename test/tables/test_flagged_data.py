@@ -4,6 +4,8 @@ import pytest
 import pandas
 from sqlalchemy import create_engine
 from src.tables import Flagged_Data
+from enum import IntEnum
+import flaggers.flagger as flagger
 
 @pytest.fixture
 def instance_fixture():
@@ -121,3 +123,27 @@ def test_process_dates(instance_fixture):
 
     assert instance_fixture._process_dates(datetime.datetime(2019, 12, 31, 0, 0)) == \
         (datetime.datetime(2019, 12, 31, 0, 0), datetime.datetime(2019, 12, 31, 0, 0))
+
+def test_create_view(monkeypatch, instance_fixture):
+    class mock_connection():
+        def __enter__(self):
+            return self
+        def __exit__(self, type, value, traceback):
+            return
+        def execute(self, sql):
+            self.sql = sql
+
+    class mock_flag(IntEnum):
+        test = 1
+
+    mock = mock_connection()
+    instance_fixture._engine.connect = lambda: mock
+    monkeypatch.setitem(flagger.flag_descriptions, mock_flag.test, "test")
+
+    expected = "".join([
+        "CREATE VIEW ", instance_fixture._schema, ".view_test AS\n",
+        "SELECT * FROM ", instance_fixture._schema, ".", instance_fixture._table_name,
+        " WHERE flag_id=1;"
+    ])
+    instance_fixture.create_view_for_flag(mock_flag.test)
+    assert mock.sql == expected

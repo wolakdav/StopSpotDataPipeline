@@ -91,6 +91,11 @@ in the format of "YYYY/MM/DD". If no dates are supplied, this will prompt the
 user for them. If `end_date` is not supplied, then it will be set to
 `start_date`.
 
+#### `bool client_instance.create_all_views()`
+
+Create all views for the Hive schema. Currently only create views for each
+flags that queries all data rows with that flag.
+
 #### `client_instance.create_hive()`
 
 This method will create the Hive schema, which is the collection of tables
