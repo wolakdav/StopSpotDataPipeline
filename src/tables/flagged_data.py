@@ -2,7 +2,9 @@ import datetime
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import SQLAlchemyError
 import pandas
+
 from .table import Table
+import flaggers.flagger as flagger
 
 
 class Flagged_Data(Table):
@@ -216,3 +218,31 @@ class Flagged_Data(Table):
             return start_date, end_date
         else:
             return end_date, start_date
+
+
+    def create_view_for_flag(self, flag):
+        # flag is one of flagger's Flags enum.
+        view_name = "view_" + flagger.flag_descriptions[flag]
+        sql = "".join([
+            "CREATE VIEW ", self._schema, ".", view_name, " AS\n",
+            "SELECT * FROM ", self._schema, ".", self._table_name,
+            " WHERE flag_id=", str(flag.value), ";"
+        ])
+
+        try:
+            with self._engine.connect() as con:
+                con.execute(sql)
+        except SQLAlchemyError as error:
+            print("SQLAlchemyError: ", error)
+            return False
+        self._print("Done")
+        return True
+
+
+    def create_views_all_flags(self):
+        # Create a view for all available flag, return false if any failed.
+        status = True
+        for flag in flagger.Flags:
+            if not self.create_view_for_flag(flag):
+                status = False
+        return status
