@@ -1,8 +1,12 @@
 # End-to-end testing requirments
 
-StopSpot includes a variety of tests. Though most of them are unit tests that don't need to be configured, end-to-end test needs to be configured to be run succesfully. 
+> StopSpot includes a variety of tests. Though most of them are unit tests that don't need to be configured, end-to-end test needs to be configured to be run succesfully. 
 
-**WARNING**: All the configurations must be prior to running pytest, and all of them are in `assets/config.json`. 
+---
+
+**WARNING**: All the **configurations** must be **prior** to running pytest, and all of them are in **assets/config.json**. 
+
+---
 
 ## Overview
 
@@ -11,12 +15,12 @@ StopSpot includes a variety of tests. Though most of them are unit tests that do
   - `output information` - tables that contain analyzed information. 
 
 End-to-end test verifies correct output by the program. Thus, test file does the following (besides small checks):
-1. Read test data from csv and upload into test aperture (input information)
-2. : Create test hive (output information)
-3. : Run all data (input information) through analyzers and save data (output information) 
-4. : Pull data from hive (output information)
-5. : Validate that data from hive (output information) matches desired output
-6. : Remove test aperture (containing test input information) and test hive (containing output information)
+1. **Read** test data from csv and **upload** into test aperture (input information)
+2. **Create** test hive (output information)
+3. **Run** all data (input information) through **analyzers** and save data (output information) 
+4. **Pull** data from hive (output information)
+5. **Validate** that data from hive (output information) matches desired output
+6. **Remove** test aperture (containing test input information) and test hive (containing output information)
 
 ## Must have
 
