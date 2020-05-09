@@ -5,7 +5,7 @@ from .flagger import Flagger, Flags, flaggers
 class UnobservedStop(Flagger):
 	name = 'Unobserved Stop'
 
-	def flag(self, data):
+	def flag(self, data, config):
 		"""
 		Checks if stop happened at a certain distance away from the actual stop to mark it as an unobserved stop.
 		To check that, we compare -
@@ -16,6 +16,7 @@ class UnobservedStop(Flagger):
 
 		Args:
 			data (Object): data row from full dataset fetched from the db
+			config (Object): contains config vars
 
 		Returns: 
 			list: either empty or containing UNOBSERVED_STOP Flag
@@ -23,8 +24,7 @@ class UnobservedStop(Flagger):
 		"""
 
 		#maxDistance specifies max distance away from the stop at which we start marking stop as an unobserved
-		#Instead of being hardcoded, in the future substitute to .env variable
-		maxDistance = 50
+		maxDistance = config.get_value("unobserved_stop_distance")
 
 		flag = []
 

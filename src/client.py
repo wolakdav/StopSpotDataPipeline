@@ -143,6 +143,8 @@ class _Client(IOs):
                     # Duplicate flagger requires a special call.
                     if flagger.name == "Duplicate":
                         flags.update(flagger.flag(row_id, ctran_df))
+                    elif flagger.name == "Unobserved Stop":
+                        flags.update(flagger.flag(row, self.config))
                     else:
                         flags.update(flagger.flag(row))
                 except Exception as e:
