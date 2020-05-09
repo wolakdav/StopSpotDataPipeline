@@ -63,6 +63,8 @@ class Config:
         if not name == 'columns':
             if name in self._data:
                 return self._data[name]
+            else: 
+                return None
 
     def set_bounds(self, column_name, min, max):
         self._data['columns'][column_name] = {'min' : min, 'max' : max}
