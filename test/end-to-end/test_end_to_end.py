@@ -35,7 +35,7 @@ def flags(client):
 	return client.flags
 
 #***********************************************************************************************************#
-#CREATION AND PROCESSING#############################################################CREATION AND PROCESSING#
+#CREATION, PROCESSING, AND REMOVAL##########################################CREATION, PROCESSING AND REMOVAL#
 #***********************************************************************************************************#
 
 #Helper function that loads data into test aperture: should return True on success
@@ -61,6 +61,16 @@ def process_and_save(client):
 	start = datetime(1900, 1, 1)
 	end = datetime(2100, 1, 1)
 	return client.process_data(start, end)
+
+#Helper function that removes aperture: where input information resides
+@pytest.fixture
+def remove_input_information(ctran):
+	return ctran.delete_schema()
+
+#Helper function that removes hive: where output information resides
+@pytest.fixture
+def remove_output_information(flagged):
+	return flagged.delete_schema()
 
 #***********************************************************************************************************#
 #OUTPUT DATA#####################################################################################OUTPUT DATA#
@@ -121,7 +131,6 @@ def test_pull_flags(flags_data):
 #ACTUAL TESTS###################################################################################ACTUAL TESTS#
 #############################################################################################################
 
-'''
 #Test first (input) row: contains all None's, except date and trip_id, because without them there will be no input into flagged table
 def test_row_1(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only _NULL flags
@@ -143,9 +152,7 @@ def test_row_1(flagged_data, flags_data):
 		if not ((row["description"] == "ROW_ID_NULL") or (row["description"] == "SERVICE_DATE_NULL")):
 			#for each null_flag that we want to check: check if first row contains it (must contain all null flags except 3 above)
 			assert any(first_row["flag_id"] == row["flag_id"]) == True
-'''
 
-'''
 #Test second (input) row: all data is good, except there is data for unobserved_stop flag to be turned on
 def test_row_2(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
@@ -166,8 +173,8 @@ def test_row_2(flagged_data, flags_data):
 
 	#Step 3: Confirm flag is turned on
 	assert unobserved_flag == second_row_flag
-'''
-'''
+
+
 #Test third (input) row: all data is good, except there is data for unopened_door flag to be turned on
 def test_row_3(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
@@ -188,9 +195,7 @@ def test_row_3(flagged_data, flags_data):
 
 	#Step 3: Confirm flag is turned on
 	assert unopened_door_flag == third_row_flag
-'''
 
-'''
 #Test fourth and fifth (rows): all data is good, but they're duplicates of each other, therefore both must contain duplicate flag
 def test_row_4_and_5(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
@@ -217,11 +222,31 @@ def test_row_4_and_5(flagged_data, flags_data):
 	#Step 3: Confirm flag is turned on
 	assert duplicate_flag == fourth_row_flag
 	assert duplicate_flag == fifth_row_flag
-'''
 
 #Test sixth row: All data is good, but service_date is null, therefore data will not be flagged, and thus absent from flagged_data: thus row_id = 5 will not be in the table
 def test_row_6(flagged_data):
 	mask = flagged_data.row_id == 5
 	sixth_row = flagged_data[mask]
 	assert len(sixth_row) == 0
-#TODO: When date or trip id isn't present, no new row will be inserted into flagged, thus test for length of returned table when one or both is absent
+
+#***********************************************************************************************************#
+#RECYCLE#############################################################################################RECYCLE#
+#############################################################################################################
+
+#Test successful aperture removal: where input information resides
+def test_input_information_removal(ctran, remove_input_information):
+	#Step 1: Assert successful removal
+	assert remove_input_information == True
+
+	#Step 2: Try to access table: should return None
+	start_date = datetime(1900, 1, 1)
+	end_date = datetime(2100, 1, 1)
+	assert ctran.query_date_range(start_date, end_date) == None
+
+#Test successful hive removal: where output information resides
+def test_output_information_removal(remove_output_information, flagged_data):
+	#Step 1: Assert succesful removal
+	assert remove_output_information == True
+
+	#Step 2: Try to access table: should return False
+	assert flagged_data == None
