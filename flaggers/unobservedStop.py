@@ -25,11 +25,11 @@ class UnobservedStop(Flagger):
 
 		#maxDistance specifies max distance away from the stop at which we start marking stop as an unobserved
 		max_distance = config.get_value("unobserved_stop_distance")
-		if(max_distance == None) max_distance = 50
+		if max_distance == None: max_distance = 50
 
 		flag = []
 
-		if ('location_distance' in data) and (data['location_distance'] > maxDistance):
+		if ('location_distance' in data) and (data['location_distance'] > max_distance):
 			flag.append(Flags.UNOBSERVED_STOP);
 
 		return flag
