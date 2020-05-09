@@ -126,7 +126,6 @@ class _Client(IOs):
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
         for row_id, row in ctran_df.iterrows():
-            print(row)
             month = row.service_date.month
             year = row.service_date.year
             service_key = self.service_periods.query_or_insert(month, year)
