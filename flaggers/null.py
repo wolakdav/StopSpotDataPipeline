@@ -1,4 +1,5 @@
 from .flagger import Flagger, Flags, flaggers
+import pandas as pd
 
 #data is a row of data from the db: parsed JSON
 class Null(Flagger):
@@ -37,7 +38,7 @@ class Null(Flagger):
     #all null flags will be appended to the list
     null_flags = []
     for col in self.columns_flag_dict:
-      if (col in data) and (data[col] is None):
+      if (col in data) and ((data[col] is None) or data[col] is pd.NaT):
         null_flags.append(self.columns_flag_dict[col])
 
     return null_flags

@@ -272,7 +272,7 @@ class Table(IOs, abc.ABC):
             self._print("ERROR: the columns of read data does not match the specified columns.")
             return None
 
-        df.replace({pandas.NaT: None})
+        #Converts NaN to None, can't do the same with NaT: null flagger takes care
         df1 = df.where(df.notnull(), None)
 
         return df1
