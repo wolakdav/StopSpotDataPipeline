@@ -16,7 +16,7 @@ from datetime import datetime
 #Returns client instance: contains other initialized instances
 @pytest.fixture
 def client():
-    client = _Client(read_env_data=False)
+    client = _Client()
     return client
 
 #Returns ctran instance
@@ -233,6 +233,7 @@ def test_row_6(flagged_data):
 #RECYCLE#############################################################################################RECYCLE#
 #############################################################################################################
 
+'''
 #Test successful aperture removal: where input information resides
 def test_input_information_removal(ctran, remove_input_information):
 	#Step 1: Assert successful removal
@@ -250,3 +251,4 @@ def test_output_information_removal(remove_output_information, flagged_data):
 
 	#Step 2: Try to access table: should return False
 	assert flagged_data == None
+'''
