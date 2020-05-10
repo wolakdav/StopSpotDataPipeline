@@ -28,7 +28,7 @@ self._hive_engine
 self._portal_engine
 """
 class _Client(IOs):
-    def __init__(self, read_env_data=True, verbose=True):
+    def __init__(self, read_env_data=True, ete_test=False, verbose=True):
         super().__init__(verbose)
         try:
             if not read_env_data and os.environ["PIPELINE_ENV_DATA"]:
@@ -37,7 +37,10 @@ class _Client(IOs):
             pass
 
         self.config = config
-        self.config.load(read_env_data=read_env_data)
+        if ete_test:
+            self.config.load(read_env_data=read_env_data, ete_test=ete_test)
+        else:
+            self.config.load(read_env_data=read_env_data)
 
         portal_user = config.get_value("portal_user")
         portal_passwd = config.get_value("portal_passwd")
@@ -68,11 +71,14 @@ class _Client(IOs):
             print("Please enter credentials for Hive's Database.")
             self.flagged = Flagged_Data(verbose=verbose)
 
-        self._hive_engine = self.flagged.get_engine()
-        engine_url = self._hive_engine.url
-        self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
-        #self.service_periods = Service_Periods(verbose=verbose, engine=engine_url)
-        self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+        if ete_test:
+            self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+            self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+        else:
+            self._hive_engine = self.flagged.get_engine()
+            engine_url = self._hive_engine.url
+            self.flags = Flags(verbose=verbose, engine=engine_url)
+            self.service_periods = Service_Periods(verbose=verbose, engine=engine_url)
 
     #######################################################
 
@@ -334,4 +340,4 @@ class _Client(IOs):
 
 ###############################################################################
 
-client_instance = _Client()
+#client_instance = _Client()

@@ -16,8 +16,8 @@ from datetime import datetime
 #Returns client instance: contains other initialized instances
 @pytest.fixture
 def client():
-    client = _Client()
-    return client
+	client = _Client(ete_test=True)
+	return client
 
 #Returns ctran instance
 @pytest.fixture

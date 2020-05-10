@@ -4,7 +4,14 @@
 
 ---
 
-**WARNING**: All the **configurations** must be **prior** to running pytest, and all of them are in **assets/config.json**. 
+**TO RUN**: `python3 -m pytest ete-test/ete.py`
+
+> This test runs separately from other tests (unit tests). In order for pytest not to detect this test during normal `pytest` command, which runs all tests, file is named in a way
+> that doesn't allow pytest to catch it automatically. Thus, there is an explicit command to run end-to-end test. 
+
+---
+
+**WARNING**: All the **configurations** must be **prior** to running pytest, and all of them are in **assets/ete_config.json**. 
 
 ---
 

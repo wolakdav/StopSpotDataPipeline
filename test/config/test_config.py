@@ -30,8 +30,9 @@ def loaded_config(tmp_path):
 
     return config
 
+
 def test_load_filenotfound(empty_config):
-    assert empty_config.load("fake") == False
+    assert empty_config.load(filename="fake") == False
 
 def test_get_set_config(empty_config):
     empty_config.set_value("test", 5)
