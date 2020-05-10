@@ -130,7 +130,8 @@ class _Client(IOs):
         for row_id, row in ctran_df.iterrows():
             month = row.service_date.month
             year = row.service_date.year
-            service_key = self.service_periods.query_or_insert(month, year)
+            date = datetime(year, month, 1)
+            service_key = self.service_periods.query_or_insert(date)
 
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
@@ -143,7 +144,8 @@ class _Client(IOs):
                 try:
                     # Duplicate flagger requires a special call.
                     if flagger.name == "Duplicate":
-                        flags.update(flagger.flag(row_id, ctran_df))
+                        #flags.update(flagger.flag(row, ctran_df))
+                        do_nothing = 1
                     elif flagger.name == "Unobserved Stop":
                         flags.update(flagger.flag(row, self.config))
                     else:

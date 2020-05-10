@@ -29,7 +29,7 @@ class UnobservedStop(Flagger):
 
 		flag = []
 
-		if ('location_distance' in data) and (data['location_distance'] > max_distance):
+		if ('location_distance' in data) and (data['location_distance'] != None) and (data['location_distance'] > max_distance):
 			flag.append(Flags.UNOBSERVED_STOP);
 
 		return flag
