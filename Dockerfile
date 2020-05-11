@@ -7,3 +7,5 @@ RUN python -m pip install \
         pandas \
         sqlalchemy \
         psycopg2
+WORKDIR "/StopSpot_Data_Pipeline"
+CMD python3 main.py --daily
