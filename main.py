@@ -3,5 +3,5 @@
 from src import _Client
 
 if __name__ == "__main__":
-	client = _Client()
-	client.main()
+	client_instance = _Client()
+	client_instance.main()
