@@ -6,7 +6,6 @@ from dateutil.parser import parse, ParserError
 from enum import Enum
 
 CONFIG_FILENAME = "./assets/config.json"
-#ETE_CONFIG_FILENAME = "./assets/ete_config.json"
 
 class BoundsResult(Enum):
     VALID = 1     #value is within range
