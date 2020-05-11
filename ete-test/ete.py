@@ -3,11 +3,76 @@ Please note, for successfull passing of this test, config.json must be correctly
 '''
 
 import pytest
-from src.client import _Client
 from src.tables import CTran_Data
 from src.tables import Flags
 from src.tables import Flagged_Data
 from datetime import datetime
+import json
+
+from src.tables import CTran_Data
+from src.tables import Flagged_Data
+from src.tables import Flags
+from src.tables import Service_Periods
+
+from src.client import _Client
+from src.config import Config
+
+#############################################################################################################
+#FAKE CLASSES###################################################################################FAKE CLASSES#
+#***********************************************************************************************************#
+
+#Returns fake config instance
+@pytest.fixture()
+def fake_config():
+	class Fake_Config(Config):
+		def __init__(self):
+			self._data = {}
+
+		def load(self):
+			self._filename = "./assets/ete_config.json"
+
+			try:
+				with open(self._filename) as f:
+					self._data = json.load(f)
+			except (FileNotFoundError, ValueError):
+				return False
+
+			return True
+
+
+	return Fake_Config()
+
+#Returns fake client instance
+@pytest.fixture
+def fake_client(fake_config):
+	class Fake_Client(_Client):
+		def __init__(self, verbose=True):
+			self.verbose = verbose
+
+			self.config = fake_config
+			self.config.load()
+
+			portal_user = self.config.get_value("portal_user")
+			portal_passwd = self.config.get_value("portal_passwd")
+			portal_hostname = self.config.get_value("portal_hostname")
+			portal_db_name = self.config.get_value("portal_db_name")
+			portal_schema = self.config.get_value("portal_schema")
+			if portal_user and portal_passwd and portal_hostname and portal_db_name and portal_schema:
+				self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema, verbose=verbose)
+
+			pipe_user = self.config.get_value("pipeline_user")
+			pipe_passwd = self.config.get_value("pipeline_passwd")
+			pipe_hostname = self.config.get_value("pipeline_hostname")
+			pipe_db_name = self.config.get_value("pipeline_db_name")
+			pipe_schema = self.config.get_value("pipeline_schema")
+			if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name and pipe_schema:
+				self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+
+
+			self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+			self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+
+	return Fake_Client()
 
 #############################################################################################################
 #INSTANCE FIXTURES#########################################################################INSTANCE_FIXTURES#
@@ -15,8 +80,8 @@ from datetime import datetime
 
 #Returns client instance: contains other initialized instances
 @pytest.fixture
-def client():
-	client = _Client(ete_test=True)
+def client(fake_client):
+	client = fake_client
 	return client
 
 #Returns ctran instance
@@ -241,12 +306,13 @@ def test_row_4_and_5(flagged_data, flags_data):
 	assert duplicate_flag == fifth_row_flag
 '''
 
+'''
 #Test sixth row: All data is good, but service_date is null, therefore data will not be flagged, and thus absent from flagged_data: thus row_id = 5 will not be in the table
 def test_row_6(flagged_data):
 	mask = flagged_data.row_id == 6
 	sixth_row = flagged_data[mask]
 	assert len(sixth_row) == 0
-
+'''
 #***********************************************************************************************************#
 #RECYCLE#############################################################################################RECYCLE#
 #############################################################################################################

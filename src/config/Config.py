@@ -6,7 +6,7 @@ from dateutil.parser import parse, ParserError
 from enum import Enum
 
 CONFIG_FILENAME = "./assets/config.json"
-ETE_CONFIG_FILENAME = "./assets/ete_config.json"
+#ETE_CONFIG_FILENAME = "./assets/ete_config.json"
 
 class BoundsResult(Enum):
     VALID = 1     #value is within range
@@ -16,9 +16,8 @@ class BoundsResult(Enum):
 class Config:
     def __init__(self):
         self._data = {}
-    def load(self, filename=CONFIG_FILENAME, read_env_data=False, debug=False, ete_test=False):
-        if ete_test: self._filename = ETE_CONFIG_FILENAME
-        else: self._filename = filename
+    def load(self, filename=CONFIG_FILENAME, read_env_data=False, debug=False):
+        self._filename = filename
 
         try:
             with open(self._filename) as f:
