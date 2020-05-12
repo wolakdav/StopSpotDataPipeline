@@ -62,6 +62,11 @@ class _Client(IOs):
         if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name:
             if pipe_schema:
                 self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+                self._hive_engine = self.flagged.get_engine()
+                engine_url = self._hive_engine.url
+                self.flags = Flags(schema=pipe_schema, verbose=verbose, engine=engine_url)
+                self.service_periods = Service_Periods(schema=pipe_schema, verbose=verbose, engine=engine_url)
+                return
             else:
                 self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, verbose=verbose)
         else:
