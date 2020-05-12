@@ -1,5 +1,5 @@
 '''
-Please note, for successfull passing of this test, config.json must be correctly set [see docs/ete-testing.md for details]
+Please note, for successfull passing of this test, assets/ete_config.json must be correctly set [see docs/ete-test.md for details]
 '''
 
 import pytest
@@ -278,6 +278,10 @@ def test_row_3(flagged_data, flags_data):
 	assert unopened_door_flag == third_row_flag
 
 '''
+
+Uncomment next 2 tests when Duplicate Flagger is correctly implemented. Right now they fail bacause duplicate turns
+on duplciate_flag for data that isn't duplciate. 
+
 #Test fourth and fifth (rows): all data is good, but they're duplicates of each other, therefore both must contain duplicate flag
 def test_row_4_and_5(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
