@@ -41,8 +41,8 @@ class Flagged_Data(Table):
         df = pandas.DataFrame(data, columns=[
             "row_id",
             "service_key",
-            "flag_id",
-            "service_date"
+            "service_date",
+            "flag_id"
             ])
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
