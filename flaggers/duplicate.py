@@ -1,5 +1,4 @@
 from .flagger import Flagger, Flags, flaggers
-import numpy as np
 
 # Class implements duplicate check
 class Duplicate(Flagger):
