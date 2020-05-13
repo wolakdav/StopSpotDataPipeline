@@ -245,7 +245,13 @@ class _Client(IOs):
             field1: date
             field2: flag
         """
-        dup_df = duplicate_instance.flag(df)
+        dup_df = None
+        try:
+            dup_df = duplicate_instance.flag(df)
+        except ValueError as err:
+            self.print("ERROR:", err)
+            return []
+
         dup_df.insert(0, "service_key", 0)
         dup_df["service_key"] = dup_df["service_date"].apply(
             lambda date: self.service_periods.query_or_insert(date))
