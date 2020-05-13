@@ -22,7 +22,4 @@ class Duplicate(Flagger):
         duplicates = duplicates["service_date"].to_frame()
         return duplicates
 
-    def get_id(self):
-        return Flags.DUPLICATE
-
 flaggers.append(Duplicate())

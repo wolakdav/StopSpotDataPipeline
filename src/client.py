@@ -14,6 +14,7 @@ from src.config import config
 from src.restarter import restarter
 from src.interface import ArgInterface
 from flaggers.flagger import flaggers
+from flaggers.flagger import Flags as flag_enums
 
 
 class _Option():
@@ -252,7 +253,7 @@ class _Client(IOs):
         dup_df["service_date"] = dup_df["service_date"].apply(
             lambda date: "".join([str(date.year), "/", str(date.month), "/", str(date.day)]))
 
-        dup_df["flag_id"] = duplicate_instance.get_id()
+        dup_df["flag_id"] = flag_enums.DUPLICATE
 
         indices = dup_df.index.tolist()
         values = dup_df.values.tolist()
