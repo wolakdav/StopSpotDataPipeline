@@ -120,7 +120,7 @@ class _Client(IOs):
     # Process data between start_date and end_date, inclusive. These parameters
     # can be Date instances or strings in format "YYYY/MM/DD". If no dates are
     # supplied, this will prompt the user for them.
-    def process_data(self, start_date=None, end_date=None):
+    def process_data(self, start_date=None, end_date=None, restart=False):
         self.print("Starting data processing pipeline.")
         start_date, end_date = self._get_date_range(start_date, end_date)
         ctran_df = self.ctran.query_date_range(start_date, end_date)
@@ -137,11 +137,12 @@ class _Client(IOs):
             year = row.service_date.year
             service_key = self.service_periods.query_or_insert(month, year)
 
-            if config.get_value('max_skipped_rows'):
-                if skipped_rows > config.get_value('max_skipped_rows'):
-                    msg = "ERROR: exceeded maximum number of skipped service rows."
-                    self.print(msg)
-                    restarter.critical_error(msg)
+            if restart:
+                if config.get_value('max_skipped_rows'):
+                    if skipped_rows > config.get_value('max_skipped_rows'):
+                        msg = "ERROR: exceeded maximum number of skipped service rows."
+                        self.print(msg)
+                        restarter.critical_error(msg)
 
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
@@ -210,7 +211,7 @@ class _Client(IOs):
         self.print("Processing from:  " + str(start_date))
         end_date = start_date
         self.print("\t   until: " + str(end_date))
-        return self.process_data(start_date, end_date)
+        return self.process_data(start_date, end_date, restart)
 
     ###########################################################
 
