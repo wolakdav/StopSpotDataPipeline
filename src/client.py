@@ -139,7 +139,9 @@ class _Client(IOs):
 
             if config.get_value('max_skipped_rows'):
                 if skipped_rows > config.get_value('max_skipped_rows'):
-                    restarter.critical_error("Exceeded maximum number of skipped service rows.")
+                    msg = "ERROR: exceeded maximum number of skipped service rows."
+                    self.print(msg)
+                    restarter.critical_error(msg)
 
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
