@@ -1,7 +1,7 @@
 import pandas
 
 from .table import Table
-from datetime import datetime, timedelta
+import datetime as dt
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
 
@@ -38,9 +38,11 @@ class Service_Periods(Table):
 
 
     def query(self, date):
-        # Find a service_periods row that matches the month and year.
+        # Find a service_periods row that the date falls in.
         # Note that ternary isn't included because that's derived from month.
+        # date is a datetime object.
 
+        date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
             return None
@@ -62,9 +64,11 @@ class Service_Periods(Table):
 
     def insert_one(self, date):
         # Insert a row and return the id.
+        # date is a datetime object.
         # Honestly should be using write_table() but the RETURNING
         # functionality isn't built into write_table() and I'm too lazy to
         # add that functionality right now so I'll save it for a TODO.
+        date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
             self._print("ERROR: invalid engine.")
             return None
@@ -96,17 +100,26 @@ class Service_Periods(Table):
 
     def get_service_period(self, date):
         # Convert date to service periods in the format of (start_date, end_date)
+        # date is a datetime object.
         # These values are not confirmed by user and may change in the future.
         # Placeholder separators for service periods:
         # Jan 10, May 10, Sep 10
-        separator = [datetime(date.year-1, 9, 10),
-                     datetime(date.year,   1, 10),
-                     datetime(date.year,   5, 10),
-                     datetime(date.year,   9, 10),
-                     datetime(date.year+1, 1, 10)]
+        date = self.convert_date_to_datetime(date)
+        separator = [dt.datetime(date.year-1, 9, 10),
+                     dt.datetime(date.year,   1, 10),
+                     dt.datetime(date.year,   5, 10),
+                     dt.datetime(date.year,   9, 10),
+                     dt.datetime(date.year+1, 1, 10)]
 
         for i in range(len(separator)):
             if date >= separator[i] and date < separator [i+1]:
-                return (separator[i], separator[i+1] - timedelta(days=1))
+                return (separator[i], separator[i+1] - dt.timedelta(days=1))
 
         return None  # Should never happen.
+
+    def convert_date_to_datetime(self, date):
+        if type(date) is dt.date:
+            # Convert date object to datetime object.
+            return dt.datetime.combine(date, dt.datetime.min.time())
+        else:
+            return date
