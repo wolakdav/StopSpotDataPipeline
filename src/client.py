@@ -194,12 +194,17 @@ class _Client(IOs):
     ###########################################################
     
     # This method will process the next day after the latest processed day.
-    def process_next_day(self):
+    def process_next_day(self, restart=False):
         start_date = self.flagged.get_latest_day()
         if start_date is None:
             msg = "ERROR: an error occured while attempting to find the last processed day. This may be because the last processed day doesn't exist or an error occured while connecting to the database."
             self.print(msg)
-            restarter.critical_error(msg)
+            if restart:
+                restarter.critical_error(msg)
+            else:
+                return False
+            
+
         self.print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
         self.print("Processing from:  " + str(start_date))
