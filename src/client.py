@@ -134,6 +134,7 @@ class _Client(IOs):
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
         self.print("Processing the queried data.")
+        duplicate = None
         for row_id, row in ctran_df.iterrows():
             service_key = self.service_periods.query_or_insert(row.service_date)
 
@@ -152,7 +153,6 @@ class _Client(IOs):
                 continue
 
             flags = set()
-            duplicate = None
             for flagger in flaggers:
                 try:
                     # Duplicate flagger requires a special call later on,
