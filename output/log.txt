@@ -1,6 +1,0 @@
-[ERROR]  2020-05-12 17:00:04.484422  An unexpected critical error occured while running the pipeline on May 12 2020 17:00:04.
- The contents of the error are listed below:
-
- sdfsdf 
- The error has been logged and the pipeline will be restarted unless the retry limit has been reached.  
-[ERROR]  2020-05-12 17:00:04.494174  sdfsdf 
