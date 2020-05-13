@@ -3,7 +3,7 @@ import pytest
 import pandas
 from sqlalchemy import create_engine
 from src.tables import Service_Periods
-from datetime import datetime
+from datetime import datetime, date
 
 @pytest.fixture
 def instance_fixture():
@@ -63,14 +63,27 @@ def test_get_service_period(instance_fixture):
                (datetime(2019, 5, 10), datetime(2019, 9, 9))
     assert instance_fixture.get_service_period(datetime(2010, 12, 25)) == \
                (datetime(2010, 9, 10), datetime(2011, 1, 9))
+    # Test date conversion to datetime.
+    assert instance_fixture.get_service_period(date(2019, 1, 1)) == \
+               (datetime(2018, 9, 10), datetime(2019, 1, 9))
+    assert instance_fixture.get_service_period(date(2019, 1, 10)) == \
+               (datetime(2019, 1, 10), datetime(2019, 5, 9))
+    assert instance_fixture.get_service_period(date(2019, 5, 10)) != \
+               (datetime(2019, 1, 10), datetime(2019, 5, 9))
+    assert instance_fixture.get_service_period(date(2019, 5, 10)) == \
+               (datetime(2019, 5, 10), datetime(2019, 9, 9))
+    assert instance_fixture.get_service_period(date(2010, 12, 25)) == \
+               (datetime(2010, 9, 10), datetime(2011, 1, 9))
 
 def test_query_or_insert(monkeypatch, instance_fixture):
     monkeypatch.setattr(instance_fixture, "query", lambda _: 1)
     monkeypatch.setattr(instance_fixture, "insert_one", lambda _: 2)
     assert instance_fixture.query_or_insert(datetime(2000, 1, 1)) == 1
+    assert instance_fixture.query_or_insert(date(2000, 1, 1)) == 1
 
     monkeypatch.setattr(instance_fixture, "query", lambda _: None)
     assert instance_fixture.query_or_insert(datetime(2000, 1, 1)) == 2
+    assert instance_fixture.query_or_insert(date(2000, 1, 1)) == 2
     
 
 def test_insert_one(instance_fixture):
