@@ -17,7 +17,7 @@ class ArgInterface:
             elif args.date_start:
                 df = self._handle_range_query(ctran, args)
             elif args.daily:
-                client.process_next_day()
+                client.process_next_day(True)
                 return None
             else:
                 print("Insufficient arguments.")
