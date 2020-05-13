@@ -218,15 +218,15 @@ def test_row_1(flagged_data, flags_data):
 	mask = flags_data.description.str.contains("_NULL")
 	null_flags = flags_data[mask]
 
-	#Should have more than 1 NULL flag
-	assert len(null_flags) > 1
+	#Should have exactly 27 NULL flags
+	assert len(null_flags) == 27
 
 	#Step 2: Need to split flagged to contain data for Row 1 only 
 	mask = flagged_data.row_id == 1
 	first_row = flagged_data[mask]
 
-	#Should have more than flagged 1 row for first inout row
-	assert len(first_row) > 1
+	#Should have 25 NULL flags: service_date can't be null (won't be flagged), and row_id is inserted automatically (can't be null)
+	assert len(first_row) == 25
 
 	#Step 3: Iterate over null flags omiting service_date
 	for index, row in null_flags.iterrows():
@@ -255,6 +255,10 @@ def test_row_2(flagged_data, flags_data):
 	#Step 3: Confirm flag is turned on
 	assert unobserved_flag == second_row_flag
 
+'''
+
+Uncomment next 3 tests when Duplicate Flagger is correctly implemented. Right now they fail bacause duplicate turns
+on duplciate_flag for data that isn't duplciate, thus throwing off correct count, making assert fail 
 
 #Test third (input) row: all data is good, except there is data for unopened_door flag to be turned on
 def test_row_3(flagged_data, flags_data):
@@ -276,11 +280,6 @@ def test_row_3(flagged_data, flags_data):
 
 	#Step 3: Confirm flag is turned on
 	assert unopened_door_flag == third_row_flag
-
-'''
-
-Uncomment next 2 tests when Duplicate Flagger is correctly implemented. Right now they fail bacause duplicate turns
-on duplciate_flag for data that isn't duplciate. 
 
 #Test fourth and fifth (rows): all data is good, but they're duplicates of each other, therefore both must contain duplicate flag
 def test_row_4_and_5(flagged_data, flags_data):
