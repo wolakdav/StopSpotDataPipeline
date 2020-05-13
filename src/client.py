@@ -14,6 +14,7 @@ from src.config import config
 from src.restarter import restarter
 from src.interface import ArgInterface
 from flaggers.flagger import flaggers
+from flaggers.flagger import Flags as flag_enums
 
 
 class _Option():
@@ -132,6 +133,8 @@ class _Client(IOs):
         skipped_rows = 0
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
+        self.print("Processing the queried data.")
+        duplicate = None
         for row_id, row in ctran_df.iterrows():
             service_key = self.service_periods.query_or_insert(row.service_date)
 
@@ -152,9 +155,10 @@ class _Client(IOs):
             flags = set()
             for flagger in flaggers:
                 try:
-                    # Duplicate flagger requires a special call.
+                    # Duplicate flagger requires a special call later on,
+                    # independent of this loop.
                     if flagger.name == "Duplicate":
-                        flags.update(flagger.flag(row_id, ctran_df))
+                        duplicate = flagger
                     else:
                         flags.update(flagger.flag(row))
                 except Exception as e:
@@ -167,12 +171,19 @@ class _Client(IOs):
                 flagged_rows.append([
                     row_id,
                     service_key,
-                    int(flag),
-                    date
+                    date,
+                    int(flag)
                 ])
 
+        # Duplicate flagger requires a special call later on, independent of
+        # the primary loop.
+        if duplicate is not None:
+            flagged_rows.extend(self._flag_duplicates(ctran_df, duplicate))
+        else:
+            self.print("NOTE: this run is not checking for duplicates.")
+
         self.flagged.write_table(flagged_rows)
-        self.print("Done.")
+        self.print("Done executing the pipeline.")
         return True
 
     ###########################################################
@@ -224,6 +235,41 @@ class _Client(IOs):
 
     def create_all_views(self):
         return self.flagged.create_views_all_flags()
+
+    #######################################################
+
+    def _flag_duplicates(self, df, duplicate_instance):
+        """ Order of fields.
+            index:  row_id
+            field0: service_key
+            field1: date
+            field2: flag
+        """
+        dup_df = None
+        try:
+            dup_df = duplicate_instance.flag(df)
+        except ValueError as err:
+            self.print("ERROR:", err)
+            return []
+
+        dup_df.insert(0, "service_key", 0)
+        dup_df["service_key"] = dup_df["service_date"].apply(
+            lambda date: self.service_periods.query_or_insert(date))
+
+        dup_df["service_date"] = dup_df["service_date"].apply(
+            lambda date: "".join([str(date.year), "/", str(date.month), "/", str(date.day)]))
+
+        dup_df["flag_id"] = flag_enums.DUPLICATE
+
+        indices = dup_df.index.tolist()
+        values = dup_df.values.tolist()
+        dup_list = []
+        for i in range(len(indices)):
+            temp = [indices[i]]
+            temp.extend(values[i])
+            dup_list.append(temp)
+
+        return dup_list
 
     ###########################################################
 
