@@ -40,12 +40,6 @@ class DataRow():
 def duplicate_flagger():
   return [f for f in flaggers if f.name == 'Duplicate'][0]
 
-@pytest.fixture
-def data():
-    full_list = []
-    full_list.append(vars(DataRow()))
-    return pandas.DataFrame(full_list)
-
 #Create list with just 1 item
 @pytest.fixture
 def good_data():
@@ -62,16 +56,16 @@ def bad_data():
     return pandas.DataFrame(full_list)
 
 #Should NOT return a flags, since data is good [returns empty list]
-def test_duplicate_flagger_on_good_data(duplicate_flagger, good_data, data):
-    flags = duplicate_flagger.flag(data, good_data)
+def test_duplicate_flagger_on_good_data(duplicate_flagger, good_data):
+    flags = duplicate_flagger.flag(0, good_data)
     assert len(flags) == 0
 
 #Should return flags, since data is bad [returns list with 1 flag]
-def test_duplicate_flagger_on_bad_data(duplicate_flagger, bad_data, data):
-    flags = duplicate_flagger.flag(data, bad_data)
+def test_duplicate_flagger_on_bad_data(duplicate_flagger, bad_data):
+    flags = duplicate_flagger.flag(0, bad_data)
     assert len(flags) == 1
     assert Flags.DUPLICATE in flags
     # Asserts that the second entry also receives a duplicate flag.
-    flags = duplicate_flagger.flag(data, bad_data)
+    flags = duplicate_flagger.flag(1, bad_data)
     assert len(flags) == 1
     assert Flags.DUPLICATE in flags

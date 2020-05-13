@@ -143,8 +143,7 @@ class _Client(IOs):
                 try:
                     # Duplicate flagger requires a special call.
                     if flagger.name == "Duplicate":
-                        #flags.update(flagger.flag(row, ctran_df))
-                        do_nothing = 1
+                        flags.update(flagger.flag(row_id, ctran_df))
                     elif flagger.name == "Unobserved Stop":
                         flags.update(flagger.flag(row, self.config))
                     else:
@@ -330,7 +329,3 @@ class _Client(IOs):
         else:
             return end_date, start_date
 
-
-###############################################################################
-
-#client_instance = _Client()
