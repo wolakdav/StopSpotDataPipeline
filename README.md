@@ -68,7 +68,7 @@ This method is called in main.py and it is the main control unit of the Client.
 `read_env_data` determines if the program will read environment data to
 determine where the Pipeline database credentials are (for more, see below).
 
-#### `bool client_instance.process_data(start_date=None, end_date=None)`
+#### `bool client_instance.process_data(start_date=None, end_date=None, restart=False)`
 
 This method will process C-Tran data between `start_date` and `end_date`,
 **inclusive**. These parameters can be datetime or date instances, or strings
@@ -76,11 +76,15 @@ in the format of "YYYY/MM/DD". If no dates are supplied, this will prompt the
 user for them. If `end_date` is not supplied, then it will be set to
 `start_date`.
 
-#### `bool client_instance.process_next_day()`
+If `restart` is true the pipeline will attempt to restart if an error occurs.
+
+#### `bool client_instance.process_next_day(restart=False)`
 
 This method will process the day after the latest processed service day.  
 
 Be aware that this will not work if First Time Execution has not occurred.
+
+If `restart` is true the pipeline will attempt to restart if an error occurs.
 
 #### `bool client_instance.process_since_checkpoint()`
 
