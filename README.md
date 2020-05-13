@@ -31,11 +31,20 @@ below.
 2) Executing the program.  
   a. `python3 main.py`: Start the program's CLI menu.  
   b. `python3 main.py --help`: See the instructions for use as a command.  
-3) `exit`: Close the virtual environment.
+3) `exit`: Close the virtual environment
 
-Alternatively, place the below into the system's crontab to automatically process new data every 24 hours.
-Again, this does require the First Time Execution to have already occurred.  
-`TODO: place the crontab line here.`
+### Setup Docker environment
+
+To setup the docker environment you can do so using the script ```docker/build```. This bash script can be executed by the following command ```./build``` while in the docker directory. This script will simply build the image for future docker containers. If you wish to connect to a docker container with the ```stop_spot``` image and interact with it using a shell you can use the ```docker/connect``` script by running it in a similar fashion to the ```docker/build``` script. The ```docker/connect``` script will create a new container everytime, if you wish to connect an existing container you can do so with the following command.
+
+```docker exec -it container_id bash```
+
+
+### Setup Cron Job
+
+To create a cron job, use the ```cron_job/create_cron_job``` script to create a cron job which will process new data every 24 hours. The script is a simple bash script which puts the contents of ```cron_job/cron_job_params``` into crontab. To run the script simply type ```./create_cron_job``` while in the ```cron_job``` directory. If you want to change the time interval for which the cron job runs you can edit the ```cron_job/cron_job_params``` file and rerun the ```cron_job/create_cron_job``` script. By default the script is set to start a container of the application and process the next days data at 4am.
+
+Again, this does require the First Time Execution to have already occurred as the connection details within ```assets/config.json``` are necessary to process the next days data. Additionally, you must build the docker image using the script ```docker/build``` as the cron job will start a docker container to process the next days data.  
 
 ### Using the Client
 
@@ -59,7 +68,7 @@ This method is called in main.py and it is the main control unit of the Client.
 `read_env_data` determines if the program will read environment data to
 determine where the Pipeline database credentials are (for more, see below).
 
-#### `bool client_instance.process_data(start_date=None, end_date=None)`
+#### `bool client_instance.process_data(start_date=None, end_date=None, restart=False)`
 
 This method will process C-Tran data between `start_date` and `end_date`,
 **inclusive**. These parameters can be datetime or date instances, or strings
@@ -67,11 +76,15 @@ in the format of "YYYY/MM/DD". If no dates are supplied, this will prompt the
 user for them. If `end_date` is not supplied, then it will be set to
 `start_date`.
 
-#### `bool client_instance.process_next_day()`
+If `restart` is true the pipeline will attempt to restart if an error occurs.
+
+#### `bool client_instance.process_next_day(restart=False)`
 
 This method will process the day after the latest processed service day.  
 
 Be aware that this will not work if First Time Execution has not occurred.
+
+If `restart` is true the pipeline will attempt to restart if an error occurs.
 
 #### `bool client_instance.process_since_checkpoint()`
 
@@ -90,6 +103,11 @@ This method will process C-Tran data between `start_date` and `end_date`,
 in the format of "YYYY/MM/DD". If no dates are supplied, this will prompt the
 user for them. If `end_date` is not supplied, then it will be set to
 `start_date`.
+
+#### `bool client_instance.create_all_views()`
+
+Create all views for the Hive schema. Currently only create views for each
+flags that queries all data rows with that flag.
 
 #### `client_instance.create_hive()`
 

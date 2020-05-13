@@ -11,6 +11,7 @@ from src.tables import Flagged_Data
 from src.tables import Flags
 from src.tables import Service_Periods
 from src.config import config
+from src.restarter import restarter
 from src.interface import ArgInterface
 from flaggers.flagger import flaggers
 
@@ -53,7 +54,6 @@ class _Client(IOs):
             print("Please enter credentials for Portals database with the C-Tran table.")
             self.ctran = CTran_Data(verbose=verbose)
         self._portal_engine = self.ctran.get_engine()
-
         pipe_user = config.get_value("pipeline_user")
         pipe_passwd = config.get_value("pipeline_passwd")
         pipe_hostname = config.get_value("pipeline_hostname")
@@ -62,6 +62,11 @@ class _Client(IOs):
         if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name:
             if pipe_schema:
                 self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+                self._hive_engine = self.flagged.get_engine()
+                engine_url = self._hive_engine.url
+                self.flags = Flags(schema=pipe_schema, verbose=verbose, engine=engine_url)
+                self.service_periods = Service_Periods(schema=pipe_schema, verbose=verbose, engine=engine_url)
+                return
             else:
                 self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, verbose=verbose)
         else:
@@ -79,7 +84,7 @@ class _Client(IOs):
 
         if len(sys.argv) > 1:
             ai = ArgInterface()
-            return ai.query_with_args(self.ctran, self.flagged, sys.argv[1:])
+            return ai.query_with_args(self, self.ctran, self.flagged, sys.argv[1:])
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
@@ -95,6 +100,8 @@ class _Client(IOs):
                         self.process_since_checkpoint),
             _Option("Reprocess service date(s)",
                         self.reprocess),
+            _Option("Create all views",
+                        self.create_all_views),
             _Option("Sub-menu: DB Operations",
                         self._db_menu),
         ]
@@ -113,7 +120,7 @@ class _Client(IOs):
     # Process data between start_date and end_date, inclusive. These parameters
     # can be Date instances or strings in format "YYYY/MM/DD". If no dates are
     # supplied, this will prompt the user for them.
-    def process_data(self, start_date=None, end_date=None):
+    def process_data(self, start_date=None, end_date=None, restart=False):
         self.print("Starting data processing pipeline.")
         start_date, end_date = self._get_date_range(start_date, end_date)
         ctran_df = self.ctran.query_date_range(start_date, end_date)
@@ -122,17 +129,24 @@ class _Client(IOs):
             return False
 
         flagged_rows = []
+        skipped_rows = 0
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
         for row_id, row in ctran_df.iterrows():
-            month = row.service_date.month
-            year = row.service_date.year
-            service_key = self.service_periods.query_or_insert(month, year)
+            service_key = self.service_periods.query_or_insert(row.service_date)
+
+            if restart:
+                if config.get_value('max_skipped_rows'):
+                    if skipped_rows > config.get_value('max_skipped_rows'):
+                        msg = "ERROR: exceeded maximum number of skipped service rows."
+                        self.print(msg)
+                        restarter.critical_error(msg)
 
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
             if not service_key:
                 self.print("ERROR: cannot find or create new service_key, skipping.")
+                skipped_rows +=1
                 continue
 
             flags = set()
@@ -179,17 +193,23 @@ class _Client(IOs):
     ###########################################################
     
     # This method will process the next day after the latest processed day.
-    def process_next_day(self):
+    def process_next_day(self, restart=False):
         start_date = self.flagged.get_latest_day()
         if start_date is None:
-            self.print("ERROR: no prior date processed; cannot continue from the last processed day.")
-            return False
+            msg = "ERROR: an error occured while attempting to find the last processed day. This may be because the last processed day doesn't exist or an error occured while connecting to the database."
+            self.print(msg)
+            if restart:
+                restarter.critical_error(msg)
+            else:
+                return False
+            
+
         self.print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
         self.print("Processing from:  " + str(start_date))
         end_date = start_date
         self.print("\t   until: " + str(end_date))
-        return self.process_data(start_date, end_date)
+        return self.process_data(start_date, end_date, restart)
 
     ###########################################################
 
@@ -199,6 +219,11 @@ class _Client(IOs):
             self.print()
             return False
         return self.process_data(start_date, end_date)
+
+    ###########################################################
+
+    def create_all_views(self):
+        return self.flagged.create_views_all_flags()
 
     ###########################################################
 
