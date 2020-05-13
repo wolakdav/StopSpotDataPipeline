@@ -11,6 +11,7 @@ from src.tables import Flagged_Data
 from src.tables import Flags
 from src.tables import Service_Periods
 from src.config import config
+from src.restarter import restarter
 from src.interface import ArgInterface
 from flaggers.flagger import flaggers
 
@@ -53,7 +54,6 @@ class _Client(IOs):
             print("Please enter credentials for Portals database with the C-Tran table.")
             self.ctran = CTran_Data(verbose=verbose)
         self._portal_engine = self.ctran.get_engine()
-
         pipe_user = config.get_value("pipeline_user")
         pipe_passwd = config.get_value("pipeline_passwd")
         pipe_hostname = config.get_value("pipeline_hostname")
@@ -129,6 +129,7 @@ class _Client(IOs):
             return False
 
         flagged_rows = []
+        skipped_rows = 0
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
         for row_id, row in ctran_df.iterrows():
@@ -136,10 +137,16 @@ class _Client(IOs):
             year = row.service_date.year
             service_key = self.service_periods.query_or_insert(month, year)
 
+            if config.get_value('max_skipped_rows'):
+                if skipped_rows > config.get_value('max_skipped_rows'):
+                    restarter.critical_error("Exceeded maximum number of skipped service rows.")
+
+
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
             if not service_key:
                 self.print("ERROR: cannot find or create new service_key, skipping.")
+                skipped_rows +=1
                 continue
 
             flags = set()
@@ -189,8 +196,9 @@ class _Client(IOs):
     def process_next_day(self):
         start_date = self.flagged.get_latest_day()
         if start_date is None:
-            self.print("ERROR: no prior date processed; cannot continue from the last processed day.")
-            return False
+            msg = "ERROR: an error occured while attempting to find the last processed day. This may be because the last processed day doesn't exist or an error occured while connecting to the database."
+            self.print(msg)
+            restarter.critical_error(msg)
         self.print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
         self.print("Processing from:  " + str(start_date))
