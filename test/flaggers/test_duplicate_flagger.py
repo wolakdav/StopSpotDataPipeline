@@ -53,16 +53,16 @@ def duplications():
 
 # There are duplicates returned.
 def test_duplicate_flagger_happy(duplicate_flagger, duplications):
-    result = duplicate_flagger.flag(duplications)
+    result = duplicate_flagger.flag(duplications, "config")
     assert not result.empty and 'service_date' in result
 
 # There are no duplicates returned.
 def test_duplicate_flagger_sad(duplicate_flagger, no_duplications):
-    result = duplicate_flagger.flag(no_duplications)
+    result = duplicate_flagger.flag(no_duplications, "config")
     assert result.empty
 
 # The ValueError is raised as the input DataFrame lacks the 'serivce_date'
 # field.
 def test_duplicate_flagger_bad(duplicate_flagger):
     with pytest.raises(ValueError):
-        duplicate_flagger.flag(pandas.DataFrame())
+        duplicate_flagger.flag(pandas.DataFrame(), "config")

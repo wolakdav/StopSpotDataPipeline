@@ -25,11 +25,11 @@ def bad_data():
 
 #Should NOT return a flags, since data is good [returns empty list]
 def test_unopened_door_flagger_on_good_data(unopened_door_flagger, good_data):
-	flags = unopened_door_flagger.flag(good_data)
+	flags = unopened_door_flagger.flag(good_data, "config")
 	assert len(flags) == 0
 
 #Should return flags, since data is bad [returns list with 1 flag]
 def test_unopened_door_flagger_on_bad_data(unopened_door_flagger, bad_data):
-	flags = unopened_door_flagger.flag(bad_data)
+	flags = unopened_door_flagger.flag(bad_data, "config")
 	assert len(flags) == 1
 	assert Flags.UNOPENED_DOOR in flags

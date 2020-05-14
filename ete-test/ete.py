@@ -255,11 +255,6 @@ def test_row_2(flagged_data, flags_data):
 	#Step 3: Confirm flag is turned on
 	assert unobserved_flag == second_row_flag
 
-'''
-
-Uncomment next 3 tests when Duplicate Flagger is correctly implemented. Right now they fail bacause duplicate turns
-on duplciate_flag for data that isn't duplciate, thus throwing off correct count, making assert fail 
-
 #Test third (input) row: all data is good, except there is data for unopened_door flag to be turned on
 def test_row_3(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
@@ -307,15 +302,13 @@ def test_row_4_and_5(flagged_data, flags_data):
 	#Step 3: Confirm flag is turned on
 	assert duplicate_flag == fourth_row_flag
 	assert duplicate_flag == fifth_row_flag
-'''
 
-'''
 #Test sixth row: All data is good, but service_date is null, therefore data will not be flagged, and thus absent from flagged_data: thus row_id = 5 will not be in the table
 def test_row_6(flagged_data):
 	mask = flagged_data.row_id == 6
 	sixth_row = flagged_data[mask]
 	assert len(sixth_row) == 0
-'''
+
 #***********************************************************************************************************#
 #RECYCLE#############################################################################################RECYCLE#
 #############################################################################################################
