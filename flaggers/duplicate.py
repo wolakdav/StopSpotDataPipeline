@@ -1,27 +1,33 @@
 from .flagger import Flagger, Flags, flaggers
 
-#Class implements duplicate check
+# Class implements duplicate check
 class Duplicate(Flagger):
-	name = 'Duplicate'
+    name = 'Duplicate'
 
-	def flag(self, row, data):
-		"""
-		Checks passed row/dict/object and passed full dataset, to see if there are duplicates.
+    def flag(self, data, config):
+        """
+        Due to this flag being an oddity, this method will return a DataFrame
+        of service_dates that are duplicates. It is the responsibility of the
+        caller to process these into whatever form they desire.
 
-		Args:
-			row (Object): data row from full dataset fetched from the db
-			data (Matrix/List of Objects): full dataset fetched from db
+        Args:
+            data (Pandas.DataFrame): The dataset to find duplicates in. This
+                    must have a 'service_date' field, otherwise an ValueError
+                    is thrown.
 
-		Returns: 
-			list: either empty or containing DUPLICATE Flag
-		"""
+        Returns: 
+            pandas.DataFrame: The DF with index row_id and field service_date
+                    of rows that are duplicates.
 
-		flag = []
+        Raises:
+            ValueError: When the input pandas.DataFrame lacks a 'service_date' field.
+        """
 
-		#Count number of occurances in the list, and if occurs more than once append Flag to flag list.
-		if(data.count(row)) > 1:
-			flag.append(Flags.DUPLICATE)
-
-		return flag
+        duplicates = data[data.duplicated(keep=False)]
+        try:
+            duplicates = duplicates['service_date'].to_frame()
+        except KeyError:
+            raise ValueError('Duplicate.flag() received a pandas.DataFrame without a "service_date" field.')
+        return duplicates
 
 flaggers.append(Duplicate())

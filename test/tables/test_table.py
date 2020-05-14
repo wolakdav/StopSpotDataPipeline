@@ -10,17 +10,17 @@ g_expected = None
 
 # Test_Dummy is used to allow for easy and precise tests of Table.
 class Table_Dummy(Table):
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, verbose, engine)
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
         self._table_name = "fake"
         self._index_col = "fake_key"
-        self._expected_cols = set([
+        self._expected_cols = [
             "this",
             "is",
             "a",
             "fake",
             "table"
-        ])
+        ]
         self._creation_sql = "".join(["""
             CREATE TABLE IF NOT EXISTS """, self._schema, ".", self._table_name, """
             (
@@ -35,7 +35,7 @@ class Table_Dummy(Table):
 
 @pytest.fixture
 def instance_fixture():
-    return Table_Dummy("sw23", "invalid")
+    return Table_Dummy("sw23", "invalid", "localhost", "aperture")
 
 @pytest.fixture
 def dummy_engine():
@@ -94,9 +94,13 @@ def test_constructor_given_engine(dummy_engine):
     instance = Table_Dummy(engine=engine_url)
     assert instance._engine.url == engine.url
 
-def test_verbose(instance_fixture):
-    verbose = instance_fixture.verbose
-    assert isinstance(verbose, bool) and verbose == False
+def test_no_print(instance_fixture):
+    with pytest.raises(AttributeError):
+        assert instance_fixture.print("string")
+
+def test_no_prompt(instance_fixture):
+    with pytest.raises(AttributeError):
+        assert instance_fixture.prompt("string")
 
 def test_chunksize(instance_fixture):
     chunksize = instance_fixture._chunksize
@@ -112,7 +116,7 @@ def test_schema(instance_fixture):
     assert instance_fixture._schema == "hive"
 
 def test_expected_cols(instance_fixture):
-    expected_cols = set(["this", "is", "a", "fake", "table"])
+    expected_cols = ["this", "is", "a", "fake", "table"]
     assert instance_fixture._expected_cols == expected_cols
 
 def test_creation_sql(instance_fixture):
@@ -136,42 +140,6 @@ def test_print_unverbose(capsys, instance_fixture):
     instance_fixture.verbose = False
     instance_fixture._print("Hello!")
     assert capsys.readouterr().out == ""
-
-def test_print_no_obj(capsys, instance_fixture):
-    instance_fixture.verbose = True
-    instance_fixture._print("Hello!")
-    assert capsys.readouterr().out == "Hello!\n"
-
-def test_print_no_obj_forced(capsys, instance_fixture):
-    instance_fixture.verbose = False
-    instance_fixture._print("Hello!", force=True)
-    assert capsys.readouterr().out == "Hello!\n"
-
-def test_print_obj(capsys, instance_fixture):
-    instance_fixture.verbose = True
-    obj = ["Pizza", "Pie"]
-    instance_fixture._print("Hello!", obj)
-    assert capsys.readouterr().out == "Hello!['Pizza', 'Pie']\n"
-
-def test_print_obj_forced(capsys, instance_fixture):
-    instance_fixture.verbose = False
-    obj = ["Pizza", "Pie"]
-    instance_fixture._print("Hello!", obj, True)
-    assert capsys.readouterr().out == "Hello!['Pizza', 'Pie']\n"
-
-def test_prompt_unhidden(capsys, monkeypatch, instance_fixture):
-    expected = "sw23"
-    prompt = "> "
-    monkeypatch.setattr("sys.stdin", io.StringIO(expected + "\n"))
-    result = instance_fixture._prompt(prompt)
-    assert result == expected
-
-def test_prompt_hidden(capsys, monkeypatch, instance_fixture):
-    expected = "fake\n"
-    prompt = "> "
-    monkeypatch.setattr("getpass.getpass", lambda _: expected)
-    result = instance_fixture._prompt(prompt, True)
-    assert result == expected
 
 def test_check_cols_happy(sample_df, instance_fixture):
     assert instance_fixture._check_cols(sample_df) == True
@@ -281,3 +249,31 @@ def test_delete_table_sqlalchemy_error(instance_fixture):
     # Since this table is fake, SQLalchemy will not be able to find it, which
     # will cause this to fail.
     assert instance_fixture.delete_table() == False
+
+
+def test_write_table(monkeypatch, instance_fixture):
+    class mock_connection():
+        def __init__(self):
+            self.sql = None
+        def __enter__(self):
+            return self
+        def __exit__(self, type, value, traceback):
+            return
+        def execute(self, sql):
+            print(sql)
+            self.sql = sql
+
+    mock = mock_connection()
+    instance_fixture._expected_cols = ["col1", "col2"]
+    conflict_columns = ["col1"]
+    df = pandas.DataFrame([[1, 2], [3, 4]], columns=instance_fixture._expected_cols)
+
+    instance_fixture._engine.connect = lambda: mock
+    instance_fixture._check_cols = lambda _: True
+
+    expected = "".join(["INSERT INTO ", instance_fixture._schema, ".",
+                        instance_fixture._table_name, " (col1, col2)"\
+                        " VALUES (1, 2), (3, 4) ON CONFLICT (col1) DO NOTHING;"])
+
+    instance_fixture._write_table(df, conflict_columns=conflict_columns)
+    assert mock.sql == expected

@@ -17,10 +17,17 @@ class Config:
         self._data = {}
     def load(self, filename=CONFIG_FILENAME, read_env_data=False, debug=False):
         self._filename = filename
-        with open(filename) as f:
-            self._data = json.load(f)
+
+        try:
+            with open(self._filename) as f:
+                self._data = json.load(f)
+        except (FileNotFoundError, ValueError):
+            return False
+
         if read_env_data:
             self._ingest_env()
+
+        return True
 
     def _ingest_env(self):
         if "PIPELINE_USER" in os.environ:
@@ -57,6 +64,8 @@ class Config:
         if not name == 'columns':
             if name in self._data:
                 return self._data[name]
+            else: 
+                return None
 
     def set_bounds(self, column_name, min, max):
         self._data['columns'][column_name] = {'min' : min, 'max' : max}

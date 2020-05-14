@@ -77,12 +77,12 @@ def good_data_row():
 
 
 def test_null_flaggers_on_good_data(null_flagger, good_data_row):
-  flags = null_flagger.flag(good_data_row)
+  flags = null_flagger.flag(good_data_row, "config")
   assert len(flags) == 0
 
 
 def test_null_flaggers_on_null_data(null_flagger, null_data_row):
-  flags = null_flagger.flag(null_data_row)
+  flags = null_flagger.flag(null_data_row, "config")
   assert len(flags) == len(null_data_row)
   assert Flags.ROW_ID_NULL in flags
   assert Flags.SERVICE_DATE_NULL in flags

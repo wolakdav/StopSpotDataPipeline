@@ -9,12 +9,11 @@ class CTran_Data(Table):
     ###########################################################################
     # Public Methods
 
-    def __init__(self, user=None, passwd=None, hostname="localhost", db_name="aperture", verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, verbose, engine)
-        self._schema = "aperture"
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="aperture", verbose=False, engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
         self._table_name = "ctran_data"
         self._index_col = "row_id"
-        self._expected_cols = set([
+        self._expected_cols = [
             "service_date",
             "vehicle_number",
             "leave_time",
@@ -28,10 +27,10 @@ class CTran_Data(Table):
             "dwell",
             "location_id",
             "door",
+            "lift",
             "ons",
             "offs",
             "estimated_load",
-            "lift",
             "maximum_speed",
             "train_mileage",
             "pattern_distance",
@@ -41,7 +40,7 @@ class CTran_Data(Table):
             "data_source",
             "schedule_status",
             "trip_id"
-        ])
+        ]
 
         self._creation_sql = "".join(["""
             CREATE TABLE IF NOT EXISTS """, self._schema, ".", self._table_name, """
@@ -79,12 +78,13 @@ class CTran_Data(Table):
 
     # [dev tool]
     # This will create a mock CTran Table for development purposes.
-    def create_table(self, ctran_sample_path="assets/"):
+    # Updated function so that sample name can be passed: used for end-to-end testing, where separate test data needs to be loaded
+    def create_table(self, ctran_sample_path="assets/", ctran_sample_name="/ctran_trips_sample.csv", exists_action="append"):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: self._engine is not an Engine, cannot continue.")
             return False
 
-        csv_location = "".join([ctran_sample_path, "/ctran_trips_sample.csv"])
+        csv_location = "".join([ctran_sample_path, ctran_sample_name])
         self._print("Loading " + csv_location)
 
         sample_data = None
@@ -100,7 +100,7 @@ class CTran_Data(Table):
             self._print("ERROR: the columns of read data does not match the specified columns.")
             return False
 
-        if not self._create_table_helper(sample_data):
+        if not self._create_table_helper(sample_data, exists_action):
             return False
 
         self._print("Done.")
@@ -110,13 +110,7 @@ class CTran_Data(Table):
 
     # Query all data between date_from and date_to, dates
     # NOTE: if there is no ctran_data table, this will not work, obviously.
-    # TODO confer with Sawyer over testing
     def query_date_range(self, date_from, date_to):
-        if self._engine is None:
-            self._print("ERROR: self._engine is None, cannot continue.")
-            return None
-
-        df = None
         sql = "".join(["SELECT * FROM ",
                        self._schema,
                        ".",
@@ -126,27 +120,13 @@ class CTran_Data(Table):
                        "' AND '",
                        date_to.strftime("%Y-%m-%d"),
                        "';"])
-        self._print(sql)
-        try:
-            df = pandas.read_sql(sql, self._engine, index_col=self._index_col)
 
-        except SQLAlchemyError as error:
-            print("SQLAclchemy:", error)
-            return None
-        except (ValueError, KeyError) as error:
-            print("Pandas:", error)
-            return None
-
-        if not self._check_cols(df):
-            self._print("ERROR: the columns of read data does not match the specified columns.")
-            return None
-
-        return df
+        return self._query_table(sql)
 
     ###########################################################################
     # Private Methods
 
-    def _create_table_helper(self, sample_data):
+    def _create_table_helper(self, sample_data, exists_action="append"):
         self._print("Connecting to DB.")
         try:
             conn = self._engine.connect()
@@ -160,7 +140,7 @@ class CTran_Data(Table):
             sample_data.to_sql(
                     self._table_name,
                     self._engine,
-                    if_exists = "append",
+                    if_exists = exists_action,
                     index = False,
                     chunksize = self._chunksize,
                     schema = self._schema,

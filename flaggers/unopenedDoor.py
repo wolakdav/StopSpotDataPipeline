@@ -5,7 +5,7 @@ from .flagger import Flagger, Flags, flaggers
 class UnopenedDoor(Flagger):
 	name = 'Unopened Door'
 
-	def flag(self, data):
+	def flag(self, data, config):
 		"""
 		Checks if bus had stopped but door haven't opened (perhaps no passengers getting on/off?).
 		To check, we check door field:
