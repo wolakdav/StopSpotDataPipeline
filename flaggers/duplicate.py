@@ -4,7 +4,7 @@ from .flagger import Flagger, Flags, flaggers
 class Duplicate(Flagger):
     name = 'Duplicate'
 
-    def flag(self, data):
+    def flag(self, data, config):
         """
         Due to this flag being an oddity, this method will return a DataFrame
         of service_dates that are duplicates. It is the responsibility of the

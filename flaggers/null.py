@@ -34,7 +34,7 @@ class Null(Flagger):
     'trip_id' : Flags.TRIP_ID_NULL
   }
 
-  def flag(self, data):
+  def flag(self, data, config):
     #all null flags will be appended to the list
     null_flags = []
     for col in self.columns_flag_dict:

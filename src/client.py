@@ -161,7 +161,7 @@ class _Client(IOs):
                     if flagger.name == "Duplicate":
                         duplicate = flagger
                     else:
-                        flags.update(flagger.flag(row))
+                        flags.update(flagger.flag(row, config))
                 except Exception as e:
                     self.print("WARNING: error in flagger {}. Skipping.\n{}"
                         .format(flagger.name, e))
@@ -248,7 +248,7 @@ class _Client(IOs):
         """
         dup_df = None
         try:
-            dup_df = duplicate_instance.flag(df)
+            dup_df = duplicate_instance.flag(df, config)
         except ValueError as err:
             self.print("ERROR:", err)
             return []
