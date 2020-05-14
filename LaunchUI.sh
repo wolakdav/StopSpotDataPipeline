@@ -15,6 +15,9 @@ sudo docker run -d -it \
 	gui
 
 # customize this line to run flask
-sudo docker exec -it pipeline 
+# Flask webpage should be accessible when the container is run, based on the command in the dockerfile
+# If not, add whats needed here.
+# sudo docker exec -it pipeline 
 
-sudo docker stop pipeline
+# Unsure how closing the container is going to work
+# sudo docker stop pipeline

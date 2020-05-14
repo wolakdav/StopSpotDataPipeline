@@ -13,4 +13,4 @@ sudo docker run -it \
 	--entrypoint "/bin/bash" \
 	--mount type=bind,source="$(pwd)"/pipeline,target=/StopSpot_Data_Pipeline \
 	--rm \
-	pipetag
+	cli
