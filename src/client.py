@@ -125,7 +125,7 @@ class _Client(IOs):
         self.print("Starting data processing pipeline.")
         start_date, end_date = self._get_date_range(start_date, end_date)
         ctran_df = self.ctran.query_date_range(start_date, end_date)
-        if ctran_df is None:
+        if ctran_df is None or ctran_df.empty:
             self.print("ERROR: the supplied dates were unable to be gathered from CTran data.")
             return False
 
@@ -136,6 +136,7 @@ class _Client(IOs):
         self.print("Processing the queried data.")
         duplicate = None
         for row_id, row in ctran_df.iterrows():
+
             service_key = self.service_periods.query_or_insert(row.service_date)
 
             if restart:
@@ -390,7 +391,3 @@ class _Client(IOs):
         else:
             return end_date, start_date
 
-
-###############################################################################
-
-client_instance = _Client()

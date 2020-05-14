@@ -78,12 +78,13 @@ class CTran_Data(Table):
 
     # [dev tool]
     # This will create a mock CTran Table for development purposes.
-    def create_table(self, ctran_sample_path="assets/"):
+    # Updated function so that sample name can be passed: used for end-to-end testing, where separate test data needs to be loaded
+    def create_table(self, ctran_sample_path="assets/", ctran_sample_name="/ctran_trips_sample.csv", exists_action="append"):
         if not isinstance(self._engine, Engine):
             self._print("ERROR: self._engine is not an Engine, cannot continue.")
             return False
 
-        csv_location = "".join([ctran_sample_path, "/ctran_trips_sample.csv"])
+        csv_location = "".join([ctran_sample_path, ctran_sample_name])
         self._print("Loading " + csv_location)
 
         sample_data = None
@@ -99,7 +100,7 @@ class CTran_Data(Table):
             self._print("ERROR: the columns of read data does not match the specified columns.")
             return False
 
-        if not self._create_table_helper(sample_data):
+        if not self._create_table_helper(sample_data, exists_action):
             return False
 
         self._print("Done.")
@@ -125,7 +126,7 @@ class CTran_Data(Table):
     ###########################################################################
     # Private Methods
 
-    def _create_table_helper(self, sample_data):
+    def _create_table_helper(self, sample_data, exists_action="append"):
         self._print("Connecting to DB.")
         try:
             conn = self._engine.connect()
@@ -139,7 +140,7 @@ class CTran_Data(Table):
             sample_data.to_sql(
                     self._table_name,
                     self._engine,
-                    if_exists = "append",
+                    if_exists = exists_action,
                     index = False,
                     chunksize = self._chunksize,
                     schema = self._schema,

@@ -38,6 +38,7 @@ class Flagged_Data(Table):
         if data == []:
             self._print("ERROR: write_table recieved no data to write, cancelling.")
             return False
+            
         df = pandas.DataFrame(data, columns=[
             "row_id",
             "service_key",

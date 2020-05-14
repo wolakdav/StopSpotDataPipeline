@@ -1,6 +1,7 @@
 # NOTE: to easily play with the data, use the below and access client_instance
 # $ python3 -i main.py
-from src import client_instance
+from src import _Client
 
 if __name__ == "__main__":
-    client_instance.main()
+	client_instance = _Client()
+	client_instance.main()

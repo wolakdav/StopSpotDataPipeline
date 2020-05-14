@@ -1,18 +1,17 @@
 {
-  "portal_user": "portal",
-  "portal_passwd": "portal",
-  "portal_hostname": "localhost",
-  "portal_db_name": "aperture",
-  "portal_schema": "aperture",
-  "max_skipped_rows": 10,
+  "portal_user": "IlliaS",
+  "portal_passwd": "IlliaS",
+  "portal_hostname": "westbot.westus.cloudapp.azure.com",
+  "portal_db_name": "IlliaS_db",
+  "portal_schema": "test_aperture",
   "user_emails": ["test@test.com"],
   "pipeline_email": "stopspot.noreply@gmail.com",
   "pipeline_email_passwd": "INVALID",
-  "pipeline_user": "pipe",
-  "pipeline_passwd": "pipe",
-  "pipeline_hostname": "localhost",
-  "pipeline_db_name": "hive",
-  "pipeline_schema": "hive",
+  "pipeline_user": "IlliaS",
+  "pipeline_passwd": "IlliaS",
+  "pipeline_hostname": "westbot.westus.cloudapp.azure.com",
+  "pipeline_db_name": "IlliaS_db",
+  "pipeline_schema": "test_hive",
   "columns": {
     "vehicle_number": { "max": "NA", "min": 0 },
     "maximum_speed": { "max": 150, "min": 0 },
@@ -21,3 +20,4 @@
   "notif_django_path": "output/notif.txt",
   "unobserved_stop_distance": 50
 }
+

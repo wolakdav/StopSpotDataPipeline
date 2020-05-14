@@ -214,6 +214,8 @@ class Table(IOs, abc.ABC):
 
         sql = "".join(["INSERT INTO ", self._schema, ".", self._table_name,
                        " (", columns, ") VALUES ", values])
+
+        print("Writing to: ", self._schema, '.', self._table_name)
         if conflict_columns:
             conflict_columns = "({})".format(
                                ", ".join([s for s in conflict_columns]))
@@ -270,7 +272,10 @@ class Table(IOs, abc.ABC):
             self._print("ERROR: the columns of read data does not match the specified columns.")
             return None
 
-        return df
+        #Converts NaN to None, can't do the same with NaT: null flagger takes care
+        df1 = df.where(df.notnull(), None)
+
+        return df1
 
     ###########################################################################
     # Private Methods
