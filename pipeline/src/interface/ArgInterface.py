@@ -17,7 +17,7 @@ class ArgInterface:
             if args.select:
                 df = self._handle_flag_query(flagged, args)
             elif args.date_start:
-                df = self._handle_range_query(ctran, args)
+                df = self._handle_range_query(client, args)
             elif args.daily:
                 client.process_next_day(True)
                 return None
@@ -32,8 +32,8 @@ class ArgInterface:
         parser = self._create_parser(args)
         return parser.parse_args(args)
 
-    def _handle_range_query(self, ctran, args):
-        return ctran.query_date_range(args.date_start, args.date_end)
+    def _handle_range_query(self, client, args):
+        return client.process_data(args.date_start, args.date_end)
 
     def _handle_flag_query(self, flagged, args):
         if args.flag:
