@@ -8,7 +8,9 @@ from src.logger import Severity
 
 class ArgInterface:
 
-    def query_with_args(self, client, ctran, flagged, args):
+    def query_with_args(self, client, args):
+        ctran = client.ctran
+        flagged = client.flagged
         try:
             args = self._parse_cl_args(args)
 

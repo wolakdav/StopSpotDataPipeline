@@ -85,7 +85,7 @@ class _Client(IOs):
 
         if len(sys.argv) > 1:
             ai = ArgInterface()
-            return ai.query_with_args(self, self.ctran, self.flagged, sys.argv[1:])
+            return ai.query_with_args(self, sys.argv[1:])
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
