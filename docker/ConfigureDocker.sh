@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Create the docker "image"; this is the tempate that containers are created from.
 # Both images are tagged with pipetag; this will help prevent multiple overlapping instances from running.
 # This file should create both images
@@ -13,4 +12,4 @@ sudo docker build -t cli \
 # GUI
 # Dockerfile is located in subdirectory dockerfiles\gui
 sudo docker build -t gui \
-	./CLI/
+	./GUI/
