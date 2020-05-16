@@ -10,7 +10,7 @@ as appropriate (for more, see below).
 ### Install and Activate Python Dependencies
 
 1) `python3 -m pip install --user pipenv`: Install pipenv locally - Python 3.7 is required.
-2) `cd TeamBeeCapstoneProject`
+2) `cd ./pipeline`
 3) `pipenv shell`: Activate the virtual environment.
 4) `pipenv install`: Install the dependencies specified by `Pipfile.lock` and `Pipefile.`
 5) `exit`: Close the virtual environment.
