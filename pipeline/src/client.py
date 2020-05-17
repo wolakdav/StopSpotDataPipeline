@@ -126,6 +126,8 @@ class _Client(IOs):
         if self._output_type == "csv":
             if not self.flags.write_csv("output/csv/"):
                 print("Error saving Flags to csv.")
+            if not self.service_periods.write_csv("output/csv/"):
+                print("Error saving Servide Dates to csv.")
 
     ###########################################################
 

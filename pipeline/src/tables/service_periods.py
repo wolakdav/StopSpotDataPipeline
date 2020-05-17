@@ -123,3 +123,13 @@ class Service_Periods(Table):
             return dt.datetime.combine(date, dt.datetime.min.time())
         else:
             return date
+
+    def write_csv(self, path):
+        data = []
+        data.append(self._expected_cols)
+        for date in dates:
+            data.append([date.month, date.year, self.get_ternary(date.month)])
+
+        df = pandas.DataFrame(data)
+
+        return super().write_csv(df, path)

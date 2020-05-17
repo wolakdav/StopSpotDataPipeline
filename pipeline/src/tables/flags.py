@@ -37,7 +37,6 @@ class Flags(Table):
             return False
 
         flags = []
-        flags.append(["flag_id", "description"])
         for flag in flagger.Flags:
             flags.append([flag.value, flagger.flag_descriptions[flag]])
 
@@ -45,9 +44,8 @@ class Flags(Table):
         return 
 
     def write_csv(self, path):
-        full_path = "" + path + self._table_name + ".csv"
-
         flags = []
+        flags.append(self._expected_cols)
         for flag in flagger.Flags:
             flags.append([flag.value, flagger.flag_descriptions[flag]])
 

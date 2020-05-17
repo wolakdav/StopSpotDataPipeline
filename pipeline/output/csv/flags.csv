@@ -1,4 +1,5 @@
 0,1
+flag_id,description
 1,ROW_ID_NULL
 2,SERVICE_DATE_NULL
 3,VEHICLE_NUMBER_NULL
