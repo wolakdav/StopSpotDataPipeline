@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
 from src.ios import IOs
+import os
 
 
 """ Extending Table
@@ -286,3 +287,24 @@ class Table(IOs, abc.ABC):
         
         self._print("Your engine has been created: ", self._engine)
         return True
+
+    ###########################################################################
+
+    def write_csv(self, df, path):
+        if not self._table_name:
+            self._print("ERROR: write_csv not called by a subclass.")
+            return False
+
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+        full_path = "" + path + self._table_name + ".csv"
+
+        try:
+            df.to_csv(full_path, index=False, encoding='utf-8')
+        except:
+            self._print("ERROR: write_csv couldn't save data to " + full_path)
+            return False
+
+        return True
+

@@ -38,6 +38,9 @@ class _Client(IOs):
         except KeyError as err:
             pass
 
+        self._output_type = "aperture"
+        self._output_path = "output/csv/"
+
         self.config = config
         self.config.load(read_env_data=read_env_data)
 
@@ -114,9 +117,15 @@ class _Client(IOs):
     #######################################################
 
     def create_hive(self):
+        '''
         self.flags.create_table()
         self.service_periods.create_table()
         self.flagged.create_table()
+        '''
+
+        if self._output_type == "csv":
+            if not self.flags.write_csv("output/csv/"):
+                print("Error saving Flags to csv.")
 
     ###########################################################
 
@@ -396,7 +405,28 @@ class _Client(IOs):
     ###########################################################
 
     def _output_menu(self):
+        def check_current():
+            print("Current output type: " + self._output_type)
+
+        def change_to_aperture(): 
+            self._output_type = "aperture"
+            print("Output will be saved to aperture")
+        
+        def change_to_csv(): 
+            self._output_type = "csv"
+            print("Output will be saved to csv's")
+        
+        def change_to_both(): 
+            self._output_type = "both"
+            print("Output will be saved to aperture AND csv's")
+
         options = [
-            
+           _Option("(or ctrl-d) Exit.", lambda: "Exit"),
+           _Option("Check current output type.", check_current),
+           _Option("Change output to Aperture.", change_to_aperture),
+           _Option("Change output to CSV's.", change_to_csv),
+           _Option("Change output to Aperture AND CSV's.", change_to_both)
         ]
+
+        return self._menu("This is output type sub-menu.", options)
 

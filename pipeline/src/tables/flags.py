@@ -37,8 +37,22 @@ class Flags(Table):
             return False
 
         flags = []
+        flags.append(["flag_id", "description"])
         for flag in flagger.Flags:
             flags.append([flag.value, flagger.flag_descriptions[flag]])
 
         self.write_table(flags)
-        return True
+        return 
+
+    def write_csv(self, path):
+        full_path = "" + path + self._table_name + ".csv"
+
+        flags = []
+        for flag in flagger.Flags:
+            flags.append([flag.value, flagger.flag_descriptions[flag]])
+
+        df = pandas.DataFrame(flags)
+
+        return super().write_csv(df, path)
+
+
