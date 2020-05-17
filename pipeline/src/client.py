@@ -89,6 +89,8 @@ class _Client(IOs):
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
+            _Option("Choose output type (defaults to aperture).", 
+                        self._output_menu),
             _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].",
                         self.ctran.create_table),
             _Option("Create Hive, the output point of the Data Pipeline.",
@@ -390,4 +392,11 @@ class _Client(IOs):
             return start_date, end_date
         else:
             return end_date, start_date
+
+    ###########################################################
+
+    def _output_menu(self):
+        options = [
+            
+        ]
 
