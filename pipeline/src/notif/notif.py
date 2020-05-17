@@ -1,13 +1,14 @@
 import datetime
 import smtplib, ssl
-from src.ios import IOs
+from ..ios import ios
 from src.config import config
 import os
 
-class _Notif(IOs):
+class _Notif():
 
     def __init__(self, config, verbose=True):
         super().__init__(verbose)
+        self._ios = ios
         self.msg = "A critical error has occured."
         self._port = 465  # For SSL
         self._config = config
@@ -32,7 +33,7 @@ class _Notif(IOs):
         msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
         password = self._update_email_data()
-        self._print(self.user_emails)
+        self._ios._print(self.user_emails)
         if isinstance(self.user_emails, list):
             for user_email in self.user_emails:
                 # Do not switch the order of this conditional expression,
@@ -48,9 +49,9 @@ class _Notif(IOs):
         return self._get_config_value("pipeline_email_passwd", "Please enter this pipeline's email password: ", True)
 
     def _email_user(self, user_email, msg, password):
-        self._print("TO:   ", user_email)
-        self._print("FROM: ", self.pipeline_email)
-        self._print(msg)
+        self._ios._print("TO:   ", user_email)
+        self._ios._print("FROM: ", self.pipeline_email)
+        self._ios._print(msg)
 
         try:
             context = ssl.create_default_context() # Create a secure SSL context
@@ -130,6 +131,6 @@ class _Notif(IOs):
 
         value = self._config.get_value(key)
         if value is None:
-            value = self._prompt(promptText, hidePromptInput)
+            value = self._ios._prompt(promptText, hidePromptInput)
 
         return value

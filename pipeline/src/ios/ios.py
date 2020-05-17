@@ -1,6 +1,7 @@
 import getpass
+from ..logger import Logger
 
-class IOs:
+class IOs(Logger):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
@@ -33,3 +34,7 @@ class IOs:
         else:
             print(string, end="")
             print(obj)
+
+    def log_and_print(self, message, severity, obj=None, force=None):
+        self._print("ERROR: " + message, obj, force)
+        self.do_log(message, severity)

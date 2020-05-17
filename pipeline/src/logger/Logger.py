@@ -1,6 +1,7 @@
 import datetime
 import os
 from enum import Enum
+from datetime import date
 
 class Severity(Enum):
     DEBUG = 1
@@ -9,7 +10,7 @@ class Severity(Enum):
     ERROR = 4
 
 class Logger:
-    def start(self, filename='output/log.txt', debug=False):
+    def start(self, filename="output/" + date.today().strftime("%m-%d-%Y") + ".txt", debug=False):
         self.debug = debug
         self._f = open(filename,'a+')
 
@@ -36,3 +37,9 @@ class Logger:
         if self.debug:
             self._f.write('[DEBUG]  {}  {} \n'.format(datetime.datetime.now(), 'Logger shutting down.'))
         self._f.close()
+
+    def do_log(self, message, severity = Severity.INFO):
+        self.start()
+        self.log(message, severity)
+        self.stop()
+
