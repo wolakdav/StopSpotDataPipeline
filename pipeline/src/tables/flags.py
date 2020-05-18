@@ -44,13 +44,29 @@ class Flags(Table):
         return 
 
     def write_csv(self, path):
+        """
+        Function is meant to be called by a subclass: saves passed in data to a csv file.
+
+        Args: 
+            path    (String): relative path to where csv will be saved. 
+
+        Returns: 
+            Boolean representing state of the operation (successfull write: True, error during process: False)
+        """
+
         flags = []
+
+        #Append expected cols first to create header row in the csv file
         flags.append(self._expected_cols)
+
+        #Create list with all flag data
         for flag in flagger.Flags:
             flags.append([flag.value, flagger.flag_descriptions[flag]])
 
+        #Create pandas DataFrame from the list
         df = pandas.DataFrame(flags)
 
+        #Call parent function that does actual saving
         return super().write_csv(df, path)
 
 

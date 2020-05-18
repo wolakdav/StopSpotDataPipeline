@@ -124,7 +124,7 @@ class Service_Periods(Table):
         else:
             return date
 
-    def write_csv(self, path):
+    def write_csv(self, path, dates):
         data = []
         data.append(self._expected_cols)
         for date in dates:

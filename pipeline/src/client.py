@@ -22,12 +22,13 @@ class _Option():
         self.msg = msg
         self.func_pointer = func_pointer
 
-
 """ Members:
 self.config
 self. tables
 self._hive_engine
 self._portal_engine
+self._output_path
+self._output_type
 """
 class _Client(IOs):
     def __init__(self, read_env_data=True, verbose=True):
@@ -38,11 +39,11 @@ class _Client(IOs):
         except KeyError as err:
             pass
 
-        self._output_type = "aperture"
-        self._output_path = "output/csv/"
-
         self.config = config
         self.config.load(read_env_data=read_env_data)
+
+        self._output_path = config.get_value("output_path")
+        self._output_type = config.get_value("output_type")
 
         portal_user = config.get_value("portal_user")
         portal_passwd = config.get_value("portal_passwd")
@@ -117,17 +118,15 @@ class _Client(IOs):
     #######################################################
 
     def create_hive(self):
-        '''
-        self.flags.create_table()
-        self.service_periods.create_table()
-        self.flagged.create_table()
-        '''
+        if (self._output_type == "aperture" or self._output_type == "both"):
+            self.flags.create_table()
+            self.service_periods.create_table()
+            self.flagged.create_table()
 
-        if self._output_type == "csv":
-            if not self.flags.write_csv("output/csv/"):
+        #When dealing with csv and hive creation, only data available right away is flags, so we only save flags to csv in this option
+        if (self._output_type == "csv" or self._output_type == "both"):
+            if not self.flags.write_csv(self._output_path):
                 print("Error saving Flags to csv.")
-            if not self.service_periods.write_csv("output/csv/"):
-                print("Error saving Servide Dates to csv.")
 
     ###########################################################
 
@@ -196,7 +195,10 @@ class _Client(IOs):
         else:
             self.print("NOTE: this run is not checking for duplicates.")
 
-        self.flagged.write_table(flagged_rows)
+        if(self._output_type == "aperture" or self._output_type == "both"):
+            self.flagged.write_table(flagged_rows)
+        if(self._output_type == "csv" or self._output_type == "both"):
+            self.flagged.write_csv(self._output_path, flagged_rows)
         self.print("Done executing the pipeline.")
         return True
 
@@ -407,8 +409,6 @@ class _Client(IOs):
     ###########################################################
 
     def _output_menu(self):
-        def check_current():
-            print("Current output type: " + self._output_type)
 
         def change_to_aperture(): 
             self._output_type = "aperture"
@@ -424,7 +424,8 @@ class _Client(IOs):
 
         options = [
            _Option("(or ctrl-d) Exit.", lambda: "Exit"),
-           _Option("Check current output type.", check_current),
+           _Option("Check current output type.", lambda: print("Current output type: " + self._output_type)),
+           _Option("Check current output path.", lambda: print("Current output path: " + self._output_path)),
            _Option("Change output to Aperture.", change_to_aperture),
            _Option("Change output to CSV's.", change_to_csv),
            _Option("Change output to Aperture AND CSV's.", change_to_both)
