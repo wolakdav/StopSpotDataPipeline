@@ -52,6 +52,9 @@ def fake_client(fake_config):
 			self.config = fake_config
 			self.config.load()
 
+			self._output_path = self.config.get_value("output_path")
+			self._output_type = self.config.get_value("output_type")
+
 			portal_user = self.config.get_value("portal_user")
 			portal_passwd = self.config.get_value("portal_passwd")
 			portal_hostname = self.config.get_value("portal_hostname")
