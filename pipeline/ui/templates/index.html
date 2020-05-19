@@ -32,25 +32,53 @@
           });
       }
       setInterval(updateLog, 2000);
+
+      window.onload = function () {
+        document.getElementById('shutdown-ui').addEventListener('click', () => {
+          document.getElementById('shutdown-message').style.display = 'block';
+          document.getElementById('running-content').style.display = 'none';
+        });
+      };
     </script>
   </head>
   <body>
     <div class="d-flex justify-content-center">
-      <h1>StopSpot</h1>
-    </div>
-    <div class="d-flex justify-content-center">
-      <i class="fas fa-bus fa-4x"></i>
-    </div>
-    <div class="container mt-2">
-      <h4>Log</h4>
-      <textarea rows="8" id="log-viewer" class="w-100"></textarea>
-    </div>
+      <div id="shutdown-message" style="display: none;" class="text-center">
+        <i class="fas fa-power-off fa-4x" style="margin: 10px 0 10px 0;"></i>
 
-    <div class="container mt-4">
-      <div class="d-flex flex-column justify-content-center">
-        <a href="/shutdown" class="btn btn-danger" role="button">Shutdown UI</a>
+        <h3>Shutting down UI container...</h3>
+        <h6>You can close the browser window.</h6>
       </div>
     </div>
+    <div id="running-content" style="margin: 10px 0 10px 0;">
+      <div class="d-flex justify-content-center"></div>
+      <div class="d-flex justify-content-center">
+        <h1><i class="fas fa-bus"></i> StopSpot</h1>
+      </div>
+      <div class="container mt-2">
+        <h4>Log</h4>
+        <textarea rows="8" id="log-viewer" class="w-100"></textarea>
+      </div>
+
+      <div class="container mt-4">
+        <div class="d-flex flex-column justify-content-center">
+          <button id="shutdown-ui" type="button" class="btn btn-danger">
+            Shutdown UI
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
 
     <script
       src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"

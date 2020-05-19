@@ -1,11 +1,22 @@
 from flask import Flask, render_template
 import sys
 import os
+import json
+from flask import jsonify
+
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
         return render_template('index.html')
+
+
+@app.route('/config', methods = ['GET', 'POST'])
+def config():
+        f = open('../assets/config.json')
+        config_json = json.load(f)
+
+        return jsonify(config_json)
 
 
 @app.route('/log')
