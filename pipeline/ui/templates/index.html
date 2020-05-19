@@ -26,6 +26,9 @@
         fetch('/log')
           .then((response) => response.text())
           .then((text) => {
+            document.getElementById('log-spinner').style.display = 'none';
+            document.getElementById('log-viewer').style.display = 'block';
+
             let logViewer = document.getElementById('log-viewer');
             logViewer.value = text;
             logViewer.scrollTop = logViewer.scrollHeight;
@@ -60,8 +63,19 @@
         <h1><i class="fas fa-bus"></i> StopSpot</h1>
       </div>
       <div class="container mt-2">
-        <h4>Log</h4>
-        <textarea rows="8" id="log-viewer" class="w-100"></textarea>
+        <h4>Pineline Log</h4>
+        <div class="text-center">
+          <div id="log-spinner" class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+
+        <textarea
+          rows="8"
+          id="log-viewer"
+          class="w-100"
+          style="display: none;"
+        ></textarea>
       </div>
 
       <div class="container mt-4">
