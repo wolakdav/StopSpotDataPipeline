@@ -37,6 +37,10 @@
         document.getElementById('shutdown-ui').addEventListener('click', () => {
           document.getElementById('shutdown-message').style.display = 'block';
           document.getElementById('running-content').style.display = 'none';
+
+          fetch('/shutdown')
+            .then((response) => response.json())
+            .then((data) => console.log(data));
         });
       };
     </script>
