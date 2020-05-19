@@ -135,19 +135,10 @@ class Flagged_Data(Table):
             self._print("ERROR: could not determine the date(s).")
             return False
 
-        values_sql = []
-        dates = self._get_date_range(start_date, end_date)
-        if dates is None:
-            self._print("ERROR: could not determine the date(s).")
-            return False
-
-        for date in dates:
-            values_sql.append(
-                "".join(["'", str(date.year), "/", str(date.month), "/", str(date.day), "'"])
-            )
-        values_sql = ", ".join(values_sql)
         sql = "".join(["DELETE FROM ", self._schema, ".", self._table_name,
-                       " WHERE service_date IN (", values_sql, ");"])
+                       " WHERE service_date BETWEEN ", 
+                       start_date.strftime("'%Y-%m-%d'"), " AND ", 
+                       end_date.strftime("'%Y-%m-%d'"), ";"])
         self._print(sql)
         try:
             self._print("Connecting to DB.")
@@ -159,33 +150,6 @@ class Flagged_Data(Table):
 
         self._print("Done")
         return True
-
-    #######################################################
-
-    # Get a list of date value(s) b/w day and end_date.
-    # day and end_date can be strings in YYYY/MM/DD or datetime instances.
-    def _get_date_range(self, day, end_date=None):
-        dates = []
-        try:
-            if not isinstance(day, datetime.date):
-                dates.append(datetime.datetime.strptime(day, "%Y/%m/%d"))
-            else:
-                dates.append(day)
-            if end_date is not None:
-                if not isinstance(end_date, datetime.date):
-                    end_date = datetime.datetime.strptime(end_date, "%Y/%m/%d")
-                delta = datetime.timedelta(days=1)
-                curr_date = dates[0]
-                curr_date += delta
-                while curr_date < end_date:
-                    dates.append(curr_date)
-                    curr_date += delta
-                dates.append(end_date)
-        except ValueError:
-            self._print("ERROR: The input date is malformed; please use the YYYY/MM/DD format.")
-            return None
-
-        return dates
 
     #######################################################
 

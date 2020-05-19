@@ -101,6 +101,8 @@ class _Client(IOs):
                         self.process_since_checkpoint),
             _Option("Reprocess service date(s)",
                         self.reprocess),
+            _Option("Delete flagged rows in date range",
+                        self.delete_flagged_range),
             _Option("Create all views",
                         self.create_all_views),
             _Option("Sub-menu: DB Operations",
@@ -222,6 +224,20 @@ class _Client(IOs):
         end_date = start_date
         self.print("\t   until: " + str(end_date))
         return self.process_data(start_date, end_date, restart)
+
+    ###########################################################
+
+    def delete_flagged_range(self):
+        self.print(
+            "Please input a date range. If either or both fields are empty,"\
+            " it will be treated as the beginning or time, or the end of"\
+            " time, respectively. Note that dates are INCLUSIVE.", force=True)
+        start_date, end_date = self._get_date_range(None, allow_empty=True)
+        if start_date is None:
+            start_date = datetime.min
+        if end_date is None:
+            end_date = datetime.max
+        return self.flagged.delete_date_range(start_date, end_date)
 
     ###########################################################
 
@@ -354,8 +370,10 @@ class _Client(IOs):
     # None. If start_date is none, the user will be prompted for the start and
     # end dates. If end_date is none, the start_date will be used for that
     # value. If dates are backwards, they will be flipped.
+    # If allow_empty is True, when the user is prompted and they input nothing,
+    # return a None for that field.
     # This returns: start_date, end_date
-    def _get_date_range(self, start_date=None, end_date=None):
+    def _get_date_range(self, start_date=None, end_date=None, allow_empty=False):
         def _convert_str_to_date(string, criteria):
             try:
                 if isinstance(string, str):
@@ -367,6 +385,9 @@ class _Client(IOs):
         def _get_valid_date(criteria):
             while True:
                 date = self.prompt("Please enter the " + criteria + " date (YYYY/MM/DD): ")
+                # To allow for empty input that represents None.
+                if allow_empty and not date:
+                    return None
                 try:
                     date = datetime.strptime(date, "%Y/%m/%d")
                 except ValueError:
@@ -385,7 +406,9 @@ class _Client(IOs):
                 end_date = start_date
             else:
                 end_date = _convert_str_to_date(end_date, "end  ")
-
+        
+        if start_date is None or end_date is None:
+            return start_date, end_date
         if start_date < end_date:
             return start_date, end_date
         else:
