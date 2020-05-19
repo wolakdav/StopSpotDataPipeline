@@ -8,7 +8,6 @@ import os
 class _Notif():
 
     def __init__(self, config, verbose=True):
-        super().__init__(verbose)
         self._ios = ios
         self.msg = "A critical error has occured."
         self._port = 465  # For SSL
