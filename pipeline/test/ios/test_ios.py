@@ -1,6 +1,6 @@
 import pytest
 import io
-from pipeline.src.ios import IOs
+from src.ios import IOs
 
 @pytest.fixture
 def instance_fixture():

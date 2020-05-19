@@ -51,7 +51,6 @@ def custom_server():
 
 def test_constructor(mock_config):
     dummy = _Notif(mock_config, True)
-    assert dummy.verbose == True
     assert dummy._config == mock_config
     assert isinstance(dummy.msg, str)
     with pytest.raises(AttributeError):

@@ -21,9 +21,9 @@ class Table(abc.ABC):
     # passwd is not stored as member data, it is destroyed after use.
     def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
         self._ios = ios
+        self._ios.verbose = verbose
         self._table_name = None
         self._index_col = None
-        super().__init__(verbose)
         self._chunksize = 1000
 
         if schema is None:
@@ -66,11 +66,11 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
             return None
         except (KeyError, ValueError) as error:
             print("Pandas:", error)
-            self._ios.log_and_print("Pandas: " + error, Severity.ERROR)
+            self._ios.log_and_print("Pandas: " + str(error), Severity.ERROR)
             return None
         
         if not self._check_cols(df):
@@ -97,7 +97,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -120,7 +120,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -147,7 +147,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -171,7 +171,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -243,7 +243,7 @@ class Table(abc.ABC):
             con.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
-            self._ios.log_and_print("SQLAlchemyError: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemyError: " + str(error), Severity.ERROR)
             return False
         self._ios._print("Done")
         return True
@@ -282,11 +282,11 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
             return None
         except (ValueError, KeyError) as error:
             print("Pandas:", error)
-            self._ios.log_and_print("Pandas: " + error, Severity.ERROR)
+            self._ios.log_and_print("Pandas: " + str(error), Severity.ERROR)
             return None
 
         if not self._check_cols(df):
