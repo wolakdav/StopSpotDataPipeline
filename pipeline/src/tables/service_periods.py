@@ -44,7 +44,7 @@ class Service_Periods(Table):
 
         date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
-            self._print("ERROR: invalid engine.")
+            self._ios._print("ERROR: invalid engine.")
             return None
         service_key = None
 
@@ -70,7 +70,7 @@ class Service_Periods(Table):
         # add that functionality right now so I'll save it for a TODO.
         date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
-            self._print("ERROR: invalid engine.")
+            self._ios._print("ERROR: invalid engine.")
             return None
 
         start_date, end_date = self.get_service_period(date)

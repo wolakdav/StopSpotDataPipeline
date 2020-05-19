@@ -8,6 +8,8 @@ from src.tables import Table
 g_is_valid = None
 g_expected = None
 
+# TODO: mock out IOs' inherited Logger functionality.
+
 # Test_Dummy is used to allow for easy and precise tests of Table.
 class Table_Dummy(Table):
     def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
@@ -138,7 +140,7 @@ def test_get_engine(instance_fixture):
 
 def test_print_unverbose(capsys, instance_fixture):
     instance_fixture.verbose = False
-    instance_fixture._print("Hello!")
+    instance_fixture._ios.print("Hello!")
     assert capsys.readouterr().out == ""
 
 def test_check_cols_happy(sample_df, instance_fixture):
