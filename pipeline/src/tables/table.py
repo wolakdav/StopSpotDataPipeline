@@ -55,10 +55,6 @@ class Table(abc.ABC):
     
     def get_full_table(self):
         if not isinstance(self._engine, Engine):
-            #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            #Logger.start(self)
-            #Logger.log(self, "self._engine is not an Engine, cannot continue.", Severity.ERROR)
-            #Logger.stop(self)
             self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
             return None
 
@@ -70,25 +66,16 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            #Logger.start(self)
-            #Logger.log(self, "SQLAlchemy: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
             return None
         except (KeyError, ValueError) as error:
             print("Pandas:", error)
-            #Logger.start(self)
-            #Logger.log(self, "Pandas: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("Pandas: " + error, Severity.ERROR)
+            self._ios.log_and_print("Pandas: " + error, Severity.ERROR)
             return None
         
         if not self._check_cols(df):
-            self._ios._print("ERROR: the columns of read data does not match the specified columns.")
-            #Logger.start(self)
-            #Logger.log(self, "ERROR: the columns of read data does not match the specified columns.", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("ERROR: the columns of read data does not match the specified columns.", Severity.ERROR)
+            #self._ios._print("ERROR: the columns of read data does not match the specified columns.")
+            self._ios.log_and_print("ERROR: the columns of read data does not match the specified columns.", Severity.ERROR)
             return None
 
         return df
@@ -97,11 +84,8 @@ class Table(abc.ABC):
 
     def create_schema(self):
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            #Logger.start(self)
-            #Logger.log(self, "self._engine is not an Engine, cannot continue.", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -113,10 +97,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            #Logger.start(self)
-            #Logger.log(self, "SQLAlchemy: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -126,11 +107,8 @@ class Table(abc.ABC):
 
     def delete_schema(self):
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            #Logger.start(self)
-            #Logger.log(self, "self._engine is not an Engine, cannot continue.", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -142,10 +120,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            #Logger.start(self)
-            #Logger.log(self, "SQLAlchemy: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -155,19 +130,13 @@ class Table(abc.ABC):
     
     def create_table(self):
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            #Logger.start(self)
-            #Logger.log(self, "self._engine is not an Engine, cannot continue.", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
             return False
 
         if not self.create_schema():
-            self._ios._print("ERROR: failed to create schema, cancelling operation.")
-            #Logger.start(self)
-            #Logger.log(self, "Failed to create schema, cancelling operation", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("Failed to create schema, cancelling operation", Severity.ERROR)
+            #self._ios._print("ERROR: failed to create schema, cancelling operation.")
+            self._ios.log_and_print("Failed to create schema, cancelling operation", Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -178,10 +147,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            #Logger.start(self)
-            #Logger.log(self, "SQLAlchemy: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -192,11 +158,8 @@ class Table(abc.ABC):
 
     def delete_table(self):
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            #Logger.start(self)
-            #Logger.log(self, "self._engine is not an Engine, cannot continue.", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -208,10 +171,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            #Logger.start(self)
-            #Logger.log(self, "SQLAlchemy: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -248,27 +208,18 @@ class Table(abc.ABC):
         # the whole thing.
 
         if not self._table_name:
-            self._ios._print("ERROR: _write_table not called by a subclass.")
-            #Logger.start(self)
-            #Logger.log(self, "_write_table not called by a subclass.", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("_write_table not called by a subclass.", Severity.ERROR)
+            #self._ios._print("ERROR: _write_table not called by a subclass.")
+            self._ios.log_and_print("_write_table not called by a subclass.", Severity.ERROR)
             return False
 
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: invalid engine.")
-            #Logger.start(self)
-            #Logger.log(self, "invalid engine", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("invalid engine", Severity.ERROR)
+            #self._ios._print("ERROR: invalid engine.")
+            self._ios.log_and_print("invalid engine", Severity.ERROR)
             return False
 
         if not self._check_cols(df):
-            self._ios._print("ERROR: the columns of data does not match required columns.")
-            #Logger.start(self)
-            #Logger.log(self, "the columns of data does not match required columns", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("the columns of data does not match required columns", Severity.ERROR)
+            #self._ios._print("ERROR: the columns of data does not match required columns.")
+            self._ios.log_and_print("the columns of data does not match required columns", Severity.ERROR)
             return False
 
         self._ios._print("Writing to table...")
@@ -292,10 +243,7 @@ class Table(abc.ABC):
             con.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
-            #Logger.start(self)
-            #Logger.log(self, "SQLAlchemyError: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("SQLAlchemyError: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemyError: " + error, Severity.ERROR)
             return False
         self._ios._print("Done")
         return True
@@ -323,11 +271,8 @@ class Table(abc.ABC):
     """
     def _query_table(self, sql):
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: invalid engine.")
-            #Logger.start(self)
-            #Logger.log(self, "invalid engine", Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("invalid engine", Severity.ERROR)
+            #self._ios._print("ERROR: invalid engine.")
+            self._ios.log_and_print("invalid engine", Severity.ERROR)
             return None
 
         df = None
@@ -337,19 +282,16 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            #Logger.start(self)
-            #Logger.log(self, "SQLAlchemy: " + error, Severity.ERROR)
-            #Logger.stop(self)
-            self.do_log("SQLAlchemy: " + error, Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + error, Severity.ERROR)
             return None
         except (ValueError, KeyError) as error:
             print("Pandas:", error)
-            self.do_log("Pandas: " + error, Severity.ERROR)
+            self._ios.log_and_print("Pandas: " + error, Severity.ERROR)
             return None
 
         if not self._check_cols(df):
-            self._ios._print("ERROR: the columns of read data does not match the specified columns.")
-            self.do_log("the columns of read data does not match the specified columns" , Severity.ERROR)
+            #self._ios._print("ERROR: the columns of read data does not match the specified columns.")
+            self._ios.log_and_print("the columns of read data does not match the specified columns" , Severity.ERROR)
             return None
 
         #Converts NaN to None, can't do the same with NaT: null flagger takes care

@@ -1,6 +1,7 @@
 import datetime
 import smtplib, ssl
 from ..ios import ios
+from ..logger import Severity
 from src.config import config
 import os
 

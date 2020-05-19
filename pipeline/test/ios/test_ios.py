@@ -1,11 +1,10 @@
 import pytest
 import io
-from src.ios import IOs
+from pipeline.src.ios import IOs
 
 @pytest.fixture
 def instance_fixture():
     return IOs()
-
 
 def test_verbose(instance_fixture):
     verbose = instance_fixture.verbose
