@@ -11,6 +11,6 @@
 sudo docker run -it \
 	--name pipeline \
 	--entrypoint "/bin/bash" \
-	--mount type=bind,source="$(pwd)"/pipeline,target=/StopSpot_Data_Pipeline \
+	--mount type=bind,source="$(pwd)"/pipeline,target=/pipeline \
 	--rm \
 	cli

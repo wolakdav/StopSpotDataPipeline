@@ -9,8 +9,8 @@ import flaggers.flagger as flagger
 
 class Flagged_Data(Table):
 
-    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, engine)
         self._table_name = "flagged_data"
         self._index_col = None
         self._expected_cols = [
@@ -36,7 +36,7 @@ class Flagged_Data(Table):
     def write_table(self, data):
         # data is list of [row_id, flag_id, service_key].
         if data == []:
-            self._print("ERROR: write_table recieved no data to write, cancelling.")
+            self._ios._print("ERROR: write_table recieved no data to write, cancelling.")
             return False
             
         df = pandas.DataFrame(data, columns=[
@@ -105,9 +105,9 @@ class Flagged_Data(Table):
         sql = "".join(["SELECT MAX(service_date) ",
                        "FROM ", self._schema, ".", self._table_name,
                        ";"])
-        self._print(sql)
+        self._ios._print(sql)
         try:
-            self._print("Connecting to DB.")
+            self._ios._print("Connecting to DB.")
             conn = self._engine.connect()
             value = conn.execute(sql)
         except SQLAlchemyError as error:
@@ -115,7 +115,7 @@ class Flagged_Data(Table):
             return None
         
         if value is not None:
-            self._print("Done")
+            self._ios._print("Done")
             return value.first()[0]
         else:
             return None
@@ -127,18 +127,18 @@ class Flagged_Data(Table):
     # dates are backwards, they will be flipped.
     def delete_date_range(self, start_date, end_date=None):
         if not isinstance(self._engine, Engine):
-            self._print("ERROR: invalid engine.")
+            self._ios._print("ERROR: invalid engine.")
             return False
 
         start_date, end_date = self._process_dates(start_date, end_date)
         if start_date is None:
-            self._print("ERROR: could not determine the date(s).")
+            self._ios._print("ERROR: could not determine the date(s).")
             return False
 
         values_sql = []
         dates = self._get_date_range(start_date, end_date)
         if dates is None:
-            self._print("ERROR: could not determine the date(s).")
+            self._ios._print("ERROR: could not determine the date(s).")
             return False
 
         for date in dates:
@@ -148,16 +148,16 @@ class Flagged_Data(Table):
         values_sql = ", ".join(values_sql)
         sql = "".join(["DELETE FROM ", self._schema, ".", self._table_name,
                        " WHERE service_date IN (", values_sql, ");"])
-        self._print(sql)
+        self._ios._print(sql)
         try:
-            self._print("Connecting to DB.")
+            self._ios._print("Connecting to DB.")
             conn = self._engine.connect()
             conn.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
             return False
 
-        self._print("Done")
+        self._ios._print("Done")
         return True
 
     #######################################################
@@ -182,7 +182,7 @@ class Flagged_Data(Table):
                     curr_date += delta
                 dates.append(end_date)
         except ValueError:
-            self._print("ERROR: The input date is malformed; please use the YYYY/MM/DD format.")
+            self._ios._print("ERROR: The input date is malformed; please use the YYYY/MM/DD format.")
             return None
 
         return dates
@@ -235,7 +235,7 @@ class Flagged_Data(Table):
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
             return False
-        self._print("Done")
+        self._ios._print("Done")
         return True
 
 
