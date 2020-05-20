@@ -1,8 +1,10 @@
 import getpass
-from ..logger import Logger
+from .logger import Logger
+from .logger import severity
 
 class IOs(Logger):
     def __init__(self):
+        self._severity = severity
         self.start()
 
     def __del__(self):
