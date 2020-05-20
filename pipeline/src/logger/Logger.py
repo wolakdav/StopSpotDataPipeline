@@ -37,9 +37,3 @@ class Logger:
         if self.debug:
             self._f.write('[DEBUG]  {}  {} \n'.format(datetime.datetime.now(), 'Logger shutting down.'))
         self._f.close()
-
-    def do_log(self, message, severity = Severity.INFO):
-        self.start()
-        self.log(message, severity)
-        self.stop()
-

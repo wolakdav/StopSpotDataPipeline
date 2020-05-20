@@ -2,6 +2,16 @@ import getpass
 from ..logger import Logger
 
 class IOs(Logger):
+    def __init__(self):
+        self.start()
+
+    def __del__(self):
+        # In case the user fails to close the logger explicitly, this will stop
+        # it eventually. This will not thrown an error if a closed file is
+        # closed again. This is fine because Logger.log() will flush each log
+        # as it goes.
+        self.stop()
+
     def prompt(self, prompt="", hide_input=False):
         return self._prompt(prompt, hide_input)
 
@@ -29,5 +39,5 @@ class IOs(Logger):
             print(obj)
 
     def log_and_print(self, message, severity, obj=None):
-        self.do_log(message, severity)
+        self.log(message, severity)
         self._print("ERROR: " + str(message), obj)
