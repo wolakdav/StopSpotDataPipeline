@@ -9,10 +9,6 @@ class IOs(Logger):
         self._started = False
 
     def __del__(self):
-        # In case the user fails to close the logger explicitly, this will stop
-        # it eventually. This will not thrown an error if a closed file is
-        # closed again. This is fine because Logger.log() will flush each log
-        # as it goes.
         self.stop()
 
     def prompt(self, prompt="", hide_input=False):
@@ -52,8 +48,9 @@ class IOs(Logger):
         return super().log(message, severity)
 
     def stop(self):
-        super().stop()
-        self._started = False
+        if self._started:
+            super().stop()
+            self._started = False
 
     def log_and_print(self, message, severity, obj=None):
         self._print(self.log(message, severity), obj)
