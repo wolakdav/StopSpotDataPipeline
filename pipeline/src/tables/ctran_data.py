@@ -79,7 +79,7 @@ class CTran_Data(Table):
     # [dev tool]
     # This will create a mock CTran Table for development purposes.
     # Updated function so that sample name can be passed: used for end-to-end testing, where separate test data needs to be loaded
-    def create_table(self, ctran_sample_path="assets/", ctran_sample_name="/ctran_trips_sample.csv", exists_action="append"):
+    def create_table(self, ctran_sample_path="assets/", ctran_sample_name="ctran_trips_sample.csv", exists_action="append"):
         if not isinstance(self._engine, Engine):
             self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
             return False
