@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
 from ..ios import ios
-from ..logger import Severity
 
 
 """ Extending Table
@@ -54,7 +53,7 @@ class Table(abc.ABC):
     
     def get_full_table(self):
         if not isinstance(self._engine, Engine):
-            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return None
 
         df = None
@@ -65,16 +64,16 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), ios.Severity.ERROR)
             return None
         except (KeyError, ValueError) as error:
             print("Pandas:", error)
-            self._ios.log_and_print("Pandas: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("Pandas: " + str(error), ios.Severity.ERROR)
             return None
         
         if not self._check_cols(df):
             #self._ios._print("ERROR: the columns of read data does not match the specified columns.")
-            self._ios.log_and_print("ERROR: the columns of read data does not match the specified columns.", Severity.ERROR)
+            self._ios.log_and_print("ERROR: the columns of read data does not match the specified columns.", ios.Severity.ERROR)
             return None
 
         return df
@@ -84,7 +83,7 @@ class Table(abc.ABC):
     def create_schema(self):
         if not isinstance(self._engine, Engine):
             #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -96,7 +95,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), ios.Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -107,7 +106,7 @@ class Table(abc.ABC):
     def delete_schema(self):
         if not isinstance(self._engine, Engine):
             #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -119,7 +118,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), ios.Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -130,12 +129,12 @@ class Table(abc.ABC):
     def create_table(self):
         if not isinstance(self._engine, Engine):
             #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return False
 
         if not self.create_schema():
             #self._ios._print("ERROR: failed to create schema, cancelling operation.")
-            self._ios.log_and_print("Failed to create schema, cancelling operation", Severity.ERROR)
+            self._ios.log_and_print("Failed to create schema, cancelling operation", ios.Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -146,7 +145,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), ios.Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -158,7 +157,7 @@ class Table(abc.ABC):
     def delete_table(self):
         if not isinstance(self._engine, Engine):
             #self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
-            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", Severity.ERROR)
+            self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return False
 
         self._ios._print("Connecting to DB.")
@@ -170,7 +169,7 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAclchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), ios.Severity.ERROR)
             return False
 
         self._ios._print("Done.")
@@ -208,17 +207,17 @@ class Table(abc.ABC):
 
         if not self._table_name:
             #self._ios._print("ERROR: _write_table not called by a subclass.")
-            self._ios.log_and_print("_write_table not called by a subclass.", Severity.ERROR)
+            self._ios.log_and_print("_write_table not called by a subclass.", ios.Severity.ERROR)
             return False
 
         if not isinstance(self._engine, Engine):
             #self._ios._print("ERROR: invalid engine.")
-            self._ios.log_and_print("invalid engine", Severity.ERROR)
+            self._ios.log_and_print("invalid engine", ios.Severity.ERROR)
             return False
 
         if not self._check_cols(df):
             #self._ios._print("ERROR: the columns of data does not match required columns.")
-            self._ios.log_and_print("the columns of data does not match required columns", Severity.ERROR)
+            self._ios.log_and_print("the columns of data does not match required columns", ios.Severity.ERROR)
             return False
 
         self._ios._print("Writing to table...")
@@ -242,7 +241,7 @@ class Table(abc.ABC):
             con.execute(sql)
         except SQLAlchemyError as error:
             print("SQLAlchemyError: ", error)
-            self._ios.log_and_print("SQLAlchemyError: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemyError: " + str(error), ios.Severity.ERROR)
             return False
         self._ios._print("Done")
         return True
@@ -271,7 +270,7 @@ class Table(abc.ABC):
     def _query_table(self, sql):
         if not isinstance(self._engine, Engine):
             #self._ios._print("ERROR: invalid engine.")
-            self._ios.log_and_print("invalid engine", Severity.ERROR)
+            self._ios.log_and_print("invalid engine", ios.Severity.ERROR)
             return None
 
         df = None
@@ -281,16 +280,16 @@ class Table(abc.ABC):
 
         except SQLAlchemyError as error:
             print("SQLAlchemy:", error)
-            self._ios.log_and_print("SQLAlchemy: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("SQLAlchemy: " + str(error), ios.Severity.ERROR)
             return None
         except (ValueError, KeyError) as error:
             print("Pandas:", error)
-            self._ios.log_and_print("Pandas: " + str(error), Severity.ERROR)
+            self._ios.log_and_print("Pandas: " + str(error), ios.Severity.ERROR)
             return None
 
         if not self._check_cols(df):
             #self._ios._print("ERROR: the columns of read data does not match the specified columns.")
-            self._ios.log_and_print("the columns of read data does not match the specified columns" , Severity.ERROR)
+            self._ios.log_and_print("the columns of read data does not match the specified columns" , ios.Severity.ERROR)
             return None
 
         #Converts NaN to None, can't do the same with NaT: null flagger takes care

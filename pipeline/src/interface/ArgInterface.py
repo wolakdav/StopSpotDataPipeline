@@ -2,7 +2,6 @@ import sys
 import argparse
 from datetime import datetime
 from ..ios import ios
-from ..logger import Severity
 
 
 class ArgInterface:
@@ -45,7 +44,7 @@ class ArgInterface:
         except ValueError:
             err_msg = "Invalid service date format: {0}, YYYY-MM-DD expected.".format(arg)
             # TODO change to use ios
-            # logger.log(err_msg, Severity.ERROR)
+            # logger.log(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _service_year(self, arg):
@@ -54,7 +53,7 @@ class ArgInterface:
         except ValueError:
             err_msg = "Invalid service year format: {0}, YYYY expected.".format(arg)
             # TODO change to use ios
-            # logger.log(err_msg, Severity.ERROR)
+            # logger.log(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _service_period(self, arg):
@@ -74,7 +73,7 @@ class ArgInterface:
         except ValueError:
             err_msg = "Invalid service period format: {0}, [1, 2, 3] or [first, second, third] expected.".format(arg)
             # TODO change to use ios
-            # logger.log(err_msg, Severity.ERROR)
+            # logger.log(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _limit(self, arg):
@@ -87,7 +86,7 @@ class ArgInterface:
         except ValueError:
             err_msg = "Invalid limit: {0}, value must be at least 1.".format(arg)
             # TODO change to use ios
-            # logger.log(err_msg, Severity.ERROR)
+            # logger.log(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _create_parser(self, args):

@@ -1,8 +1,13 @@
 # Class IOs
 
 This class exists to be used for a unifying how several classes gather
-information from the user and print verbose information. This extends Logger
-so it can also write to the log with it's `log` method.
+information from the user and print verbose information. This class exists as a
+singleton `ios`, which is in the `src.ios` package.
+
+#### self.Severity
+
+This member is the class of severity ENUMs that can be supplied to the various
+methods that desire severity levels.
 
 #### `str self.prompt(prompt="", hide_input=False)`
 
@@ -16,6 +21,18 @@ This method is a public wrapper for `self._print`. Subclasses that do not want
 this available should override it to throw `AttributeError:
 self.__class__.__name__  has no attribute 'prompt'`.
 
+#### `void self.log_and_print(message, severity, obj=None)`
+
+This will log the message with its severity and then print that message to
+STDOUT.
+
+#### `str self.log(message, severity=Severity.INFO)`
+
+This method will write the message with the severity level to the log file.
+After every write, the buffer is flushed to best ensure an accurate log in the
+case of a crash. This log file defaults to `pipeline/output/`, and the file is
+named the date with a text file extension.
+
 #### `str self._prompt(prompt="", hide_input=False)`
 
 This method will prompt STDOUT with `prompt` and read from STDIN the returned
@@ -26,8 +43,3 @@ typed; this is necessary for sensitive data, such as passwords.
 
 This method will is used to support dialog. If `obj` is supplied, it is printed
 after `string`.
-
-#### `void self.log_and_print(message, severity, obj=None)`
-
-This will log the message with it's severity and then print that message to
-STDOUT.

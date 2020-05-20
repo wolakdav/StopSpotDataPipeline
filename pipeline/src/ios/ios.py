@@ -4,7 +4,7 @@ from .logger import severity
 
 class IOs(Logger):
     def __init__(self):
-        self.severity = severity
+        self._severity = severity
         self.start()
 
     def __del__(self):
