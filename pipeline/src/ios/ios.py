@@ -39,5 +39,4 @@ class IOs(Logger):
             print(obj)
 
     def log_and_print(self, message, severity, obj=None):
-        self.log(message, severity)
-        self._print("ERROR: " + str(message), obj)
+        self._print(self.log(message, severity), obj)
