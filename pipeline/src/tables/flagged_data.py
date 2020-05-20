@@ -9,8 +9,8 @@ import flaggers.flagger as flagger
 
 class Flagged_Data(Table):
 
-    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, engine)
         self._table_name = "flagged_data"
         self._index_col = None
         self._expected_cols = [

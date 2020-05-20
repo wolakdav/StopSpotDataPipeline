@@ -19,27 +19,24 @@ class Logger:
 
     def log(self, message, severity = Severity.INFO):
         timestamp = datetime.datetime.now()
+        msg = ''
 
         if severity == Severity.ERROR:
-            self._f.write('[ERROR]  {}  {} \n'.format(timestamp, message))
+            msg = '[ERROR]  {}  {} \n'.format(timestamp, message)
         elif severity == Severity.INFO:
-            self._f.write('[INFO]  {}  {} \n'.format(timestamp, message))
+            msg = '[INFO]  {}  {} \n'.format(timestamp, message)
         elif severity == Severity.WARNING:
-            self._f.write('[WARNING]  {}  {} \n'.format(timestamp, message))
+            msg = '[WARNING]  {}  {} \n'.format(timestamp, message)
         elif severity == Severity.DEBUG:
             if self.debug:
-                self._f.write('[DEBUG]  {}  {} \n'.format(timestamp, message))
+                msg = '[DEBUG]  {}  {} \n'.format(timestamp, message)
 
+        self._f.write(msg)
         self._f.flush()
         os.fsync(self._f)
+        return msg
 
     def stop(self):
         if self.debug:
             self._f.write('[DEBUG]  {}  {} \n'.format(datetime.datetime.now(), 'Logger shutting down.'))
         self._f.close()
-
-    def do_log(self, message, severity = Severity.INFO):
-        self.start()
-        self.log(message, severity)
-        self.stop()
-

@@ -6,12 +6,8 @@ from src.ios import IOs
 def instance_fixture():
     return IOs()
 
-def test_verbose(instance_fixture):
-    verbose = instance_fixture.verbose
-    assert isinstance(verbose, bool) and verbose == False
-
 def test_print_is_wrapper(instance_fixture):
-    instance_fixture._print = lambda x, y, z: "Success!"
+    instance_fixture._print = lambda x, y: "Success!"
     assert instance_fixture.print("") == "Success!"
 
 def test_prompt_is_wrapper(instance_fixture):
@@ -19,25 +15,12 @@ def test_prompt_is_wrapper(instance_fixture):
     assert instance_fixture.prompt("") == "Success!"
 
 def test_print_no_obj(capsys, instance_fixture):
-    instance_fixture.verbose = True
     instance_fixture._print("Hello!")
     assert capsys.readouterr().out == "Hello!\n"
 
-def test_print_no_obj_forced(capsys, instance_fixture):
-    instance_fixture.verbose = False
-    instance_fixture._print("Hello!", force=True)
-    assert capsys.readouterr().out == "Hello!\n"
-
 def test_print_obj(capsys, instance_fixture):
-    instance_fixture.verbose = True
     obj = ["Pizza", "Pie"]
     instance_fixture._print("Hello!", obj)
-    assert capsys.readouterr().out == "Hello!['Pizza', 'Pie']\n"
-
-def test_print_obj_forced(capsys, instance_fixture):
-    instance_fixture.verbose = False
-    obj = ["Pizza", "Pie"]
-    instance_fixture._print("Hello!", obj, True)
     assert capsys.readouterr().out == "Hello!['Pizza', 'Pie']\n"
 
 def test_prompt_unhidden(monkeypatch, instance_fixture):

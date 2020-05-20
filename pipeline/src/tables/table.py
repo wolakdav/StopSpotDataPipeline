@@ -19,9 +19,8 @@ class Table(abc.ABC):
     # Public Methods
 
     # passwd is not stored as member data, it is destroyed after use.
-    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", engine=None):
         self._ios = ios
-        self._ios.verbose = verbose
         self._table_name = None
         self._index_col = None
         self._chunksize = 1000

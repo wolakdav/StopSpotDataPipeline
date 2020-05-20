@@ -1,12 +1,8 @@
 # Class IOs
 
 This class exists to be used for a unifying how several classes gather
-information from the user and print verbose information.
-
-#### `bool self.verbose`
-
-This member contains a boolean reflecting if verbose printing is enabled. For
-more, see `self.print()`.
+information from the user and print verbose information. This extends Logger
+so it can also write to the log with it's `log` method.
 
 #### `str self.prompt(prompt="", hide_input=False)`
 
@@ -26,8 +22,12 @@ This method will prompt STDOUT with `prompt` and read from STDIN the returned
 string. `hide_input` hides the input from appearing in the terminal as it is
 typed; this is necessary for sensitive data, such as passwords.
 
-#### `void self._print(string, obj=None, force=False)`
+#### `void self._print(string, obj=None)`
 
-This method will is used to support verbose dialog. If `obj` is supplied, it is
-printed after `string`. If `force` is `True`, then the message will print
-regardless of the value in `self.verbose`.
+This method will is used to support dialog. If `obj` is supplied, it is printed
+after `string`.
+
+#### `void self.log_and_print(message, severity, obj=None)`
+
+This will log the message with it's severity and then print that message to
+STDOUT.
