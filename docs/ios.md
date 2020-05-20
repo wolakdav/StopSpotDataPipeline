@@ -4,6 +4,11 @@ This class exists to be used for a unifying how several classes gather
 information from the user and print verbose information. This class exists as a
 singleton `ios`, which is in the `src.ios` package.
 
+#### self.severity
+
+This member is the class of severity ENUMs that can be supplied to the various
+methods that desire severity levels.
+
 #### `str self.prompt(prompt="", hide_input=False)`
 
 This method is a public wrapper for `self._prompt`. Subclasses that do not want

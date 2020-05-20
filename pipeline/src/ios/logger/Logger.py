@@ -10,12 +10,11 @@ class Severity(Enum):
     ERROR = 4
 
 class Logger:
-    def start(self, filename="output/" + date.today().strftime("%m-%d-%Y") + ".txt", debug=False):
-        self.debug = debug
+    def start(self, filename='output/' + date.today().strftime('%m-%d-%Y') + '.txt'):
         self._f = open(filename,'a+')
 
         if self.debug:
-            self._f.write('[DEBUG]  {}  {} \n'.format(datetime.datetime.now(), 'Logger started.'))
+            self._f.write('[INFO]  {}  {} \n'.format(datetime.datetime.now(), 'Logger started.'))
 
     def log(self, message, severity = Severity.INFO):
         timestamp = datetime.datetime.now()
@@ -28,8 +27,7 @@ class Logger:
         elif severity == Severity.WARNING:
             msg = '[WARNING]  {}  {} \n'.format(timestamp, message)
         elif severity == Severity.DEBUG:
-            if self.debug:
-                msg = '[DEBUG]  {}  {} \n'.format(timestamp, message)
+            msg = '[DEBUG]  {}  {} \n'.format(timestamp, message)
 
         self._f.write(msg)
         self._f.flush()
@@ -37,6 +35,5 @@ class Logger:
         return msg
 
     def stop(self):
-        if self.debug:
-            self._f.write('[DEBUG]  {}  {} \n'.format(datetime.datetime.now(), 'Logger shutting down.'))
+        self._f.write('[INFO]  {}  {} \n'.format(datetime.datetime.now(), 'Logger shutting down.'))
         self._f.close()
