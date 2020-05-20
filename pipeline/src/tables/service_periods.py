@@ -7,8 +7,8 @@ from sqlalchemy.engine.base import Engine
 
 class Service_Periods(Table):
 
-    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, engine)
         self._table_name = "service_periods"
         self._index_col = "service_key"
         self._expected_cols = [
@@ -44,7 +44,7 @@ class Service_Periods(Table):
 
         date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
-            self._print("ERROR: invalid engine.")
+            self._ios._print("ERROR: invalid engine.")
             return None
         service_key = None
 
@@ -70,7 +70,7 @@ class Service_Periods(Table):
         # add that functionality right now so I'll save it for a TODO.
         date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
-            self._print("ERROR: invalid engine.")
+            self._ios._print("ERROR: invalid engine.")
             return None
 
         start_date, end_date = self.get_service_period(date)
