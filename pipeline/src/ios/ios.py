@@ -2,9 +2,6 @@ import getpass
 from ..logger import Logger
 
 class IOs(Logger):
-    def __init__(self, verbose=False):
-        self.verbose = verbose
-
     def prompt(self, prompt="", hide_input=False):
         return self._prompt(prompt, hide_input)
 
@@ -20,14 +17,10 @@ class IOs(Logger):
             except EOFError:
                 print()
 
-    def print(self, string, obj=None, force=False):
-        return self._print(string, obj, force)
+    def print(self, string, obj=None):
+        return self._print(string, obj)
 
-    def _print(self, string, obj=None, force=False):
-        if not force:
-            if not self.verbose:
-                return
-
+    def _print(self, string, obj=None):
         if obj is None:
             print(string)
 
@@ -35,6 +28,6 @@ class IOs(Logger):
             print(string, end="")
             print(obj)
 
-    def log_and_print(self, message, severity, obj=None, force=None):
+    def log_and_print(self, message, severity, obj=None):
         self.do_log(message, severity)
-        self._print("ERROR: " + message, obj, force)
+        self._print("ERROR: " + str(message), obj)

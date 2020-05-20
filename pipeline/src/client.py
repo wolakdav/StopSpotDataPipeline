@@ -30,7 +30,7 @@ self._hive_engine
 self._portal_engine
 """
 class _Client():
-    def __init__(self, read_env_data=True, verbose=True):
+    def __init__(self, read_env_data=True):
         try:
             if not read_env_data and os.environ["PIPELINE_ENV_DATA"]:
                 read_env_data = True
@@ -48,12 +48,12 @@ class _Client():
         portal_schema = config.get_value("portal_schema")
         if portal_user and portal_passwd and portal_hostname and portal_db_name :
             if portal_schema:
-                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema, verbose=verbose)
+                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema)
             else:
-                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, verbose=verbose)
+                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name)
         else:
             print("Please enter credentials for Portals database with the C-Tran table.")
-            self.ctran = CTran_Data(verbose=verbose)
+            self.ctran = CTran_Data()
         self._portal_engine = self.ctran.get_engine()
         pipe_user = config.get_value("pipeline_user")
         pipe_passwd = config.get_value("pipeline_passwd")
@@ -62,22 +62,22 @@ class _Client():
         pipe_schema = config.get_value("pipeline_schema")
         if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name:
             if pipe_schema:
-                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
                 self._hive_engine = self.flagged.get_engine()
                 engine_url = self._hive_engine.url
-                self.flags = Flags(schema=pipe_schema, verbose=verbose, engine=engine_url)
-                self.service_periods = Service_Periods(schema=pipe_schema, verbose=verbose, engine=engine_url)
+                self.flags = Flags(schema=pipe_schema, engine=engine_url)
+                self.service_periods = Service_Periods(schema=pipe_schema, engine=engine_url)
                 return
             else:
-                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, verbose=verbose)
+                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name)
         else:
             print("Please enter credentials for Hive's Database.")
-            self.flagged = Flagged_Data(verbose=verbose)
+            self.flagged = Flagged_Data()
 
         self._hive_engine = self.flagged.get_engine()
         engine_url = self._hive_engine.url
-        self.flags = Flags(verbose=verbose, engine=engine_url)
-        self.service_periods = Service_Periods(verbose=verbose, engine=engine_url)
+        self.flags = Flags(engine=engine_url)
+        self.service_periods = Service_Periods(engine=engine_url)
 
     #######################################################
 
