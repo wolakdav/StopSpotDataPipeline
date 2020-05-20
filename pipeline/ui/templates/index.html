@@ -22,6 +22,15 @@
       crossorigin="anonymous"
     ></script>
     <script>
+      function getConfig() {
+        fetch('/config')
+          .then((response) => response.text())
+          .then((text) => {
+            let configText = document.getElementById('config-text');
+            configText.value = text;
+            configText.scrollTop = logViewer.scrollHeight;
+          });
+      }
       function updateLog() {
         fetch('/log')
           .then((response) => response.text())
@@ -37,11 +46,21 @@
       setInterval(updateLog, 2000);
 
       window.onload = function () {
+        document
+          .getElementById('config-cancel')
+          .addEventListener('click', () => {
+            document.getElementById('config-editor').style.display = 'none';
+            document.getElementById('actions').style.display = 'block';
+
+            document.getElementById('running-content').style.display = 'block';
+          });
         document.getElementById('edit-config').addEventListener('click', () => {
           document.getElementById('config-editor').style.display = 'block';
           document.getElementById('actions').style.display = 'none';
 
           document.getElementById('running-content').style.display = 'none';
+
+          getConfig();
         });
         document.getElementById('shutdown-ui').addEventListener('click', () => {
           document.getElementById('shutdown-message').style.display = 'block';
@@ -85,6 +104,15 @@
     <div id="config-editor" style="display: none;">
       <div class="text-center">
         <h6>Config</h6>
+        <div>
+          <textarea id="config-text" rows="8" style="width: 600px;"></textarea>
+        </div>
+        <button id="config-save" type="button" class="btn btn-primary">
+          Save
+        </button>
+        <button id="config-cancel" type="button" class="btn btn-secondary">
+          Cancel
+        </button>
       </div>
     </div>
 
@@ -101,7 +129,13 @@
           <div class="text-center">
             <h6>Pineline Log</h6>
           </div>
-          <textarea id="log-text" rows="8" class="w-100"></textarea>
+          <div class="text-center">
+            <textarea
+              id="log-text"
+              rows="8"
+              style="width: 600px; margin-left: auto; margin-right: auto;"
+            ></textarea>
+          </div>
         </div>
       </div>
     </div>
