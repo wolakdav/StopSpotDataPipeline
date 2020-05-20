@@ -8,12 +8,11 @@ from src.tables import Table
 g_is_valid = None
 g_expected = None
 
-# TODO: mock out IOs' inherited Logger functionality.
-
 # Test_Dummy is used to allow for easy and precise tests of Table.
 class Table_Dummy(Table):
     def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", engine=None):
         super().__init__(user, passwd, hostname, db_name, schema, engine)
+
         self._table_name = "fake"
         self._index_col = "fake_key"
         self._expected_cols = [
@@ -33,6 +32,12 @@ class Table_Dummy(Table):
                 fake SMALLINT,
                 table SMALLINT
             );"""])
+
+        # ios' methods inherited from Logger are disconnected here so they do
+        # create a log file for tests.
+        self._ios.start = lambda filename="": None
+        self._ios.stop  = lambda: None
+        self._ios.log   = lambda message, severity=self._ios.Severity.INFO: None
 
 
 @pytest.fixture
