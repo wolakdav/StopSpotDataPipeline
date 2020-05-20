@@ -14,7 +14,7 @@ class Logger:
         self._f = open(filename,'a+')
 
         if self.debug:
-            self._f.write('[DEBUG]  {}  {} \n'.format(datetime.datetime.now(), 'Logger started.'))
+            self._f.write('[INFO]  {}  {} \n'.format(datetime.datetime.now(), 'Logger started.'))
 
     def log(self, message, severity = Severity.INFO):
         timestamp = datetime.datetime.now()
@@ -35,6 +35,5 @@ class Logger:
         return msg
 
     def stop(self):
-        if self.debug:
-            self._f.write('[DEBUG]  {}  {} \n'.format(datetime.datetime.now(), 'Logger shutting down.'))
+        self._f.write('[INFO]  {}  {} \n'.format(datetime.datetime.now(), 'Logger shutting down.'))
         self._f.close()
