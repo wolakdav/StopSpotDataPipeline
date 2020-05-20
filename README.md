@@ -19,8 +19,8 @@ as appropriate (for more, see below).
 
 If the output database has not been generated or used, then it is required to
 first boot the CLI menu to build the output database's schema, and then
-manually execute this program. This is possible via the same CLI menu or via
-the command arguments (for more, see below).  
+manually process some data. This is possible via the same CLI menu or via the
+command arguments (for more, see below).  
 
 It is recommended to adjust `assets/config.json` for ease of use. For more, see
 below.
