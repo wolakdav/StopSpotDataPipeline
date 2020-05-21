@@ -34,7 +34,11 @@ class Logger:
         self._f.write('{} ({}):   {}\n'.format(tag, timestamp, message))
         self._f.flush()
         os.fsync(self._f)
-        return '{}: {}'.format(tag, message)
+
+        if severity == Severity.INFO:
+            return message
+        else:
+            return '{}: {}'.format(tag, message)
 
     def stop(self):
         self.log('The logger is shutting down.', self.Severity.INFO)

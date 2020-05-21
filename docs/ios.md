@@ -25,7 +25,8 @@ This method is a public wrapper for `ios._print`.
 #### `str ios.log_and_print(message, severity=Severity.INFO, obj=None)`
 
 This will log the message with its severity and then print that message to
-`STDOUT`. The output is the message logged without the datetime.
+`STDOUT`. The output is the message logged without the datetime, and without
+the severity if the severity is INFO.
 
 #### `str ios.log(message, severity=Severity.INFO)`
 
