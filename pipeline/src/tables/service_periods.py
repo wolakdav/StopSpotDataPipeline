@@ -44,7 +44,7 @@ class Service_Periods(Table):
 
         date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: invalid engine.")
+            self._ios.log_and_print("Invalid engine.", self._ios.Severity.ERROR)
             return None
         service_key = None
 
@@ -53,12 +53,14 @@ class Service_Periods(Table):
                        " BETWEEN start_date AND end_date;"
                        ])
         try:
+            self._ios.log_and_print(sql)
             with self._engine.connect() as con:
                 result = con.execute(sql)
                 if result.rowcount != 0:
-                    return result.first()['service_key']
+                    return result.first()["service_key"]
         except SQLAlchemyError as error:
-            print("SQLAlchemy: ", error)
+            self._ios.log_and_print(
+                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
             return None
 
 
@@ -70,7 +72,9 @@ class Service_Periods(Table):
         # add that functionality right now so I'll save it for a TODO.
         date = self.convert_date_to_datetime(date)
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: invalid engine.")
+            self._ios.log_and_print(
+                "self._engine is not an Engine, cannot continue.",
+                self._ios.Severity.ERROR)
             return None
 
         start_date, end_date = self.get_service_period(date)
@@ -79,12 +83,14 @@ class Service_Periods(Table):
                        start_date.strftime("'%Y-%m-%d'"), ', ',
                        end_date.strftime("'%Y-%m-%d'"),
                        ") RETURNING service_key;"])
+        self._ios.log_and_print(sql)
         try:
             with self._engine.connect() as con:
                 result = con.execute(sql)
                 return result.first()[0]
         except SQLAlchemyError as error:
-            print("SQLAlchemy: ", error)
+            self._ios.log_and_print(
+                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
             return None
 
 

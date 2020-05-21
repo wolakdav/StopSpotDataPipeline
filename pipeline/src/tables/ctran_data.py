@@ -81,29 +81,32 @@ class CTran_Data(Table):
     # Updated function so that sample name can be passed: used for end-to-end testing, where separate test data needs to be loaded
     def create_table(self, ctran_sample_path="assets/", ctran_sample_name="ctran_trips_sample.csv", exists_action="append"):
         if not isinstance(self._engine, Engine):
-            self._ios._print("ERROR: self._engine is not an Engine, cannot continue.")
+            self._ios.log_and_print(
+                "self._engine is not an Engine, cannot continue.",
+                self._ios.Severity.ERROR)
             return False
 
         csv_location = "".join([ctran_sample_path, ctran_sample_name])
-        self._ios._print("Loading " + csv_location)
+        self._ios.log_and_print("Loading " + str(csv_location))
 
         sample_data = None
         try:
             sample_data = pandas.read_csv(csv_location, parse_dates=["service_date"])
 
         except (FileNotFoundError, ValueError) as error:
-            print("Pandas:", error)
-            print("Cannot continue table creation, cancelling.")
+            self._ios.log_and_print(
+                "Pandas: " + str(error), self._ios.Severity.ERROR)
             return False
 
         if not self._check_cols(sample_data):
-            self._ios._print("ERROR: the columns of read data does not match the specified columns.")
+            self._ios.log_and_print(
+                "The columns of read data does not match the specified columns.",
+                self._ios.Severity.ERROR)
             return False
 
         if not self._create_table_helper(sample_data, exists_action):
             return False
 
-        self._ios._print("Done.")
         return True
 
     #######################################################
@@ -127,15 +130,17 @@ class CTran_Data(Table):
     # Private Methods
 
     def _create_table_helper(self, sample_data, exists_action="append"):
-        self._ios._print("Connecting to DB.")
+        self._ios.log_and_print("Connecting to DB.")
         try:
             conn = self._engine.connect()
-            self._ios._print("Initializing table.")
+            self._ios.log_and_print("Initializing table.")
             if not super().create_table():
-                self._ios._print("ERROR: failed to create the table; cannot proceed.")
+                self._ios.log_and_print(
+                    "To create the table; cannot proceed.", self._ios.Severity.ERROR)
                 return False
 
-            self._ios._print("Writing sample data to table. This will take a few minutes.")
+            self._ios.log_and_print(
+                "Writing sample data to table. This will take a few minutes.")
 
             sample_data.to_sql(
                     self._table_name,
@@ -147,10 +152,12 @@ class CTran_Data(Table):
                 )
 
         except SQLAlchemyError as error:
-            print("SQLAclchemy:", error)
+            self._ios.log_and_print(
+                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
             return False
         except (KeyError, ValueError) as error:
-            print("Pandas:", error)
+            self._ios.log_and_print(
+                "Pandas: " + str(error), self._ios.Severity.ERROR)
             return False
 
         return True
