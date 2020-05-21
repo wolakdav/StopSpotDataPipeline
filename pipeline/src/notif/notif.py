@@ -17,6 +17,7 @@ class _Notif():
     #######################################################
 
     def email(self, subject="", msg=""):
+        self._ios.log_and_print("Sending out an email to the user(s).")
         time = datetime.datetime.now()
         result = True
         if subject == "":
