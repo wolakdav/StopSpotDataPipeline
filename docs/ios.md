@@ -44,3 +44,20 @@ as it is typed; this is necessary for sensitive data, such as passwords.
 
 This method will is used to support dialog. If `obj` is supplied, it is printed
 after `string`.
+
+#### `void ios.start(filename=None)`
+
+This method is available to outside sources to use but it is also handled
+entirely by other methods.  
+
+Open the file supplied for logging. If there is no file supplied, then use the
+previously stored filename, or the default value if that is None as well. This
+will not open a new file unless the current file is stopped.
+
+#### `void ios.stop()`
+
+This method is available to outside sources to use but it is also handled
+entirely by other methods.  
+
+Stop the open logging file. This will not stop a file unless there is no open
+file.

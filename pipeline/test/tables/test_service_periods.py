@@ -8,11 +8,6 @@ from datetime import datetime, date
 @pytest.fixture
 def instance_fixture():
     instance = Service_Periods("sw23", "invalid", "localhost", "aperture")
-    # ios' methods inherited from Logger are disconnected here so they do
-    # create a log file for tests.
-    instance._ios.start = lambda filename="": None
-    instance._ios.stop  = lambda: None
-    instance._ios.log   = lambda message, severity=instance._ios.Severity.INFO: None
     return instance
 
 @pytest.fixture
