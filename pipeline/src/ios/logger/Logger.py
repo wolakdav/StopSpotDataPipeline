@@ -23,13 +23,13 @@ class Logger:
         msg = ''
 
         if severity == Severity.ERROR:
-            msg = '[ERROR]  ({})  {} \n'.format(timestamp, message)
+            msg = '[ERROR] ({}):  {} \n'.format(timestamp, message)
         elif severity == Severity.INFO:
-            msg = '[INFO]  ({})  {} \n'.format(timestamp, message)
+            msg = '[INFO] ({}):  {} \n'.format(timestamp, message)
         elif severity == Severity.WARNING:
-            msg = '[WARNING]  ({})  {} \n'.format(timestamp, message)
+            msg = '[WARNING] ({}):  {} \n'.format(timestamp, message)
         elif severity == Severity.DEBUG:
-            msg = '[DEBUG]  ({})  {} \n'.format(timestamp, message)
+            msg = '[DEBUG] ({}):  {} \n'.format(timestamp, message)
 
         self._f.write(msg)
         self._f.flush()
