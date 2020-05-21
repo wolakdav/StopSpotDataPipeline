@@ -34,7 +34,7 @@ class Logger:
         self._f.write(msg)
         self._f.flush()
         os.fsync(self._f)
-        return msg
+        return msg[:-2]
 
     def stop(self):
         self.log('The logger is shutting down.', self.Severity.INFO)
