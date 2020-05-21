@@ -130,7 +130,6 @@ class CTran_Data(Table):
     # Private Methods
 
     def _create_table_helper(self, sample_data, exists_action="append"):
-        self._ios.log_and_print("Connecting to DB.")
         try:
             conn = self._engine.connect()
             self._ios.log_and_print("Initializing table.")

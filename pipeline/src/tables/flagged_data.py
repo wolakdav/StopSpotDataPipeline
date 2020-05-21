@@ -120,7 +120,6 @@ class Flagged_Data(Table):
                        "FROM ", self._schema, ".", self._table_name,
                        ";"])
         try:
-            self._ios.log_and_print("Connecting to DB.")
             self._ios.log_and_print(sql)
             conn = self._engine.connect()
             value = conn.execute(sql)
@@ -166,7 +165,6 @@ class Flagged_Data(Table):
                        " WHERE service_date IN (", values_sql, ");"])
 
         try:
-            self._ios.log_and_print("Connecting to DB.")
             self._ios.log_and_print(sql)
             conn = self._engine.connect()
             conn.execute(sql)
@@ -249,7 +247,6 @@ class Flagged_Data(Table):
         ])
 
         try:
-            self._ios.log_and_print("Connecting to DB.")
             self._ios.log_and_print(sql)
             with self._engine.connect() as con:
                 con.execute(sql)

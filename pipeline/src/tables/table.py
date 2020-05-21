@@ -82,7 +82,6 @@ class Table(abc.ABC):
             self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return False
 
-        self._ios.log_and_print("Connecting to DB.")
         sql = "".join(["CREATE SCHEMA IF NOT EXISTS ", self._schema, ";"])
         try:
             conn = self._engine.connect()
@@ -102,7 +101,6 @@ class Table(abc.ABC):
             self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return False
 
-        self._ios.log_and_print("Connecting to DB.")
         sql = "".join(["DROP SCHEMA IF EXISTS ", self._schema, " CASCADE;"])
         try:
             conn = self._engine.connect()
@@ -126,7 +124,6 @@ class Table(abc.ABC):
             self._ios.log_and_print("Failed to create schema, cancelling operation", ios.Severity.ERROR)
             return False
 
-        self._ios.log_and_print("Connecting to DB.")
         try:
             conn = self._engine.connect()
             self._ios.log_and_print(self._creation_sql)
@@ -146,7 +143,6 @@ class Table(abc.ABC):
             self._ios.log_and_print("self._engine is not an Engine, cannot continue.", ios.Severity.ERROR)
             return False
 
-        self._ios.log_and_print("Connecting to DB.")
         sql = "".join(["DROP TABLE IF EXISTS " + self._schema + "." + self._table_name + ";"])
         try:
             conn = self._engine.connect()
