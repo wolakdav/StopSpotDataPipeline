@@ -131,8 +131,6 @@ class _Client():
 
         flagged_rows = []
         skipped_rows = 0
-        # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
-        # but i'll leave optimizing for later.
         self._ios.print("Processing the queried data.")
         duplicate = None
         for row_id, row in ctran_df.iterrows():
