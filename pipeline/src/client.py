@@ -4,6 +4,7 @@ from datetime import datetime
 from datetime import timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+from progress.bar import Bar
 
 from src.ios import ios
 from src.tables import CTran_Data
@@ -131,8 +132,9 @@ class _Client():
 
         flagged_rows = []
         skipped_rows = 0
-        self._ios.print("Processing the queried data.")
         duplicate = None
+        self._ios.print("Processing the queried data.")
+        progress_bar = Bar("", max=len(ctran_df.index))
         for row_id, row in ctran_df.iterrows():
 
             service_key = self.service_periods.query_or_insert(row.service_date)
@@ -173,13 +175,16 @@ class _Client():
                     date,
                     int(flag)
                 ])
+            progress_bar.next()
 
+        progress_bar.finish()
         # Duplicate flagger requires a special call later on, independent of
         # the primary loop.
         if duplicate is not None:
+            self._ios.print("Checking for duplicates.")
             flagged_rows.extend(self._flag_duplicates(ctran_df, duplicate))
         else:
-            self._ios.print("NOTE: this run is not checking for duplicates.")
+            self._ios.print("NOTE: this run is not checking for duplicates.") # TODO: change this to a log_n_print
 
         self.flagged.write_table(flagged_rows)
         self._ios.print("Done executing the pipeline.")
