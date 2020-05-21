@@ -20,7 +20,7 @@ class ArgInterface:
                 client.process_next_day(True)
                 return None
             else:
-                print("Insufficient arguments.")
+                ios.print("Insufficient arguments.")
                 return None
         except ValueError:
             raise SystemExit(2)
@@ -45,8 +45,7 @@ class ArgInterface:
             return datetime.strptime(arg, "%Y-%m-%d")
         except ValueError:
             err_msg = "Invalid service date format: {0}, YYYY-MM-DD expected.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _service_year(self, arg):
@@ -54,8 +53,7 @@ class ArgInterface:
             return datetime.strptime(arg, "%Y")
         except ValueError:
             err_msg = "Invalid service year format: {0}, YYYY expected.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _service_period(self, arg):
@@ -74,8 +72,7 @@ class ArgInterface:
                     raise e
         except ValueError:
             err_msg = "Invalid service period format: {0}, [1, 2, 3] or [first, second, third] expected.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _limit(self, arg):
@@ -87,8 +84,7 @@ class ArgInterface:
                 raise ValueError
         except ValueError:
             err_msg = "Invalid limit: {0}, value must be at least 1.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _create_parser(self, args):
