@@ -3,6 +3,7 @@ import os
 from enum import Enum
 from datetime import date
 
+# NOTE: if you change this Enum, please adjust ios.md
 class Severity(Enum):
     DEBUG = 1
     INFO = 2
@@ -14,7 +15,7 @@ class Logger:
     def __init__(self):
         self.Severity = Severity
 
-    def start(self, filename='output/' + date.today().strftime('%m-%d-%Y') + '.txt'):
+    def start(self, filename='output/' + date.today().strftime('%Y-%m-%d') + '.txt'):
         self._f = open(filename,'a+')
 
     def log(self, message, severity=Severity.INFO):
@@ -22,13 +23,13 @@ class Logger:
         msg = ''
 
         if severity == Severity.ERROR:
-            msg = '[ERROR]  {}  {} \n'.format(timestamp, message)
+            msg = '[ERROR]  ({})  {} \n'.format(timestamp, message)
         elif severity == Severity.INFO:
-            msg = '[INFO]  {}  {} \n'.format(timestamp, message)
+            msg = '[INFO]  ({})  {} \n'.format(timestamp, message)
         elif severity == Severity.WARNING:
-            msg = '[WARNING]  {}  {} \n'.format(timestamp, message)
+            msg = '[WARNING]  ({})  {} \n'.format(timestamp, message)
         elif severity == Severity.DEBUG:
-            msg = '[DEBUG]  {}  {} \n'.format(timestamp, message)
+            msg = '[DEBUG]  ({})  {} \n'.format(timestamp, message)
 
         self._f.write(msg)
         self._f.flush()
