@@ -52,5 +52,7 @@ class IOs(Logger):
             super().stop()
             self._started = False
 
-    def log_and_print(self, message, severity, obj=None):
-        self._print(self.log(message, severity), obj)
+    def log_and_print(self, message, severity=Severity.INFO, obj=None):
+        msg = self.log(message, severity)
+        self.print(msg, obj)
+        return msg
