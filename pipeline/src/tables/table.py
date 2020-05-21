@@ -274,5 +274,5 @@ class Table(abc.ABC):
         engine_info = ["postgresql://", user, ":", passwd, "@", hostname, "/", db_name]
         self._engine = create_engine("".join(engine_info))
         
-        self._ios.log_and_print("Your engine has been created: ", self._engine)
+        self._ios.log_and_print("Your engine has been created: ", obj=self._engine)
         return True
