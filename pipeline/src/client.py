@@ -138,7 +138,7 @@ class _Client():
         duplicate = None
         self._ios.log_and_print("Processing the queried data.")
         progress_bar = Bar(
-            "                                       ",
+            "                                     ",
             max=len(ctran_df.index))
         for row_id, row in ctran_df.iterrows():
 
