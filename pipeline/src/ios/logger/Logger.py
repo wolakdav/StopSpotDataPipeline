@@ -20,21 +20,21 @@ class Logger:
 
     def log(self, message, severity=Severity.INFO):
         timestamp = datetime.datetime.now()
-        msg = ''
+        tag = ''
 
         if severity == Severity.ERROR:
-            msg = '[ERROR] ({}):    {} \n'.format(timestamp, message)
+            tag = '[ERROR]'
         elif severity == Severity.INFO:
-            msg = '[INFO] ({}):     {} \n'.format(timestamp, message)
+            tag = '[INFO]'
         elif severity == Severity.WARNING:
-            msg = '[WARNING] ({}):  {} \n'.format(timestamp, message)
+            tag = '[WARNING]'
         elif severity == Severity.DEBUG:
-            msg = '[DEBUG] ({}):    {} \n'.format(timestamp, message)
+            tag = '[DEBUG]'
 
-        self._f.write(msg)
+        self._f.write('{} ({}):   {}\n'.format(tag, timestamp, message))
         self._f.flush()
         os.fsync(self._f)
-        return msg[:-2]
+        return '{}: {}'.format(tag, message)
 
     def stop(self):
         self.log('The logger is shutting down.', self.Severity.INFO)
