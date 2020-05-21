@@ -206,17 +206,14 @@ class Table(abc.ABC):
         # the whole thing.
 
         if not self._table_name:
-            #self._ios._print("ERROR: _write_table not called by a subclass.")
             self._ios.log_and_print("_write_table not called by a subclass.", ios.Severity.ERROR)
             return False
 
         if not isinstance(self._engine, Engine):
-            #self._ios._print("ERROR: invalid engine.")
             self._ios.log_and_print("invalid engine", ios.Severity.ERROR)
             return False
 
         if not self._check_cols(df):
-            #self._ios._print("ERROR: the columns of data does not match required columns.")
             self._ios.log_and_print("the columns of data does not match required columns", ios.Severity.ERROR)
             return False
 
