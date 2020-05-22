@@ -14,8 +14,12 @@ def hello_world():
 @app.route('/config', methods = ['GET', 'POST'])
 def config():
         if request.method == 'POST':
+                try:
+                        request_json = request.get_json()
+                except Exception:
+                        return jsonify({'status': 'fail'})
+
                 f = open('../assets/config.json', 'w')
-                request_json = request.get_json()
                 f.write(json.dumps(request_json, indent=4))
                 f.close()
                 return jsonify({'status': 'success'})
