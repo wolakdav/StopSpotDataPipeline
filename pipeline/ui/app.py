@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import sys
 import os
 import json
@@ -13,10 +13,18 @@ def hello_world():
 
 @app.route('/config', methods = ['GET', 'POST'])
 def config():
-        f = open('../assets/config.json')
-        config_json = json.load(f)
+        if request.method == 'POST':
+                f = open('../assets/config.json', 'w')
+                request_json = request.get_json()
+                f.write(json.dumps(request_json, indent=4))
+                f.close()
+                return jsonify({'status': 'success'})
+ 
+        else:
+                f = open('../assets/config.json')
+                config_json = json.load(f)
 
-        return jsonify(config_json)
+                return jsonify(config_json)
 
 
 @app.route('/log')

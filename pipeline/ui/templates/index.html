@@ -28,7 +28,6 @@
           .then((text) => {
             let configText = document.getElementById('config-text');
             configText.value = text;
-            configText.scrollTop = logViewer.scrollHeight;
           });
       }
       function updateLog() {
@@ -40,7 +39,7 @@
 
             let logText = document.getElementById('log-text');
             logText.value = text;
-            logText.scrollTop = logViewer.scrollHeight;
+            logText.scrollTop = logText.scrollHeight;
           });
       }
       setInterval(updateLog, 2000);
@@ -54,6 +53,23 @@
 
             document.getElementById('running-content').style.display = 'block';
           });
+        document.getElementById('config-save').addEventListener('click', () => {
+          fetch('/config', {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+
+            body: document.getElementById('config-text').value,
+          })
+            .then((response) => response.json())
+            .then((data) => alert('config saved'));
+
+          document.getElementById('config-editor').style.display = 'none';
+          document.getElementById('actions').style.display = 'block';
+
+          document.getElementById('running-content').style.display = 'block';
+        });
         document.getElementById('edit-config').addEventListener('click', () => {
           document.getElementById('config-editor').style.display = 'block';
           document.getElementById('actions').style.display = 'none';
