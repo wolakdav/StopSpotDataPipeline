@@ -14,6 +14,6 @@ docker run -d -it \
 	--rm \
 	cli
 
-sudo docker exec -it pipeline python3 main.py
+docker exec -it pipeline python3 main.py
 
-sudo docker stop pipeline
+docker stop pipeline
