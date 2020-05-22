@@ -38,19 +38,26 @@ class IOs(Logger):
             print(obj)
 
     def log(self, message, severity=Severity.INFO):
-        if not self._started:
-            if self._filename is None:
-                self.start()
-            else:
-                self.start(self._filename)
-            self._started = True
-
+        self.start()
         return super().log(message, severity)
+
+    def start(self, filename=None):
+        if not self._started:
+            if filename is not None:
+                self._filename = filename
+
+            if self._filename is None:
+                super().start()
+            else:
+                super().start(self._filename)
+            self._started = True
 
     def stop(self):
         if self._started:
             super().stop()
             self._started = False
 
-    def log_and_print(self, message, severity, obj=None):
-        self._print(self.log(message, severity), obj)
+    def log_and_print(self, message, severity=Severity.INFO, obj=None):
+        msg = self.log(message, severity)
+        self.print(msg, obj)
+        return msg

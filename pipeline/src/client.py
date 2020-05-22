@@ -4,6 +4,7 @@ from datetime import datetime
 from datetime import timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+from progress.bar import Bar
 
 from src.ios import ios
 from src.tables import CTran_Data
@@ -28,6 +29,7 @@ self.config
 self. tables
 self._hive_engine
 self._portal_engine
+self._ios
 """
 class _Client():
     def __init__(self, read_env_data=True):
@@ -85,7 +87,7 @@ class _Client():
 
         if len(sys.argv) > 1:
             ai = ArgInterface()
-            return ai.query_with_args(self, self.ctran, self.flagged, sys.argv[1:])
+            return ai.query_with_args(self, sys.argv[1:])
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
@@ -122,34 +124,38 @@ class _Client():
     # can be Date instances or strings in format "YYYY/MM/DD". If no dates are
     # supplied, this will prompt the user for them.
     def process_data(self, start_date=None, end_date=None, restart=False):
-        self._ios.print("Starting data processing pipeline.")
+        self._ios.log_and_print("Starting data processing pipeline.")
         start_date, end_date = self._get_date_range(start_date, end_date)
         ctran_df = self.ctran.query_date_range(start_date, end_date)
         if ctran_df is None or ctran_df.empty:
-            self._ios.print("ERROR: the supplied dates were unable to be gathered from CTran data.")
+            self._ios.log_and_print(
+                "The supplied dates were unable to be gathered from CTran data.",
+                self._ios.Severity.ERROR)
             return False
 
         flagged_rows = []
         skipped_rows = 0
-        # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
-        # but i'll leave optimizing for later.
-        self._ios.print("Processing the queried data.")
         duplicate = None
+        self._ios.log_and_print("Processing the queried data.")
+        progress_bar = Bar(
+            "",
+            max=len(ctran_df.index))
         for row_id, row in ctran_df.iterrows():
 
             service_key = self.service_periods.query_or_insert(row.service_date)
 
             if restart:
-                if config.get_value('max_skipped_rows'):
-                    if skipped_rows > config.get_value('max_skipped_rows'):
-                        msg = "ERROR: exceeded maximum number of skipped service rows."
-                        self._ios.print(msg)
+                if config.get_value("max_skipped_rows"):
+                    if skipped_rows > config.get_value("max_skipped_rows"):
+                        msg = self._ios.print("Exceeded maximum number of skipped service rows.")
                         restarter.critical_error(msg)
 
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
             if not service_key:
-                self._ios.print("ERROR: cannot find or create new service_key, skipping.")
+                self._ios.log_and_print(
+                    "Cannot find or create new service_key, skipping.",
+                    self._ios.Severity.WARNING)
                 skipped_rows +=1
                 continue
 
@@ -163,8 +169,9 @@ class _Client():
                     else:
                         flags.update(flagger.flag(row, config))
                 except Exception as e:
-                    self._ios.print("WARNING: error in flagger {}. Skipping.\n{}"
-                        .format(flagger.name, e))
+                    self._ios.log_and_print(
+                        "Error in flagger {}. Skipping.\n{}".format(flagger.name, e),
+                        self._ios.Severity.WARNING)
 
             date = row["service_date"]
             date = "".join([str(date.year), "/", str(date.month), "/", str(date.day)])
@@ -175,16 +182,21 @@ class _Client():
                     date,
                     int(flag)
                 ])
+            progress_bar.next()
 
+        progress_bar.finish()
         # Duplicate flagger requires a special call later on, independent of
         # the primary loop.
         if duplicate is not None:
+            self._ios.log_and_print("Checking for duplicates.")
             flagged_rows.extend(self._flag_duplicates(ctran_df, duplicate))
         else:
-            self._ios.print("NOTE: this run is not checking for duplicates.")
+            self._ios.log_and_print(
+                "This run is not checking for duplicates.",
+                self._ios.Severity.WARNING)
 
         self.flagged.write_table(flagged_rows)
-        self._ios.print("Done executing the pipeline.")
+        self._ios.log_and_print("Done executing the pipeline.")
         return True
 
     ###########################################################
@@ -193,13 +205,16 @@ class _Client():
     def process_since_checkpoint(self):
         start_date = self.flagged.get_latest_day()
         if start_date is None:
-            self._ios.print("ERROR: no prior date processed; cannot continue from the last processed day.")
+            self._ios.log_and_print(
+                "No prior date processed; cannot continue from the last processed day.",
+                self._ios.Severity.ERROR)
             return False
-        self._ios.print("Last processed day: " + str(start_date))
+
+        self._ios.log_and_print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self._ios.print("Processing from:  " + str(start_date))
+        self._ios.log_and_print("Processing    from: " + str(start_date))
         end_date = datetime.now().date()
-        self._ios.print("\t   until: " + str(end_date))
+        self._ios.log_and_print("             until: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
@@ -208,19 +223,21 @@ class _Client():
     def process_next_day(self, restart=False):
         start_date = self.flagged.get_latest_day()
         if start_date is None:
-            msg = "ERROR: an error occured while attempting to find the last processed day. This may be because the last processed day doesn't exist or an error occured while connecting to the database."
-            self._ios.print(msg)
+            msg = "".join([
+                "An error occured while attempting to find the last processed day. ",
+                "This may be because the last processed day doesn't exist or an ",
+                "error occured while connecting to the database."])
+            msg = self._ios.log_and_print(msg, self._ios.Severity.ERROR)
             if restart:
                 restarter.critical_error(msg)
             else:
                 return False
             
-
-        self._ios.print("Last processed day: " + str(start_date))
+        self._ios.log_and_print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self._ios.print("Processing from:  " + str(start_date))
+        self._ios.log_and_print("Processing    from: " + str(start_date))
         end_date = start_date
-        self._ios.print("\t   until: " + str(end_date))
+        self._ios.log_and_print("             until: " + str(end_date))
         return self.process_data(start_date, end_date, restart)
 
     ###########################################################
@@ -228,7 +245,12 @@ class _Client():
     def reprocess(self, start_date=None, end_date=None):
         start_date, end_date = self._get_date_range(start_date, end_date)
         if not self.flagged.delete_date_range(start_date, end_date):
-            self._ios.print()
+            msg = "".join([
+                "An error occured while attempting to delete the data in the ",
+                "supplied range [", str(start_date), ", ", str(end_date), "]. ",
+                "This may be because the last processed day doesn't exist or an ",
+                "error occured while connecting to the database."])
+            self._ios.log_and_print(msg, self._ios.Severity.ERROR)
             return False
         return self.process_data(start_date, end_date)
 
@@ -250,7 +272,7 @@ class _Client():
         try:
             dup_df = duplicate_instance.flag(df, config)
         except ValueError as err:
-            self._ios.print("ERROR:", err)
+            self._ios.log_and_print("", self._ios.Severity.ERRROR, err)
             return []
 
         dup_df.insert(0, "service_key", 0)
