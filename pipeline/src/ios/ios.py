@@ -58,6 +58,8 @@ class IOs(Logger):
             self._started = False
 
     def log_and_print(self, message, severity=Severity.INFO, obj=None):
+        if obj is not None:
+            message = message + str(obj)
         msg = self.log(message, severity)
-        self.print(msg, obj)
+        self.print(msg)
         return msg
