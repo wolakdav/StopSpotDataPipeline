@@ -6,10 +6,10 @@
 # CLI
 # Dockerfile is located in subdirectory dockerfiles\cli
 
-sudo docker build -t cli \
+docker build -t cli \
 	./CLI/
 
 # GUI
 # Dockerfile is located in subdirectory dockerfiles\gui
-sudo docker build -t gui \
+docker build -t gui \
 	./GUI/
