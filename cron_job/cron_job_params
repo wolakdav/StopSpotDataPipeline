@@ -10,5 +10,9 @@
 # Once the container finishes its job the container will stop and delete the container. Within the Dockerfile the default command
 # is to run the application with the --daily flag and so this command will process the next days data at 4am everyday by default.
 
-0 4 * * * docker run --restart on-failure:2 stop_spot && docker rm stop_spot
+# For this line:
+# --mount type=bind,source=/home/pipeline/project/pipeline,target=/pipeline
+# The path "/home/pipeline/project/pipeline/" will need to be manually set up on each system.
+# This needs to be an absolute path to the directory that contains the folder "pipeline".
 
+0 4 * * * sudo docker run -d --name pipeline --mount type=bind,source=/home/pipeline/project/pipeline,target=/pipeline --rm cli
