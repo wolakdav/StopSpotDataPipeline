@@ -15,4 +15,4 @@
 # The path "/home/pipeline/project/pipeline/" will need to be manually set up on each system.
 # This needs to be an absolute path to the directory that contains the folder "pipeline".
 
-0 4 * * * sudo docker run -d --name pipeline --mount type=bind,source=/home/pipeline/project/pipeline,target=/pipeline --rm cli
+0 4 * * * docker run -d --name pipeline --mount type=bind,source=/home/pipeline/project/pipeline,target=/pipeline --rm cli
