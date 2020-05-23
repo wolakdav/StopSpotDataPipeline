@@ -3,7 +3,7 @@ import sys
 import os
 import json
 from flask import jsonify
-
+from datetime import date
 app = Flask(__name__)
 
 @app.route('/')
@@ -33,9 +33,15 @@ def config():
 
 @app.route('/log')
 def log():
-        f = open('../output/log.txt')
+        today = date.today().strftime('%Y-%m-%d')
+        filename = today + '.txt'
         
-        return f.read()
+        try:
+                f = open('../output/' + filename)
+                return f.read()
+
+        except FileNotFoundError:
+                return 'Log file not found for {}.'.format(today)
 
 @app.route('/shutdown')
 def shutdown_ui():
