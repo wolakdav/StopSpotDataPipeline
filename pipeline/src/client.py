@@ -1,5 +1,6 @@
 import os
 import sys
+from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 from sqlalchemy import create_engine
@@ -80,6 +81,7 @@ class _Client():
         engine_url = self._hive_engine.url
         self.flags = Flags(engine=engine_url)
         self.service_periods = Service_Periods(engine=engine_url)
+        self.flag_lookup = None
 
     #######################################################
 
@@ -88,6 +90,8 @@ class _Client():
         if len(sys.argv) > 1:
             ai = ArgInterface()
             return ai.query_with_args(self, sys.argv[1:])
+
+        self.init_flag_dict()
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
@@ -258,6 +262,20 @@ class _Client():
 
     def create_all_views(self):
         return self.flagged.create_views_all_flags()
+
+    ###########################################################
+
+    def init_flag_dict(self):
+        self.flag_lookup = dict()
+        df = self.flags.get_full_table()
+
+        if df is None:
+            return
+
+        FlagInfo = namedtuple("FlagInfo", "id desc")
+
+        for row in df.itertuples():
+            self.flag_lookup[row.name] = FlagInfo(row.flag_id, row.description)
 
     #######################################################
 

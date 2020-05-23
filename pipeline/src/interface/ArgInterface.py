@@ -12,6 +12,20 @@ class ArgInterface:
         try:
             args = self._parse_cl_args(args)
 
+            if args.flag:
+                client.init_flag_dict()
+                query = args.flag
+                args.flag = client.flag_lookup.get(query)
+
+                if args.flag is None:
+                    ios.log(
+                            "No flag exists in the database by the name of \"{}\".".format(query),
+                            ios.Severity.ERROR
+                    )
+                    return None
+
+                args.flag = args.flag.id
+
             if args.select:
                 df = self._handle_flag_query(flagged, args)
             elif args.date_start:
@@ -36,9 +50,9 @@ class ArgInterface:
     def _handle_flag_query(self, flagged, args):
         if args.flag:
             limit = args.limit if args.limit else 100
-            return flagged.query_flags_by_flag_id(limit, args.flag)
+            return flagged.query_by_flag_id(args.flag, limit)
         elif args.row:
-            return flagged.query_flags_by_row_id("service_periods", args.row, args.year, args.service_period)
+            return flagged.query_by_row_id("service_periods", args.row, args.year, args.service_period)
 
     def _service_date(self, arg):
         try:
@@ -116,8 +130,7 @@ class ArgInterface:
         parser.add_argument("-f",
                             "--flag",
                             help="Placeholder",
-                            required=not daily and query and not row,
-                            type=int)
+                            required=not daily and query and not row)
         parser.add_argument("-l",
                             "--limit",
                             help="Sets the number of rows to be returned (default=100).",

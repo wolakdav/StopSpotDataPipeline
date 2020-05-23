@@ -37,7 +37,7 @@ def test_table_name(instance_fixture):
     assert instance_fixture._table_name == "flags"
 
 def test_expected_cols(instance_fixture):
-    expected_cols = ["flag_id", "description"]
+    expected_cols = ["flag_id", "description", "name"]
     assert instance_fixture._expected_cols == expected_cols
 
 def test_creation_sql(instance_fixture):
@@ -46,6 +46,7 @@ def test_creation_sql(instance_fixture):
             CREATE TABLE IF NOT EXISTS """, instance_fixture._schema, ".", instance_fixture._table_name, """
             (
                 flag_id INTEGER PRIMARY KEY,
-                description VARCHAR(200)
+                description VARCHAR(200),
+                name VARCHAR(30)
             );"""])
     assert expected == instance_fixture._creation_sql
