@@ -19,7 +19,7 @@
   },
   "notif_django_path": "output/notif.txt",
   "unobserved_stop_distance": 50,
-  "output_path": "output/csv/",
+  "output_path": "output/test_csv/",
   "output_type": "aperture"
 }
 

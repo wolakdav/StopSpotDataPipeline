@@ -123,7 +123,7 @@ class _Client(IOs):
             self.service_periods.create_table()
             self.flagged.create_table()
 
-        #When dealing with csv and hive creation, only data available right away is flags, so we only save flags to csv in this option
+        #When dealing with csv and hive creation, only data available right away is flags, so we only save flags to csv when "creating" csv-hive
         if (self._output_type == "csv" or self._output_type == "both"):
             if not self.flags.write_csv(self._output_path):
                 print("Error saving Flags to csv.")
@@ -195,6 +195,7 @@ class _Client(IOs):
         else:
             self.print("NOTE: this run is not checking for duplicates.")
 
+        #Saving result
         if(self._output_type == "aperture" or self._output_type == "both"):
             self.flagged.write_table(flagged_rows)
         if(self._output_type == "csv" or self._output_type == "both"):

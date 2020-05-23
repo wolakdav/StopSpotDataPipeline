@@ -6,6 +6,10 @@
 
 **TO RUN**: `python3 -m pytest ete-test/ete.py`
 
+> It is also possible to run by excluding some tests. There are tests which test aperture output, marked as aperture test. 
+
+*To run and exclude certain tests, e.g.: exclude apreture test: * `python3 -m pytest -v -m "not aperture" ete-test/ete.py`
+
 > This test runs separately from other tests (unit tests). In order for pytest not to detect this test during normal `pytest` command, which runs all tests, file is named in a way
 > that doesn't allow pytest to catch it automatically. Thus, there is an explicit command to run end-to-end test. 
 
