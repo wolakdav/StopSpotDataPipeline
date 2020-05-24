@@ -14,15 +14,10 @@ class _Notif():
 
         self.pipeline_email = ""  #tests fail without including this in the constructor
 
-    def print(self, string, obj=None, force=False):
-        raise AttributeError("AttributeError: " + self.__class__.__name__ + " has no attribute 'print'")
-
-    def prompt(self, prompt="", hide_input=False):
-        raise AttributeError("AttributeError: " + self.__class__.__name__ + " has no attribute 'prompt'")
-
     #######################################################
 
     def email(self, subject="", msg=""):
+        self._ios.log_and_print("Sending out an email to the user(s).")
         time = datetime.datetime.now()
         result = True
         if subject == "":
@@ -32,7 +27,7 @@ class _Notif():
         msg = "".join(["Subject: [StopSpot Pipeline] ", subject, " on/at ", str(time), "\n\n", msg])
 
         password = self._update_email_data()
-        self._ios._print(self.user_emails)
+        self._ios.log_and_print(self.user_emails)
         if isinstance(self.user_emails, list):
             for user_email in self.user_emails:
                 # Do not switch the order of this conditional expression,
@@ -48,9 +43,9 @@ class _Notif():
         return self._get_config_value("pipeline_email_passwd", "Please enter this pipeline's email password: ", True)
 
     def _email_user(self, user_email, msg, password):
-        self._ios._print("TO:   ", user_email)
-        self._ios._print("FROM: ", self.pipeline_email)
-        self._ios._print(msg)
+        self._ios.log_and_print("TO:   ", user_email)
+        self._ios.log_and_print("FROM: ", self.pipeline_email)
+        self._ios.log_and_print(msg)
 
         try:
             context = ssl.create_default_context() # Create a secure SSL context
@@ -59,10 +54,12 @@ class _Notif():
             server.login(self.pipeline_email, password)
             server.sendmail(self.pipeline_email, user_email, msg)
         except smtplib.SMTPAuthenticationError:
-            print("ERROR: email authentication failed.")
+            self._ios.log_and_print(
+                "Email authentication failed.", self._ios.Severity.ERROR)
             return False
         except smtplib.SMTPException:
-            print("ERROR: a general email error occured.")
+            self._ios.log_and_print(
+                "A general email error occured.", self._ios.Severity.ERROR)
             return False
 
         return True

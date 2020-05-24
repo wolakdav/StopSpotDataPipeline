@@ -6,19 +6,21 @@ from ..ios import ios
 
 class ArgInterface:
 
-    def query_with_args(self, client, ctran, flagged, args):
+    def query_with_args(self, client, args):
+        ctran = client.ctran
+        flagged = client.flagged
         try:
             args = self._parse_cl_args(args)
 
             if args.select:
                 df = self._handle_flag_query(flagged, args)
             elif args.date_start:
-                df = self._handle_range_query(ctran, args)
+                df = self._handle_range_query(client, args)
             elif args.daily:
                 client.process_next_day(True)
                 return None
             else:
-                print("Insufficient arguments.")
+                ios.print("Insufficient arguments.")
                 return None
         except ValueError:
             raise SystemExit(2)
@@ -28,8 +30,8 @@ class ArgInterface:
         parser = self._create_parser(args)
         return parser.parse_args(args)
 
-    def _handle_range_query(self, ctran, args):
-        return ctran.query_date_range(args.date_start, args.date_end)
+    def _handle_range_query(self, client, args):
+        return client.process_data(args.date_start, args.date_end)
 
     def _handle_flag_query(self, flagged, args):
         if args.flag:
@@ -43,8 +45,7 @@ class ArgInterface:
             return datetime.strptime(arg, "%Y-%m-%d")
         except ValueError:
             err_msg = "Invalid service date format: {0}, YYYY-MM-DD expected.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _service_year(self, arg):
@@ -52,8 +53,7 @@ class ArgInterface:
             return datetime.strptime(arg, "%Y")
         except ValueError:
             err_msg = "Invalid service year format: {0}, YYYY expected.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _service_period(self, arg):
@@ -72,8 +72,7 @@ class ArgInterface:
                     raise e
         except ValueError:
             err_msg = "Invalid service period format: {0}, [1, 2, 3] or [first, second, third] expected.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _limit(self, arg):
@@ -85,8 +84,7 @@ class ArgInterface:
                 raise ValueError
         except ValueError:
             err_msg = "Invalid limit: {0}, value must be at least 1.".format(arg)
-            # TODO change to use ios
-            # logger.log(err_msg, ios.Severity.ERROR)
+            ios.log_and_print(err_msg, ios.Severity.ERROR)
             raise argparse.ArgumentTypeError(err_msg)
 
     def _create_parser(self, args):

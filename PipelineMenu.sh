@@ -7,13 +7,13 @@
 # The container will be deleted when it stops running.
 # The tag "cli" is searched for as a base image for creating this container.
 
-sudo docker run -d -it \
+docker run -d -it \
 	--name pipeline \
 	--entrypoint "/bin/bash" \
 	--mount type=bind,source="$(pwd)"/pipeline,target=/pipeline \
 	--rm \
 	cli
 
-sudo docker exec -it pipeline python3 main.py
+docker exec -it pipeline python3 main.py
 
-sudo docker stop pipeline
+docker stop pipeline

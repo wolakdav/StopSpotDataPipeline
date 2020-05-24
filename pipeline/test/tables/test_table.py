@@ -33,12 +33,6 @@ class Table_Dummy(Table):
                 table SMALLINT
             );"""])
 
-        # ios' methods inherited from Logger are disconnected here so they do
-        # create a log file for tests.
-        self._ios.start = lambda filename="": None
-        self._ios.stop  = lambda: None
-        self._ios.log   = lambda message, severity=self._ios.Severity.INFO: None
-
 
 @pytest.fixture
 def instance_fixture():
