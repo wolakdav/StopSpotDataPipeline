@@ -7,7 +7,7 @@
 # The container will be deleted when it stops running.
 # The tag "gui" is searched for as a base image for creating this container.
 
-sudo docker run -d -it \
+docker run -d -it \
 	-p 5000:5000	\
 	--name pipeline \
 	--mount type=bind,source="$(pwd)"/pipeline,target=/pipeline \
