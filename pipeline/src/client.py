@@ -128,6 +128,8 @@ class _Client(IOs):
             if not self.flags.write_csv(self._output_path):
                 print("Error saving Flags to csv.")
 
+            self.service_periods.create_table()
+
     ###########################################################
 
     # Process data between start_date and end_date, inclusive. These parameters
@@ -184,8 +186,8 @@ class _Client(IOs):
                 flagged_rows.append([
                     row_id,
                     service_key,
-                    date,
-                    int(flag)
+                    int(flag),
+                    date
                 ])
 
         # Duplicate flagger requires a special call later on, independent of
@@ -273,10 +275,11 @@ class _Client(IOs):
         dup_df["service_key"] = dup_df["service_date"].apply(
             lambda date: self.service_periods.query_or_insert(date))
 
+        dup_df.insert(1, "flag_id", 1)
+        dup_df["flag_id"] = flag_enums.DUPLICATE
+
         dup_df["service_date"] = dup_df["service_date"].apply(
             lambda date: "".join([str(date.year), "/", str(date.month), "/", str(date.day)]))
-
-        dup_df["flag_id"] = flag_enums.DUPLICATE
 
         indices = dup_df.index.tolist()
         values = dup_df.values.tolist()

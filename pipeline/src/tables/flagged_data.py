@@ -42,8 +42,8 @@ class Flagged_Data(Table):
         df = pandas.DataFrame(data, columns=[
             "row_id",
             "service_key",
+            "flag_id",
             "service_date",
-            "flag_id"
             ])
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
@@ -260,7 +260,7 @@ class Flagged_Data(Table):
         """
 
         #Append expected cols to beginning of the list to create header row in the csv
-        data.insert(0, [self._expected_cols])
+        data.insert(0, self._expected_cols)
 
         #Create dataframe that will be saved to csv
         df = pandas.DataFrame(data)

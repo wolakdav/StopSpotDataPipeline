@@ -6,9 +6,6 @@
 
 **TO RUN**: `python3 -m pytest ete-test/ete.py`
 
-> It is also possible to run by excluding some tests. There are tests which test aperture output, marked as aperture test. 
-
-*To run and exclude certain tests, e.g.: exclude apreture test: * `python3 -m pytest -v -m "not aperture" ete-test/ete.py`
 
 > This test runs separately from other tests (unit tests). In order for pytest not to detect this test during normal `pytest` command, which runs all tests, file is named in a way
 > that doesn't allow pytest to catch it automatically. Thus, there is an explicit command to run end-to-end test. 
@@ -47,3 +44,5 @@ Since during pytest used input is prohibited, valid information must be supplied
   - `pipeline_hostname`				[URL to the server that holds database with output information]
   - `pipeline_db_name`				[Name of the database on the server that contain output information]
   - `pipeline_schema`				[Name of the schema which holds output information. *RECOMMEND*: test_yourOutputDbName]
+  - `output_path`           [Path to csv output. Default is output/csv/]
+  - `output_type`           [Where output will be put. Default is aperture. Test changes the output to csv when testing csv output]

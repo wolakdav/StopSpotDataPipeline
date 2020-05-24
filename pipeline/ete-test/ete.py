@@ -8,6 +8,7 @@ from src.tables import Flags
 from src.tables import Flagged_Data
 from datetime import datetime
 import json
+import shutil
 
 from src.tables import CTran_Data
 from src.tables import Flagged_Data
@@ -181,7 +182,6 @@ def test_client(client):
 	assert isinstance(client, _Client)
 
 #Test valid ctran instance creation
-@pytest.mark.aperture
 def test_ctran(ctran):
 	assert isinstance(ctran, CTran_Data)
 
@@ -194,34 +194,28 @@ def test_flags(flags):
 	assert isinstance(flags, Flags)
 
 #Tests saving test data to aperture
-@pytest.mark.aperture
 def test_save_ctran_test_data(save_ctran_test_data):
 	assert save_ctran_test_data == True
 
 #Test hive creation, for output/processed data
-@pytest.mark.aperture
 def test_create_hive(create_hive):
 	assert create_hive == True
 
 #Tests data processing and saving [function in client]
-@pytest.mark.aperture
 def test_process_and_save(process_and_save):
 	assert process_and_save == True
 
 #Test that correct number of rows has been inserted
-@pytest.mark.aperture
 def test_pull_test_data(get_ctran_test_data):
 	assert not type(get_ctran_test_data) is None
 	assert len(get_ctran_test_data) == 5
 
 #Tests pulling processed data for further testing
-@pytest.mark.aperture
 def test_pull_flagged_data(flagged_data):
 	assert not type(flagged_data) is bool
 	assert len(flagged_data) > 0
 
 #Test pulling flags data
-@pytest.mark.aperture
 def test_pull_flags(flags_data, num_of_flags):
 	assert not type(flags_data) is bool
 	assert len(flags_data) == num_of_flags
@@ -232,7 +226,6 @@ def test_pull_flags(flags_data, num_of_flags):
 
 #Test first (input) row: contains all None's, except date.
 #Row_id can't be null because it's automatically incremented
-@pytest.mark.aperture
 def test_row_1(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only _NULL flags
 	mask = flags_data.description.str.contains("_NULL")
@@ -255,7 +248,6 @@ def test_row_1(flagged_data, flags_data):
 			assert any(first_row["flag_id"] == row["flag_id"]) == True
 
 #Test second (input) row: all data is good, except there is data for unobserved_stop flag to be turned on
-@pytest.mark.aperture
 def test_row_2(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
 	mask = flags_data.description.str.contains("UNOBSERVED_STOP")
@@ -277,7 +269,6 @@ def test_row_2(flagged_data, flags_data):
 	assert unobserved_flag == second_row_flag
 
 #Test third (input) row: all data is good, except there is data for unopened_door flag to be turned on
-@pytest.mark.aperture
 def test_row_3(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
 	mask = flags_data.description.str.contains("UNOPENED_DOOR")
@@ -299,7 +290,6 @@ def test_row_3(flagged_data, flags_data):
 	assert unopened_door_flag == third_row_flag
 
 #Test fourth and fifth (rows): all data is good, but they're duplicates of each other, therefore both must contain duplicate flag
-@pytest.mark.aperture
 def test_row_4_and_5(flagged_data, flags_data):
 	#Step 1: Need to split flags to have only UNOBSERVED_STOP flag
 	mask = flags_data.description.str.contains("DUPLICATE")
@@ -327,18 +317,108 @@ def test_row_4_and_5(flagged_data, flags_data):
 	assert duplicate_flag == fifth_row_flag
 
 #Test sixth row: All data is good, but service_date is null, therefore data will not be flagged, and thus absent from flagged_data: thus row_id = 5 will not be in the table
-@pytest.mark.aperture
 def test_row_6(flagged_data):
 	mask = flagged_data.row_id == 6
 	sixth_row = flagged_data[mask]
 	assert len(sixth_row) == 0
 
 #***********************************************************************************************************#
+#CSV OUTPUT TESTS###########################################################################CSV OUTPUT TESTS#
+#############################################################################################################	
+
+#At this point all aperture output has either passed or failed. No need to test both outputs, can foxus on csv output
+
+#Changes output type from aperture to csv
+@pytest.fixture
+def change_output_to_csv(client):
+	try:
+		client._output_type = "csv"
+	except:
+		return False
+
+	return True
+
+#Creates fake hive aka flags.csv
+@pytest.fixture
+def create_csv_hive(client, change_output_to_csv):
+	try:
+		client.create_hive()
+	except:
+		return False
+
+	return True
+
+#Reads created flags.csv
+@pytest.fixture
+def read_csv_hive(client, flags):
+	try:
+		path = client._output_path + flags._table_name + ".csv"
+		#When panda reads, it numberates columns, thus we skip first numerate column
+		flags = pandas.read_csv(path, skiprows=1)
+		return flags
+	except FileNotFoundError:
+		return []
+
+@pytest.fixture
+def process_and_save_to_csv(client, change_output_to_csv):
+	start = datetime(1900, 1, 1)
+	end = datetime(2100, 1, 1)
+	return client.process_data(start, end)
+
+@pytest.fixture 
+def read_csv_flagged(client, flagged):
+	try:
+		path = client._output_path + flagged._table_name + ".csv"
+		#When panda reads, it numberates columns, thus we skip first numerate column
+		flagged = pandas.read_csv(path, skiprows=1)
+		return flagged
+	except FileNotFoundError:
+		return []
+
+@pytest.fixture
+def remove_csv_directory(client):
+	try:
+		shutil.rmtree(client._output_path, ignore_errors=True)
+	except:
+		return False
+
+	return True
+
+#Process data
+
+#Tests successful output type change
+def test_output_is_csv(change_output_to_csv, client):
+	assert change_output_to_csv == True
+	assert client._output_type == "csv"
+
+#Tests successful tables.csv creation
+@pytest.mark.csv
+def test_csv_hive_creation(create_csv_hive):
+	assert create_csv_hive == True
+	
+#Tests that tables.csv contains correct info
+def test_csv_hive_read(read_csv_hive, num_of_flags, flags):
+	assert len(read_csv_hive) == num_of_flags
+	cols = list(read_csv_hive.columns.values)
+	assert cols == flags._expected_cols
+
+#AT THIS POINT WE CAN TEST PROCESSING OUTPUT
+
+def test_csv_process_and_save(process_and_save_to_csv):
+	#assert save_ctran_test_data == True
+	assert process_and_save_to_csv == True
+
+def test_flagged_csv_output(read_csv_flagged, flagged):
+	assert len(read_csv_flagged) == 29
+	cols = list(read_csv_flagged.columns.values)
+	assert cols == flagged._expected_cols
+
+
+#***********************************************************************************************************#
 #RECYCLE#############################################################################################RECYCLE#
 #############################################################################################################
 
 #Test successful aperture removal: where input information resides
-@pytest.mark.aperture
 def test_input_information_removal(ctran, remove_input_information):
 	#Step 1: Assert successful removal
 	assert remove_input_information == True
@@ -349,7 +429,6 @@ def test_input_information_removal(ctran, remove_input_information):
 	assert ctran.query_date_range(start_date, end_date) == None
 
 #Test successful hive removal: where output information resides
-@pytest.mark.aperture
 def test_output_information_removal(remove_output_information, flagged_data):
 	#Step 1: Assert succesful removal
 	assert remove_output_information == True
@@ -357,52 +436,7 @@ def test_output_information_removal(remove_output_information, flagged_data):
 	#Step 2: Try to access table: should return False
 	assert flagged_data == None
 
-#***********************************************************************************************************#
-#CSV OUTPUT TESTS###########################################################################CSV OUTPUT TESTS#
-#############################################################################################################	
-
-#At this point all aperture output has either passed or failed. No need to test both outputs, can foxus on csv output
-
-@pytest.fixture
-def change_output_to_csv(client):
-	try:
-		client._output_type = "csv"
-	except:
-		return False
-
-	return True
-
-@pytest.fixture
-def create_csv_hive(client, change_output_to_csv):
-	try:
-		client.create_hive()
-	except:
-		return False
-
-	return True
-
-@pytest.fixture
-def read_csv_hive(client, flags):
-	try:
-		path = client._output_path + flags._table_name + ".csv"
-		#When panda reads, it numberates columns, thus we skip first numerate column
-		flags = pandas.read_csv(path, skiprows=1, index=False)
-		#It also numberates rows, which we don't need
-		#flags = flags.drop(flags.columns[0], axis=1)
-		return flags
-	except FileNotFoundError:
-		return []
-
-def test_output_is_csv(change_output_to_csv, client):
-	assert change_output_to_csv == True
-	assert client._output_type == "csv"
-
-def test_csv_hive_creation(create_csv_hive):
-	assert create_csv_hive == True
-	
-def test_csv_hive_read(read_csv_hive, num_of_flags, flags):
-	assert len(read_csv_hive) == num_of_flags
-	print(read_csv_hive)
-	cols = list(read_csv_hive.columns.values)
-	assert cols == flags._expected_cols
-
+#Tests successful removal of test_csv directory
+@pytest.mark.csv
+def test_csv_directory_removal(remove_csv_directory):
+	assert remove_csv_directory == True
