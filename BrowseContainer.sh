@@ -8,9 +8,9 @@
 # The container will be deleted when it stops running.
 # The tag "pipetag" is searched for as a base image for creating this container.
 
-sudo docker run -it \
+docker run -it \
 	--name pipeline \
 	--entrypoint "/bin/bash" \
-	--mount type=bind,source="$(pwd)"/pipeline,target=/StopSpot_Data_Pipeline \
+	--mount type=bind,source="$(pwd)"/pipeline,target=/pipeline \
 	--rm \
 	cli

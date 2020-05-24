@@ -7,7 +7,8 @@ from datetime import datetime, date
 
 @pytest.fixture
 def instance_fixture():
-    return Service_Periods("sw23", "invalid", "localhost", "aperture")
+    instance = Service_Periods("sw23", "invalid", "localhost", "aperture")
+    return instance
 
 @pytest.fixture
 def dummy_engine():
