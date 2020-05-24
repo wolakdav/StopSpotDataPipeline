@@ -141,8 +141,7 @@ def test_create_view(monkeypatch, instance_fixture):
 
     mock = mock_connection()
     instance_fixture._engine.connect = lambda: mock
-    Value = namedtuple("Value", "desc")
-    monkeypatch.setitem(flagger.flag_descriptions, mock_flag.test, Value("test"))
+    monkeypatch.setitem(flagger.flag_descriptions, mock_flag.test, flagger.FlagInfo("test", "test"))
 
     expected = "".join([
         "CREATE VIEW ", instance_fixture._schema, ".view_test AS\n",

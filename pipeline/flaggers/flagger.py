@@ -57,7 +57,11 @@ class Flagger(abc.ABC):
     pass
 
 
-FlagInfo = namedtuple("FlagInfo", "name desc")
+class FlagInfo:
+    def __init__(self, name="", desc=""):
+        self.name = name
+        self.desc = desc
+
 
 flag_descriptions = {
   Flags.ROW_ID_NULL: FlagInfo("null-row-id", "ROW_ID_NULL"),

@@ -13,7 +13,6 @@ class ArgInterface:
             args = self._parse_cl_args(args)
 
             if args.flag:
-                client.init_flag_dict()
                 query = args.flag
                 args.flag = client.lookup_flag_id(query)
 

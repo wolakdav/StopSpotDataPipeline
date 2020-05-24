@@ -265,9 +265,27 @@ class _Client():
 
     ###########################################################
 
-    def init_flag_dict(self):
+    def lookup_flag_id(self, flag_name):
+        if self._flag_lookup is None:
+            self._init_flag_dict()
+
+        if self._flag_lookup is None:
+            self._ios.log_and_print(
+                "Call made to flag_lookup, but flag_lookup could not be initialized.",
+                ios.Severity.WARNING
+            )
+            return None
+
+        return self._flag_lookup.get(flag_name)
+
+    ###########################################################
+
+    def _init_flag_dict(self):
         self._flag_lookup = dict()
         df = self.flags.get_full_table()
+
+        if df is None and self.flags.create_table():
+            df = self.flags.get_full_table()
 
         if df is None:
             return
@@ -276,13 +294,6 @@ class _Client():
 
         for row in df.itertuples():
             self._flag_lookup[row.name] = FlagInfo(row.flag_id, row.description)
-
-    ###########################################################
-
-    def lookup_flag_id(self, flag_name):
-        if self._flag_lookup is None:
-            return None
-        return self._flag_lookup.get(flag_name)
 
     #######################################################
 
