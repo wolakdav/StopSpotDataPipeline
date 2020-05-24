@@ -140,6 +140,3 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 *.swp
-
-# Pipeline log file
-log.txt
