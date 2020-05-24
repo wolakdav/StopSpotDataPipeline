@@ -145,11 +145,16 @@ class _Client(IOs):
 
         flagged_rows = []
         skipped_rows = 0
+        csv_service_keys = []
         # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
         # but i'll leave optimizing for later.
         self.print("Processing the queried data.")
         duplicate = None
         for row_id, row in ctran_df.iterrows():
+
+            if self._output_type == "csv" or self._output_type == "both":
+                if not row.service_date in csv_service_keys:
+                    csv_service_keys.append(row.service_date)
 
             service_key = self.service_periods.query_or_insert(row.service_date)
 
@@ -198,10 +203,16 @@ class _Client(IOs):
             self.print("NOTE: this run is not checking for duplicates.")
 
         #Saving result
-        if(self._output_type == "aperture" or self._output_type == "both"):
+        if self._output_type == "aperture":
             self.flagged.write_table(flagged_rows)
-        if(self._output_type == "csv" or self._output_type == "both"):
+        if self._output_type == "csv":
             self.flagged.write_csv(self._output_path, flagged_rows)
+            self.service_periods.write_csv(self._output_path, csv_service_keys)
+        if self._output_path == "both":
+            self.flagged.write_table(flagged_rows)
+            self.flagged.write_csv(self._output_path, flagged_rows)
+            self.service_periods.write_csv(self._output_path, csv_service_keys)
+
         self.print("Done executing the pipeline.")
         return True
 

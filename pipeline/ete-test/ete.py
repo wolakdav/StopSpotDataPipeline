@@ -107,6 +107,11 @@ def flagged(client):
 def flags(client):
 	return client.flags
 
+#Returns service_periods instance
+@pytest.fixture
+def service_periods(client):
+	return client.service_periods
+
 #Returns number of flags specified in flagger
 @pytest.fixture
 def num_of_flags():
@@ -192,6 +197,10 @@ def test_flagged(flagged):
 #Test valid flags instance creation
 def test_flags(flags):
 	assert isinstance(flags, Flags)
+
+#Test valid service_periods instance creation
+def test_service_periods(service_periods):
+	assert isinstance(service_periods, Service_Periods)
 
 #Tests saving test data to aperture
 def test_save_ctran_test_data(save_ctran_test_data):
@@ -376,6 +385,16 @@ def read_csv_flagged(client, flagged):
 		return []
 
 @pytest.fixture
+def read_csv_service_periods(client, service_periods):
+	try:
+		path = client._output_path + service_periods._table_name + ".csv"
+		#When panda reads, it numberates columns, thus we skip first numerate column
+		flagged = pandas.read_csv(path, skiprows=1)
+		return flagged
+	except FileNotFoundError:
+		return []
+
+@pytest.fixture
 def remove_csv_directory(client):
 	try:
 		shutil.rmtree(client._output_path, ignore_errors=True)
@@ -392,7 +411,6 @@ def test_output_is_csv(change_output_to_csv, client):
 	assert client._output_type == "csv"
 
 #Tests successful tables.csv creation
-@pytest.mark.csv
 def test_csv_hive_creation(create_csv_hive):
 	assert create_csv_hive == True
 	
@@ -413,6 +431,9 @@ def test_flagged_csv_output(read_csv_flagged, flagged):
 	cols = list(read_csv_flagged.columns.values)
 	assert cols == flagged._expected_cols
 
+def test_service_periods_csv_output(read_csv_service_periods, service_periods):
+	cols = list(read_csv_service_periods.columns.values)
+	assert cols == service_periods._expected_cols
 
 #***********************************************************************************************************#
 #RECYCLE#############################################################################################RECYCLE#
@@ -437,6 +458,5 @@ def test_output_information_removal(remove_output_information, flagged_data):
 	assert flagged_data == None
 
 #Tests successful removal of test_csv directory
-@pytest.mark.csv
 def test_csv_directory_removal(remove_csv_directory):
 	assert remove_csv_directory == True

@@ -128,7 +128,9 @@ class Service_Periods(Table):
         data = []
         data.append(self._expected_cols)
         for date in dates:
-            data.append([date.month, date.year, self.get_ternary(date.month)])
+            date = self.convert_date_to_datetime(date)
+            start_date, end_date = self.get_service_period(date)
+            data.append([start_date.strftime("'%Y-%m-%d'"), end_date.strftime("'%Y-%m-%d'")])
 
         df = pandas.DataFrame(data)
 
