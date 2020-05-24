@@ -5,6 +5,7 @@ RUN python -m pip install \
         realpython-reader \
         pandas \
         sqlalchemy \
-        psycopg2
+        psycopg2 \
+        progress
 WORKDIR "/pipeline"
 CMD python3 main.py --daily

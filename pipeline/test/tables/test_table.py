@@ -10,8 +10,9 @@ g_expected = None
 
 # Test_Dummy is used to allow for easy and precise tests of Table.
 class Table_Dummy(Table):
-    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", verbose=False, engine=None):
-        super().__init__(user, passwd, hostname, db_name, schema, verbose, engine)
+    def __init__(self, user=None, passwd=None, hostname=None, db_name=None, schema="hive", engine=None):
+        super().__init__(user, passwd, hostname, db_name, schema, engine)
+
         self._table_name = "fake"
         self._index_col = "fake_key"
         self._expected_cols = [
@@ -135,11 +136,6 @@ def test_creation_sql(instance_fixture):
 
 def test_get_engine(instance_fixture):
     assert instance_fixture.get_engine().url == instance_fixture._engine.url
-
-def test_print_unverbose(capsys, instance_fixture):
-    instance_fixture.verbose = False
-    instance_fixture._print("Hello!")
-    assert capsys.readouterr().out == ""
 
 def test_check_cols_happy(sample_df, instance_fixture):
     assert instance_fixture._check_cols(sample_df) == True

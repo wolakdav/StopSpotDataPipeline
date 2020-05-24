@@ -10,7 +10,8 @@ g_expected = None
 
 @pytest.fixture
 def instance_fixture():
-    return CTran_Data("sw23", "invalid", "localhost", "aperture", verbose=True)
+    instance = CTran_Data("sw23", "invalid", "localhost", "aperture")
+    return instance
 
 @pytest.fixture
 def dummy_engine():

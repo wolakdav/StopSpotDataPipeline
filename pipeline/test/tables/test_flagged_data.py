@@ -9,7 +9,8 @@ import flaggers.flagger as flagger
 
 @pytest.fixture
 def instance_fixture():
-    return Flagged_Data("sw23", "invalid", "localhost", "aperture")
+    instance = Flagged_Data("sw23", "invalid", "localhost", "aperture")
+    return instance
 
 @pytest.fixture
 def dummy_engine():

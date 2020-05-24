@@ -10,7 +10,7 @@ as appropriate (for more, see below).
 ### Install and Activate Python Dependencies
 
 1) `python3 -m pip install --user pipenv`: Install pipenv locally - Python 3.7 is required.
-2) `cd TeamBeeCapstoneProject`
+2) `cd ./pipeline`
 3) `pipenv shell`: Activate the virtual environment.
 4) `pipenv install`: Install the dependencies specified by `Pipfile.lock` and `Pipefile.`
 5) `exit`: Close the virtual environment.
@@ -19,8 +19,8 @@ as appropriate (for more, see below).
 
 If the output database has not been generated or used, then it is required to
 first boot the CLI menu to build the output database's schema, and then
-manually execute this program. This is possible via the same CLI menu or via
-the command arguments (for more, see below).  
+manually process some data. This is possible via the same CLI menu or via the
+command arguments (for more, see below).  
 
 It is recommended to adjust `assets/config.json` for ease of use. For more, see
 below.
