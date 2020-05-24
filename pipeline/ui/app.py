@@ -20,7 +20,7 @@ def config():
                         return jsonify({'status': 'fail'})
 
                 f = open('../assets/config.json', 'w')
-                f.write(json.dumps(request_json, indent=4))
+                f.write(json.dumps(request_json, indent=4, sort_keys=False))
                 f.close()
                 return jsonify({'status': 'success'})
  

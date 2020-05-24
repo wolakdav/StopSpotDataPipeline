@@ -1,34 +1,23 @@
 {
-    "columns": {
-        "maximum_speed": {
-            "max": 15660,
-            "min": 0
-        },
-        "service_date": {
-            "max": "NA",
-            "min": "1990-01-01"
-        },
-        "vehicle_number": {
-            "max": "NA",
-            "min": 0
-        }
-    },
-    "max_skipped_rows": 10,
-    "notif_django_path": "output/notif.txt",
-    "pipeline_db_name": "hive",
-    "pipeline_email": "stopspot.noreply@gmail.com",
-    "pipeline_email_passwd": "INVALID",
-    "pipeline_hostname": "localhost",
-    "pipeline_passwd": "pipe",
-    "pipeline_schema": "hive",
-    "pipeline_user": "pipe",
-    "portal_db_name": "aperture",
-    "portal_hostname": "localhost",
-    "portal_passwd": "portal",
-    "portal_schema": "aperture",
-    "portal_user": "portal",
-    "unobserved_stop_distance": 50,
-    "user_emails": [
-        "test@test.com"
-    ]
+  "portal_user": "portal",
+  "portal_passwd": "portal",
+  "portal_hostname": "localhost",
+  "portal_db_name": "aperture",
+  "portal_schema": "aperture",
+  "max_skipped_rows": 10,
+  "user_emails": ["test@test.com"],
+  "pipeline_email": "stopspot.noreply@gmail.com",
+  "pipeline_email_passwd": "INVALID",
+  "pipeline_user": "pipe",
+  "pipeline_passwd": "pipe",
+  "pipeline_hostname": "localhost",
+  "pipeline_db_name": "hive",
+  "pipeline_schema": "hive",
+  "columns": {
+    "vehicle_number": { "max": "NA", "min": 0 },
+    "maximum_speed": { "max": 150, "min": 0 },
+    "service_date": { "max": "NA", "min": "1990-01-01" }
+  },
+  "notif_django_path": "output/notif.txt",
+  "unobserved_stop_distance": 50
 }
