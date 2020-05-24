@@ -15,10 +15,10 @@ class ArgInterface:
             if args.flag:
                 client.init_flag_dict()
                 query = args.flag
-                args.flag = client.flag_lookup.get(query)
+                args.flag = client.lookup_flag_id(query)
 
                 if args.flag is None:
-                    ios.log(
+                    ios.log_and_print(
                             "No flag exists in the database by the name of \"{}\".".format(query),
                             ios.Severity.ERROR
                     )

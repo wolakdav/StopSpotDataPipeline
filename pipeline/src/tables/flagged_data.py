@@ -239,8 +239,6 @@ class Flagged_Data(Table):
 
     def create_view_for_flag(self, flag):
         # flag is one of flagger's Flags enum.
-        print("BIG TEST")
-        print(flagger.flag_descriptions[flag])
         view_name = "view_" + flagger.flag_descriptions[flag].desc
         sql = "".join([
             "CREATE VIEW ", self._schema, ".", view_name, " AS\n",

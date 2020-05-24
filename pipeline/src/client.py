@@ -81,7 +81,7 @@ class _Client():
         engine_url = self._hive_engine.url
         self.flags = Flags(engine=engine_url)
         self.service_periods = Service_Periods(engine=engine_url)
-        self.flag_lookup = None
+        self._flag_lookup = None
 
     #######################################################
 
@@ -266,7 +266,7 @@ class _Client():
     ###########################################################
 
     def init_flag_dict(self):
-        self.flag_lookup = dict()
+        self._flag_lookup = dict()
         df = self.flags.get_full_table()
 
         if df is None:
@@ -275,7 +275,14 @@ class _Client():
         FlagInfo = namedtuple("FlagInfo", "id desc")
 
         for row in df.itertuples():
-            self.flag_lookup[row.name] = FlagInfo(row.flag_id, row.description)
+            self._flag_lookup[row.name] = FlagInfo(row.flag_id, row.description)
+
+    ###########################################################
+
+    def lookup_flag_id(self, flag_name):
+        if self._flag_lookup is None:
+            return None
+        return self._flag_lookup.get(flag_name)
 
     #######################################################
 

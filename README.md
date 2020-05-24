@@ -109,10 +109,34 @@ user for them. If `end_date` is not supplied, then it will be set to
 Create all views for the Hive schema. Currently only create views for each
 flags that queries all data rows with that flag.
 
+#### `init_flag_dict()`
+
+Query the database for all present flag-types. This information is made available
+for translating queries utilizing flag names into queries with flag ids. This
+functionality is performed on the program-side instead of the database-side
+in order to allow the end-user to view what flags exist and write command-
+line queries with sensible names. NOTE: Current behavior only runs this
+operation and initializes the dictionary as-needed. This means in use cases
+where translating flag names to ids is not needed, this table does not get
+initialized.
+
+#### `lookup_flag_id(flag_name)`
+
+This method expects a string `flag_name` and will return the numerical id
+of the corresponding flag, if it exists. None will be returned if the dictionary
+has not been initialized.
+
 #### `client_instance.create_hive()`
 
 This method will create the Hive schema, which is the collection of tables
 flags, flagged_data, and service_periods.
+
+#### `dict client_instance._flag_lookup`
+
+This member will store the information from the database flags table for use
+in local queries. The client will avoid initializing this dictionary when not
+required, initialized to None when not in use. Command line queries will
+only initialize the dictionary if the --flag (-f) argument is set.
 
 #### `CTran_Data client_instance.ctran`
 
