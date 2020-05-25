@@ -215,7 +215,9 @@ class Table(abc.ABC):
             # extremely hard to read and needlessly long.
             con.execute(sql)
         except SQLAlchemyError as error:
-            self._ios.log_and_print("SQLAlchemyError: " + str(error), ios.Severity.ERROR)
+            self._ios.log_and_print(
+                "SQLAlchemyError: " + str(error).splitlines()[0],
+                ios.Severity.ERROR)
             return False
 
         return True
