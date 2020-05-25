@@ -473,3 +473,6 @@ class _Client():
 
         return self._menu("This is output type sub-menu.", options)
 
+    def save_to_csv():
+        
+
