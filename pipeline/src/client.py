@@ -120,16 +120,15 @@ class _Client():
     #######################################################
 
     def create_hive(self):
-        if (self._output_type == "aperture" or self._output_type == "both"):
-            self.flags.create_table()
+        self.flags.create_table()
+        self.service_periods.create_table()
+        self.flagged.create_table()
 
-        #When dealing with csv and hive creation, only data available right away is flags, so we only save flags to csv when "creating" csv-hive
+        # When dealing with csv and hive creation, only data available right away is flags, so we only save flags to csv when "creating" csv-hive
+        # service_periods and flagged csv's are created when process_data is run
         if (self._output_type == "csv" or self._output_type == "both"):
             if not self.flags.write_csv(self._output_path):
                 print("Error saving Flags to csv.")
-
-        self.service_periods.create_table()
-        self.flagged.create_table()
 
     ###########################################################
 
