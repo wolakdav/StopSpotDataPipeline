@@ -91,7 +91,7 @@ class _Client():
             ai = ArgInterface()
             return ai.query_with_args(self, sys.argv[1:])
 
-        self.init_flag_dict()
+        self._init_flag_dict()
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
