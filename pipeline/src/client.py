@@ -4,8 +4,9 @@ from datetime import datetime
 from datetime import timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+from progress.bar import Bar
 
-from src.ios import IOs
+from src.ios import ios
 from src.tables import CTran_Data
 from src.tables import Flagged_Data
 from src.tables import Flags
@@ -28,16 +29,17 @@ self.config
 self. tables
 self._hive_engine
 self._portal_engine
+self._ios
 """
-class _Client(IOs):
-    def __init__(self, read_env_data=True, verbose=True):
-        super().__init__(verbose)
+class _Client():
+    def __init__(self, read_env_data=True):
         try:
             if not read_env_data and os.environ["PIPELINE_ENV_DATA"]:
                 read_env_data = True
         except KeyError as err:
             pass
 
+        self._ios = ios
         self.config = config
         self.config.load(read_env_data=read_env_data)
 
@@ -48,12 +50,12 @@ class _Client(IOs):
         portal_schema = config.get_value("portal_schema")
         if portal_user and portal_passwd and portal_hostname and portal_db_name :
             if portal_schema:
-                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema, verbose=verbose)
+                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema)
             else:
-                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, verbose=verbose)
+                self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name)
         else:
             print("Please enter credentials for Portals database with the C-Tran table.")
-            self.ctran = CTran_Data(verbose=verbose)
+            self.ctran = CTran_Data()
         self._portal_engine = self.ctran.get_engine()
         pipe_user = config.get_value("pipeline_user")
         pipe_passwd = config.get_value("pipeline_passwd")
@@ -62,22 +64,22 @@ class _Client(IOs):
         pipe_schema = config.get_value("pipeline_schema")
         if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name:
             if pipe_schema:
-                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
                 self._hive_engine = self.flagged.get_engine()
                 engine_url = self._hive_engine.url
-                self.flags = Flags(schema=pipe_schema, verbose=verbose, engine=engine_url)
-                self.service_periods = Service_Periods(schema=pipe_schema, verbose=verbose, engine=engine_url)
+                self.flags = Flags(schema=pipe_schema, engine=engine_url)
+                self.service_periods = Service_Periods(schema=pipe_schema, engine=engine_url)
                 return
             else:
-                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, verbose=verbose)
+                self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name)
         else:
             print("Please enter credentials for Hive's Database.")
-            self.flagged = Flagged_Data(verbose=verbose)
+            self.flagged = Flagged_Data()
 
         self._hive_engine = self.flagged.get_engine()
         engine_url = self._hive_engine.url
-        self.flags = Flags(verbose=verbose, engine=engine_url)
-        self.service_periods = Service_Periods(verbose=verbose, engine=engine_url)
+        self.flags = Flags(engine=engine_url)
+        self.service_periods = Service_Periods(engine=engine_url)
 
     #######################################################
 
@@ -85,7 +87,7 @@ class _Client(IOs):
 
         if len(sys.argv) > 1:
             ai = ArgInterface()
-            return ai.query_with_args(self, self.ctran, self.flagged, sys.argv[1:])
+            return ai.query_with_args(self, sys.argv[1:])
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
@@ -101,6 +103,8 @@ class _Client(IOs):
                         self.process_since_checkpoint),
             _Option("Reprocess service date(s)",
                         self.reprocess),
+            _Option("Delete flagged rows in date range",
+                        self.delete_flagged_range),
             _Option("Create all views",
                         self.create_all_views),
             _Option("Sub-menu: DB Operations",
@@ -122,34 +126,38 @@ class _Client(IOs):
     # can be Date instances or strings in format "YYYY/MM/DD". If no dates are
     # supplied, this will prompt the user for them.
     def process_data(self, start_date=None, end_date=None, restart=False):
-        self.print("Starting data processing pipeline.")
+        self._ios.log_and_print("Starting data processing pipeline.")
         start_date, end_date = self._get_date_range(start_date, end_date)
         ctran_df = self.ctran.query_date_range(start_date, end_date)
         if ctran_df is None or ctran_df.empty:
-            self.print("ERROR: the supplied dates were unable to be gathered from CTran data.")
+            self._ios.log_and_print(
+                "The supplied dates were unable to be gathered from CTran data.",
+                self._ios.Severity.ERROR)
             return False
 
         flagged_rows = []
         skipped_rows = 0
-        # TODO: Stackoverflow is telling me iterrows is a slow way of iterrating,
-        # but i'll leave optimizing for later.
-        self.print("Processing the queried data.")
         duplicate = None
+        self._ios.log_and_print("Processing the queried data.")
+        progress_bar = Bar(
+            "",
+            max=len(ctran_df.index))
         for row_id, row in ctran_df.iterrows():
 
             service_key = self.service_periods.query_or_insert(row.service_date)
 
             if restart:
-                if config.get_value('max_skipped_rows'):
-                    if skipped_rows > config.get_value('max_skipped_rows'):
-                        msg = "ERROR: exceeded maximum number of skipped service rows."
-                        self.print(msg)
+                if config.get_value("max_skipped_rows"):
+                    if skipped_rows > config.get_value("max_skipped_rows"):
+                        msg = self._ios.print("Exceeded maximum number of skipped service rows.")
                         restarter.critical_error(msg)
 
             # If this fails, it's very likely a sqlalchemy error.
             # e.g. not able to connect to db.
             if not service_key:
-                self.print("ERROR: cannot find or create new service_key, skipping.")
+                self._ios.log_and_print(
+                    "Cannot find or create new service_key, skipping.",
+                    self._ios.Severity.WARNING)
                 skipped_rows +=1
                 continue
 
@@ -163,8 +171,9 @@ class _Client(IOs):
                     else:
                         flags.update(flagger.flag(row, config))
                 except Exception as e:
-                    self.print("WARNING: error in flagger {}. Skipping.\n{}"
-                        .format(flagger.name, e))
+                    self._ios.log_and_print(
+                        "Error in flagger {}. Skipping.\n{}".format(flagger.name, e),
+                        self._ios.Severity.WARNING)
 
             date = row["service_date"]
             date = "".join([str(date.year), "/", str(date.month), "/", str(date.day)])
@@ -175,16 +184,21 @@ class _Client(IOs):
                     date,
                     int(flag)
                 ])
+            progress_bar.next()
 
+        progress_bar.finish()
         # Duplicate flagger requires a special call later on, independent of
         # the primary loop.
         if duplicate is not None:
+            self._ios.log_and_print("Checking for duplicates.")
             flagged_rows.extend(self._flag_duplicates(ctran_df, duplicate))
         else:
-            self.print("NOTE: this run is not checking for duplicates.")
+            self._ios.log_and_print(
+                "This run is not checking for duplicates.",
+                self._ios.Severity.WARNING)
 
         self.flagged.write_table(flagged_rows)
-        self.print("Done executing the pipeline.")
+        self._ios.log_and_print("Done executing the pipeline.")
         return True
 
     ###########################################################
@@ -193,13 +207,16 @@ class _Client(IOs):
     def process_since_checkpoint(self):
         start_date = self.flagged.get_latest_day()
         if start_date is None:
-            self.print("ERROR: no prior date processed; cannot continue from the last processed day.")
+            self._ios.log_and_print(
+                "No prior date processed; cannot continue from the last processed day.",
+                self._ios.Severity.ERROR)
             return False
-        self.print("Last processed day: " + str(start_date))
+
+        self._ios.log_and_print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self.print("Processing from:  " + str(start_date))
+        self._ios.log_and_print("Processing    from: " + str(start_date))
         end_date = datetime.now().date()
-        self.print("\t   until: " + str(end_date))
+        self._ios.log_and_print("             until: " + str(end_date))
         return self.process_data(start_date, end_date)
 
     ###########################################################
@@ -208,27 +225,48 @@ class _Client(IOs):
     def process_next_day(self, restart=False):
         start_date = self.flagged.get_latest_day()
         if start_date is None:
-            msg = "ERROR: an error occured while attempting to find the last processed day. This may be because the last processed day doesn't exist or an error occured while connecting to the database."
-            self.print(msg)
+            msg = "".join([
+                "An error occured while attempting to find the last processed day. ",
+                "This may be because the last processed day doesn't exist or an ",
+                "error occured while connecting to the database."])
+            msg = self._ios.log_and_print(msg, self._ios.Severity.ERROR)
             if restart:
                 restarter.critical_error(msg)
             else:
                 return False
             
-
-        self.print("Last processed day: " + str(start_date))
+        self._ios.log_and_print("Last processed day: " + str(start_date))
         start_date = start_date + timedelta(days=1)
-        self.print("Processing from:  " + str(start_date))
+        self._ios.log_and_print("Processing    from: " + str(start_date))
         end_date = start_date
-        self.print("\t   until: " + str(end_date))
+        self._ios.log_and_print("             until: " + str(end_date))
         return self.process_data(start_date, end_date, restart)
+
+    ###########################################################
+
+    def delete_flagged_range(self):
+        self.print(
+            "Please input a date range. If either or both fields are empty,"\
+            " it will be treated as the beginning or time, or the end of"\
+            " time, respectively. Note that dates are INCLUSIVE.", force=True)
+        start_date, end_date = self._get_date_range(None, allow_empty=True)
+        if start_date is None:
+            start_date = datetime.min
+        if end_date is None:
+            end_date = datetime.max
+        return self.flagged.delete_date_range(start_date, end_date)
 
     ###########################################################
 
     def reprocess(self, start_date=None, end_date=None):
         start_date, end_date = self._get_date_range(start_date, end_date)
         if not self.flagged.delete_date_range(start_date, end_date):
-            self.print()
+            msg = "".join([
+                "An error occured while attempting to delete the data in the ",
+                "supplied range [", str(start_date), ", ", str(end_date), "]. ",
+                "This may be because the last processed day doesn't exist or an ",
+                "error occured while connecting to the database."])
+            self._ios.log_and_print(msg, self._ios.Severity.ERROR)
             return False
         return self.process_data(start_date, end_date)
 
@@ -250,7 +288,7 @@ class _Client(IOs):
         try:
             dup_df = duplicate_instance.flag(df, config)
         except ValueError as err:
-            self.print("ERROR:", err)
+            self._ios.log_and_print("", self._ios.Severity.ERRROR, err)
             return []
 
         dup_df.insert(0, "service_key", 0)
@@ -278,7 +316,7 @@ class _Client(IOs):
         def ctran_info():
             query = self.ctran.get_full_table()
             if query is None:
-                self.print("WARNING: no data returned.")
+                self._ios.print("WARNING: no data returned.")
             else:
                 query.info()
 
@@ -354,8 +392,10 @@ class _Client(IOs):
     # None. If start_date is none, the user will be prompted for the start and
     # end dates. If end_date is none, the start_date will be used for that
     # value. If dates are backwards, they will be flipped.
+    # If allow_empty is True, when the user is prompted and they input nothing,
+    # return a None for that field.
     # This returns: start_date, end_date
-    def _get_date_range(self, start_date=None, end_date=None):
+    def _get_date_range(self, start_date=None, end_date=None, allow_empty=False):
         def _convert_str_to_date(string, criteria):
             try:
                 if isinstance(string, str):
@@ -366,7 +406,9 @@ class _Client(IOs):
 
         def _get_valid_date(criteria):
             while True:
-                date = self.prompt("Please enter the " + criteria + " date (YYYY/MM/DD): ")
+                date = self._ios.prompt("Please enter the " + criteria + " date (YYYY/MM/DD): ")
+                if allow_empty and not date:
+                    return None
                 try:
                     date = datetime.strptime(date, "%Y/%m/%d")
                 except ValueError:
@@ -385,7 +427,9 @@ class _Client(IOs):
                 end_date = start_date
             else:
                 end_date = _convert_str_to_date(end_date, "end  ")
-
+        
+        if start_date is None or end_date is None:
+            return start_date, end_date
         if start_date < end_date:
             return start_date, end_date
         else:
