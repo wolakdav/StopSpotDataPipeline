@@ -82,10 +82,11 @@ def test_get_latest_day(mock_connection, instance_fixture):
 
 def test_delete_date_range_happy(mock_connection, instance_fixture):
     instance_fixture._engine.connect = lambda: mock_connection
-    input_date = "2020/1/1"
+    input_date = "2020-01-01"
     expected = "".join(["DELETE FROM ", instance_fixture._schema, ".", instance_fixture._table_name,
-                       " WHERE service_date IN ('", input_date, "', '", input_date, "');"])
-    instance_fixture.delete_date_range(input_date)
+                        " WHERE service_date BETWEEN '", input_date, "' AND '", 
+                        input_date, "';"])
+    instance_fixture.delete_date_range("2020/1/1")
     assert mock_connection.sql == expected
 
 def test_delete_date_range_bad_engine(instance_fixture):
@@ -101,16 +102,6 @@ def test_delete_date_range_invalid_inputs(instance_fixture):
 def test_delete_date_range_bad_connection(instance_fixture):
     # Since the default engine is already terrible, no changes are needed.
     assert instance_fixture.delete_date_range("2020/1/1") == False
-
-def test_get_date_range(instance_fixture):
-    assert instance_fixture._get_date_range("2020/1/1") == [datetime.datetime(2020, 1, 1, 0, 0)]
-    assert instance_fixture._get_date_range("2020/1/28", "2020/2/2") == \
-            [datetime.datetime(2020, 1, 28, 0, 0),
-            datetime.datetime(2020, 1, 29, 0, 0),
-            datetime.datetime(2020, 1, 30, 0, 0),
-            datetime.datetime(2020, 1, 31, 0, 0),
-            datetime.datetime(2020, 2, 1, 0, 0),
-            datetime.datetime(2020, 2, 2, 0, 0)]
 
 def test_process_dates(instance_fixture):
     assert instance_fixture._process_dates(None) == \
