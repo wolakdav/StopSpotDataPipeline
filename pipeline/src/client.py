@@ -308,7 +308,7 @@ class _Client():
         try:
             dup_df = duplicate_instance.flag(df, config)
         except ValueError as err:
-            self._ios.log_and_print("", self._ios.Severity.ERRROR, err)
+            self._ios.log_and_print("", self._ios.Severity.ERROR, err)
             return []
 
         dup_df.insert(0, "service_key", 0)
