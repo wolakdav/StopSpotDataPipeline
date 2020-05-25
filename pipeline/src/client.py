@@ -126,12 +126,6 @@ class _Client():
         self.service_periods.create_table()
         self.flagged.create_table()
 
-        # When dealing with csv and hive creation, only data available right away is flags, so we only save flags to csv when "creating" csv-hive
-        # service_periods and flagged csv's are created when process_data is run
-        if (self._output_type == "csv" or self._output_type == "both"):
-            if not self.flags.write_csv(self._output_path):
-                print("Error saving Flags to csv.")
-
     ###########################################################
 
     # Process data between start_date and end_date, inclusive. These parameters
@@ -152,7 +146,7 @@ class _Client():
 
         csv_service_keys = []
 
-        self.print("Processing the queried data.")
+        self._ios.print("Processing the queried data.")
         
         duplicate = None
         self._ios.log_and_print("Processing the queried data.")
@@ -218,16 +212,7 @@ class _Client():
                 "This run is not checking for duplicates.",
                 self._ios.Severity.WARNING)
 
-        #Saving result
-        if self._output_type == "aperture":
-            self.flagged.write_table(flagged_rows)
-        if self._output_type == "csv":
-            self.flagged.write_csv(self._output_path, flagged_rows)
-            self.service_periods.write_csv(self._output_path, csv_service_keys)
-        if self._output_path == "both":
-            self.flagged.write_table(flagged_rows)
-            self.flagged.write_csv(self._output_path, flagged_rows)
-            self.service_periods.write_csv(self._output_path, csv_service_keys)
+        self._save_output(flagged_rows, csv_service_keys)
 
         self._ios.log_and_print("Done executing the pipeline.")
 
@@ -495,6 +480,11 @@ class _Client():
 
         return self._menu("This is output type sub-menu.", options)
 
-    def save_to_csv():
-        
+    def _save_output(self, flagged_rows, csv_service_keys):
+        if self._output_type == "aperture" or self._output_type == "both":
+            self.flagged.write_table(flagged_rows)
 
+        if self._output_type == "csv" or self._output_type == "both":
+            self.flags.write_csv(self._output_path)
+            self.flagged.write_csv(self._output_path, flagged_rows)
+            self.service_periods.write_csv(self._output_path, csv_service_keys)

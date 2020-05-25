@@ -21,6 +21,7 @@ from src.config import Config
 import pandas
 
 import flaggers.flagger as flagger
+from src.ios import ios
 
 #############################################################################################################
 #FAKE CLASSES###################################################################################FAKE CLASSES#
@@ -51,9 +52,9 @@ def fake_config():
 @pytest.fixture
 def fake_client(fake_config):
 	class Fake_Client(_Client):
-		def __init__(self, verbose=True):
-			self.verbose = verbose
+		def __init__(self, read_env_data=True):
 
+			self._ios = ios
 			self.config = fake_config
 			self.config.load()
 
@@ -66,7 +67,7 @@ def fake_client(fake_config):
 			portal_db_name = self.config.get_value("portal_db_name")
 			portal_schema = self.config.get_value("portal_schema")
 			if portal_user and portal_passwd and portal_hostname and portal_db_name and portal_schema:
-				self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema, verbose=verbose)
+				self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema)
 
 			pipe_user = self.config.get_value("pipeline_user")
 			pipe_passwd = self.config.get_value("pipeline_passwd")
@@ -74,11 +75,10 @@ def fake_client(fake_config):
 			pipe_db_name = self.config.get_value("pipeline_db_name")
 			pipe_schema = self.config.get_value("pipeline_schema")
 			if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name and pipe_schema:
-				self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+				self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
 
-
-			self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
-			self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+			self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
+			self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
 
 	return Fake_Client()
 
@@ -347,19 +347,15 @@ def change_output_to_csv(client):
 
 	return True
 
-#Creates fake hive aka flags.csv
 @pytest.fixture
-def create_csv_hive(client, change_output_to_csv):
-	try:
-		client.create_hive()
-	except:
-		return False
-
-	return True
+def process_and_save_to_csv(client, change_output_to_csv):
+	start = datetime(1900, 1, 1)
+	end = datetime(2100, 1, 1)
+	return client.process_data(start_date=start, end_date=end)
 
 #Reads created flags.csv
 @pytest.fixture
-def read_csv_hive(client, flags):
+def read_flags_csv(client, flags):
 	try:
 		path = client._output_path + flags._table_name + ".csv"
 		#When panda reads, it numberates columns, thus we skip first numerate column
@@ -368,14 +364,8 @@ def read_csv_hive(client, flags):
 	except FileNotFoundError:
 		return []
 
-@pytest.fixture
-def process_and_save_to_csv(client, change_output_to_csv):
-	start = datetime(1900, 1, 1)
-	end = datetime(2100, 1, 1)
-	return client.process_data(start, end)
-
 @pytest.fixture 
-def read_csv_flagged(client, flagged):
+def read_flagged_csv(client, flagged):
 	try:
 		path = client._output_path + flagged._table_name + ".csv"
 		#When panda reads, it numberates columns, thus we skip first numerate column
@@ -385,7 +375,7 @@ def read_csv_flagged(client, flagged):
 		return []
 
 @pytest.fixture
-def read_csv_service_periods(client, service_periods):
+def read_service_periods_csv(client, service_periods):
 	try:
 		path = client._output_path + service_periods._table_name + ".csv"
 		#When panda reads, it numberates columns, thus we skip first numerate column
@@ -410,29 +400,25 @@ def test_output_is_csv(change_output_to_csv, client):
 	assert change_output_to_csv == True
 	assert client._output_type == "csv"
 
-#Tests successful tables.csv creation
-def test_csv_hive_creation(create_csv_hive):
-	assert create_csv_hive == True
-	
-#Tests that tables.csv contains correct info
-def test_csv_hive_read(read_csv_hive, num_of_flags, flags):
-	assert len(read_csv_hive) == num_of_flags
-	cols = list(read_csv_hive.columns.values)
-	assert cols == flags._expected_cols
-
 #AT THIS POINT WE CAN TEST PROCESSING OUTPUT
 
 def test_csv_process_and_save(process_and_save_to_csv):
 	#assert save_ctran_test_data == True
 	assert process_and_save_to_csv == True
 
-def test_flagged_csv_output(read_csv_flagged, flagged):
-	assert len(read_csv_flagged) == 29
-	cols = list(read_csv_flagged.columns.values)
+#Tests that tables.csv contains correct info
+def test_flags_csv_output(read_flags_csv, num_of_flags, flags):
+	assert len(read_flags_csv) == num_of_flags
+	cols = list(read_flags_csv.columns.values)
+	assert cols == flags._expected_cols
+
+def test_flagged_csv_output(read_flagged_csv, flagged):
+	assert len(read_flagged_csv) == 29
+	cols = list(read_flagged_csv.columns.values)
 	assert cols == flagged._expected_cols
 
-def test_service_periods_csv_output(read_csv_service_periods, service_periods):
-	cols = list(read_csv_service_periods.columns.values)
+def test_service_periods_csv_output(read_service_periods_csv, service_periods):
+	cols = list(read_service_periods_csv.columns.values)
 	assert cols == service_periods._expected_cols
 
 #***********************************************************************************************************#

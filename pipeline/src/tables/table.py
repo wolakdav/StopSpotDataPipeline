@@ -5,6 +5,7 @@ import pandas
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
+import os
 
 from ..ios import ios
 
