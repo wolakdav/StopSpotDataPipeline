@@ -30,6 +30,16 @@ class Config:
         return True
 
     def _ingest_env(self):
+        if "PORTAL_USER" in os.environ:
+            self._data["portal_user"] = os.environ["PORTAL_USER"]
+        if "PORTAL_PASSWD" in os.environ:
+            self._data["portal_passwd"] = os.environ["PORTAL_PASSWD"]
+        if "PORTAL_HOSTNAME" in os.environ:
+            self._data["portal_hostname"] = os.environ["PORTAL_HOSTNAME"]
+        if "PORTAL_DB_NAME" in os.environ:
+            self._data["portal_db_name"] = os.environ["PORTAL_DB_NAME"]
+        if "PORTAL_SCHEMA" in os.environ:
+            self._data["portal_schema"] = os.environ["PORTAL_SCHEMA"]
         if "PIPELINE_USER" in os.environ:
             self._data["pipeline_user"] = os.environ["PIPELINE_USER"]
         if "PIPELINE_PASSWD" in os.environ:
@@ -38,6 +48,16 @@ class Config:
             self._data["pipeline_hostname"] = os.environ["PIPELINE_HOSTNAME"]
         if "PIPELINE_DB_NAME" in os.environ:
             self._data["pipeline_db_name"] = os.environ["PIPELINE_DB_NAME"]
+        if "PIPELINE_SCHEMA" in os.environ:
+            self._data["pipeline_schema"] = os.environ["PIPELINE_SCHEMA"]
+        # if "PIPELINE_USER" in os.environ:
+        #     self._data["pipeline_user"] = os.environ["PIPELINE_USER"]
+        # if "PIPELINE_PASSWD" in os.environ:
+        #     self._data["pipeline_passwd"] = os.environ["PIPELINE_PASSWD"]
+        # if "PIPELINE_HOSTNAME" in os.environ:
+        #     self._data["pipeline_hostname"] = os.environ["PIPELINE_HOSTNAME"]
+        # if "PIPELINE_DB_NAME" in os.environ:
+        #     self._data["pipeline_db_name"] = os.environ["PIPELINE_DB_NAME"]
 
     def _is_date(self, val):
         if not isinstance(val, str):
