@@ -89,10 +89,12 @@ def set_sys_argv_range_query_2():
 
 # Helper Functions
 def find_error(lf="./test/.it_test_log.txt", search_for="ERROR"):
-    with open(lf) as f:
-        print(f)
-        if search_for in f.read():
-            return True
+    try:
+        with open(lf) as f:
+            if search_for in f.read():
+                return True
+    except FileNotFoundError as e:
+        print(e)
     return False
 
 
@@ -102,8 +104,7 @@ def test_query_date_range_with_bad_env_vars_fails(monkeypatch, set_sys_argv_rang
     client = _Client()
     df = client.ctran._query_table("SELECT COUNT(*) FROM " + client.ctran._schema + "." + client.ctran._table_name)
     assert find_error(search_for="role \"foo\" does not exist")
-    assert df is not None
-    assert isinstance(client.ctran._engine, sqlalchemy.engine.Connectable)
+    assert df is None
     assert find_error() is True
     with pytest.raises(SystemExit) as sys_ext:
         client.main()  # Passes
