@@ -1,5 +1,4 @@
 import abc
-from collections import namedtuple
 from enum import IntEnum, auto
 
 class Flags(IntEnum):

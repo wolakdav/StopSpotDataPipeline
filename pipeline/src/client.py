@@ -15,7 +15,7 @@ from src.tables import Service_Periods
 from src.config import config
 from src.restarter import restarter
 from src.interface import ArgInterface
-from flaggers.flagger import flaggers
+from flaggers.flagger import flaggers, FlagInfo
 from flaggers.flagger import Flags as flag_enums
 
 
@@ -279,6 +279,14 @@ class _Client():
 
     ###########################################################
 
+    # Query the database for all present flag-types. This information is made available
+    # for translating queries utilizing flag names into queries with flag ids. This
+    # functionality is performed on the program-side instead of the database-side
+    # in order to allow the end-user to view what flags exist and write command-
+    # line queries with sensible names. NOTE: Current behavior only runs this
+    # operation and initializes the dictionary as-needed. This means in use cases
+    # where translating flag names to ids is not needed, this table does not get
+    # initialized.
     def _init_flag_dict(self):
         self._flag_lookup = dict()
         df = self.flags.get_full_table()
@@ -288,8 +296,6 @@ class _Client():
 
         if df is None:
             return
-
-        FlagInfo = namedtuple("FlagInfo", "id desc")
 
         for row in df.itertuples():
             self._flag_lookup[row.name] = FlagInfo(row.flag_id, row.description)

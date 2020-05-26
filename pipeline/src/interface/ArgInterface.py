@@ -111,7 +111,7 @@ class ArgInterface:
         row = self._is_present(args, "-r", "--row_id")
         parser.add_argument("--daily",
                             help="Process data of the next unprocessed day. No arguments.",
-                            required=not query and not flag and not row and not self._is_present(args, None, "--date-start"),
+                            required=self._is_present(args, None, "--daily") and len(args) == 1,
                             action="store_true")
         parser.add_argument("--date-start",
                             help="Format: --date-start=YYYY-MM-DD (ex. 2020-01-01)",
@@ -124,7 +124,7 @@ class ArgInterface:
         parser.add_argument("-s",
                             "--select",
                             help="Switch to activate handling of flag querying.",
-                            required=False,
+                            required=flag or row,
                             action="store_true")
         parser.add_argument("-f",
                             "--flag",
