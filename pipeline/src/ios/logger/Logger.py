@@ -16,7 +16,6 @@ class Logger:
         self.Severity = Severity
 
     def start(self, filename='output/' + date.today().strftime('%Y-%m-%d') + '.txt'):
-        print("TESTTT")
         self._f = open(filename,'a+')
 
     def log(self, message, severity=Severity.INFO):
