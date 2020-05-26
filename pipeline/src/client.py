@@ -40,6 +40,7 @@ class _Client():
         except KeyError as err:
             pass
 
+        self._flag_lookup = None
         self._ios = ios
         self.config = config
         self.config.load(read_env_data=read_env_data)
@@ -81,17 +82,15 @@ class _Client():
         engine_url = self._hive_engine.url
         self.flags = Flags(engine=engine_url)
         self.service_periods = Service_Periods(engine=engine_url)
-        self._flag_lookup = None
 
     #######################################################
 
     def main(self, read_env_data=False):
+        self._init_flag_dict()
 
         if len(sys.argv) > 1:
             ai = ArgInterface()
             return ai.query_with_args(self, sys.argv[1:])
-
-        self._init_flag_dict()
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
