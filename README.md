@@ -114,11 +114,17 @@ flags that queries all data rows with that flag.
 This method will create the Hive schema, which is the collection of tables
 flags, flagged_data, and service_periods.
 
-#### `int lookup_flag_id(flag_name)`
+#### `int client_instance.lookup_flag_id(flag_name)`
 
 This method expects a string `flag_name` and will return the numerical id
 of the corresponding flag, if it exists. None will be returned if the dictionary
 has not been initialized.
+
+#### `client_instance.print_flag_names()`
+
+This helper method prints the names of all available flags loaded in the
+dictionary to standard out. This provides the user a list of flags to use
+when querying.
 
 #### `CTran_Data client_instance.ctran`
 

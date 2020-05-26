@@ -18,9 +18,11 @@ class ArgInterface:
 
                 if args.flag is None:
                     ios.log_and_print(
-                            "No flag exists in the database by the name of \"{}\".".format(query),
+                            "No flag by the name of \"{}\" exists in the database.".format(query),
                             ios.Severity.ERROR
                     )
+                    ios.print("Available Flags:")
+                    client.print_flag_names()
                     return None
 
                 args.flag = args.flag.id
@@ -123,12 +125,12 @@ class ArgInterface:
                             type=self._service_date)
         parser.add_argument("-s",
                             "--select",
-                            help="Switch to activate handling of flag querying.",
+                            help="Switch to activate handling of flag querying for utilizing --flag and --row.",
                             required=flag or row,
                             action="store_true")
         parser.add_argument("-f",
                             "--flag",
-                            help="Placeholder",
+                            help="Specify the name of the flag you wish to query rows for.",
                             required=not daily and query and not row)
         parser.add_argument("-l",
                             "--limit",

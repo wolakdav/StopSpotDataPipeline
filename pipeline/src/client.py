@@ -86,8 +86,6 @@ class _Client():
     #######################################################
 
     def main(self, read_env_data=False):
-        self._init_flag_dict()
-
         if len(sys.argv) > 1:
             ai = ArgInterface()
             return ai.query_with_args(self, sys.argv[1:])
@@ -276,6 +274,13 @@ class _Client():
             return None
 
         return self._flag_lookup.get(flag_name)
+
+    ###########################################################
+
+    def print_flag_names(self):
+        if self._flag_lookup is not None:
+            for flag in self._flag_lookup.keys():
+                ios.print(flag)
 
     ###########################################################
 
