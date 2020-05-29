@@ -184,66 +184,66 @@ def run():
 #   - Test of perfect user input
 #   - Test of bad username
 #   - Test of bad database name
-@pytest.mark.parametrize(
-    'inputs',
-    (FakeInput(),
-     FakeInput(USERNAME, "foo"),
-     FakeInput(DATABASE, "foo")),
-    indirect=True
-)
-def test_capture_input(inputs, mock_empty_config, capsys, set_sys_argv_range_query_1):
-    # Force the system to read user input
-    config._data.pop("portal_user", None)
-    assert "portal_user" not in config._data
-
-    # Run main
-    run()
-
-    assert find_print(capsys, "Please enter credentials for Portals database with the C-Tran table.")
-
-    # Check which input was replaced with bad data, if any
-    # Look for the appropriate error message
-    bad_input = inputs.replaced
-
-    if bad_input is None:
-        assert not find_print(capsys)
-    elif bad_input == USERNAME:
-        assert find_print(capsys, "role \"foo\" does not exist")
-    elif bad_input == DATABASE:
-        assert find_print(capsys, "database \"foo\" does not exist")
-
-
-def test_query_date_range_with_bad_portal_env_user_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
-    monkeypatch.setenv("PORTAL_USER", "foo")
-    run()
-    assert find_print(capsys, "role \"foo\" does not exist")
-
-
-def test_query_date_range_with_bad_portal_env_db_name_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
-    monkeypatch.setenv("PORTAL_DB_NAME", "foo")
-    run()
-    assert find_print(capsys, "database \"foo\" does not exist")
-
-
-def test_query_date_range_with_bad_portal_env_schema_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
-    monkeypatch.setenv("PORTAL_SCHEMA", "foo")
-    run()
-    assert find_print(capsys, "relation \"foo.ctran_data\" does not exist")
-
-
-def test_query_date_range_with_bad_pipeline_env_user_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
-    monkeypatch.setenv("PIPELINE_USER", "foo")
-    run()
-    assert find_print(capsys, "role \"foo\" does not exist")
-
-
-def test_query_date_range_with_bad_pipeline_env_db_name_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
-    monkeypatch.setenv("PIPELINE_DB_NAME", "foo")
-    run()
-    assert find_print(capsys, "database \"foo\" does not exist")
-
-
-def test_query_date_range_with_bad_pipeline_env_schema_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
-    monkeypatch.setenv("PIPELINE_SCHEMA", "foo")
-    run()
-    assert find_print(capsys, "relation \"foo.service_periods\" does not exist")
+# @pytest.mark.parametrize(
+#     'inputs',
+#     (FakeInput(),
+#      FakeInput(USERNAME, "foo"),
+#      FakeInput(DATABASE, "foo")),
+#     indirect=True
+# )
+# def test_capture_input(inputs, mock_empty_config, capsys, set_sys_argv_range_query_1):
+#     # Force the system to read user input
+#     config._data.pop("portal_user", None)
+#     assert "portal_user" not in config._data
+#
+#     # Run main
+#     run()
+#
+#     assert find_print(capsys, "Please enter credentials for Portals database with the C-Tran table.")
+#
+#     # Check which input was replaced with bad data, if any
+#     # Look for the appropriate error message
+#     bad_input = inputs.replaced
+#
+#     if bad_input is None:
+#         assert not find_print(capsys)
+#     elif bad_input == USERNAME:
+#         assert find_print(capsys, "role \"foo\" does not exist")
+#     elif bad_input == DATABASE:
+#         assert find_print(capsys, "database \"foo\" does not exist")
+#
+#
+# def test_query_date_range_with_bad_portal_env_user_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
+#     monkeypatch.setenv("PORTAL_USER", "foo")
+#     run()
+#     assert find_print(capsys, "role \"foo\" does not exist")
+#
+#
+# def test_query_date_range_with_bad_portal_env_db_name_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
+#     monkeypatch.setenv("PORTAL_DB_NAME", "foo")
+#     run()
+#     assert find_print(capsys, "database \"foo\" does not exist")
+#
+#
+# def test_query_date_range_with_bad_portal_env_schema_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
+#     monkeypatch.setenv("PORTAL_SCHEMA", "foo")
+#     run()
+#     assert find_print(capsys, "relation \"foo.ctran_data\" does not exist")
+#
+#
+# def test_query_date_range_with_bad_pipeline_env_user_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
+#     monkeypatch.setenv("PIPELINE_USER", "foo")
+#     run()
+#     assert find_print(capsys, "role \"foo\" does not exist")
+#
+#
+# def test_query_date_range_with_bad_pipeline_env_db_name_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
+#     monkeypatch.setenv("PIPELINE_DB_NAME", "foo")
+#     run()
+#     assert find_print(capsys, "database \"foo\" does not exist")
+#
+#
+# def test_query_date_range_with_bad_pipeline_env_schema_vars_fails(monkeypatch, mock_it_config, setup_and_clean_env, capsys, set_sys_argv_range_query_1):
+#     monkeypatch.setenv("PIPELINE_SCHEMA", "foo")
+#     run()
+#     assert find_print(capsys, "relation \"foo.service_periods\" does not exist")
