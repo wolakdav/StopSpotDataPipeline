@@ -15,13 +15,15 @@ class Flags(Table):
         # id when changing the flag enums.
         self._expected_cols = [
             "flag_id",
-            "description"
+            "description",
+            "name"
         ]
         self._creation_sql = "".join(["""
             CREATE TABLE IF NOT EXISTS """, self._schema, ".", self._table_name, """
             (
                 flag_id INTEGER PRIMARY KEY,
-                description VARCHAR(200)
+                description VARCHAR(200),
+                name VARCHAR(30)
             );"""])
 
 
@@ -38,7 +40,8 @@ class Flags(Table):
 
         flags = []
         for flag in flagger.Flags:
-            flags.append([flag.value, flagger.flag_descriptions[flag]])
+            fd = flagger.flag_descriptions[flag]
+            flags.append([flag.value, fd.desc, fd.name])
 
         self.write_table(flags)
         return True

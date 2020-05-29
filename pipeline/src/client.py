@@ -1,5 +1,6 @@
 import os
 import sys
+from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 from sqlalchemy import create_engine
@@ -14,7 +15,7 @@ from src.tables import Service_Periods
 from src.config import config
 from src.restarter import restarter
 from src.interface import ArgInterface
-from flaggers.flagger import flaggers
+from flaggers.flagger import flaggers, FlagInfo
 from flaggers.flagger import Flags as flag_enums
 
 
@@ -39,6 +40,7 @@ class _Client():
         except KeyError as err:
             pass
 
+        self._flag_lookup = None
         self._ios = ios
         self.config = config
         self.config.load(read_env_data=read_env_data)
@@ -84,7 +86,6 @@ class _Client():
     #######################################################
 
     def main(self, read_env_data=False):
-
         if len(sys.argv) > 1:
             ai = ArgInterface()
             return ai.query_with_args(self, sys.argv[1:])
@@ -275,6 +276,51 @@ class _Client():
     def create_all_views(self):
         return self.flagged.create_views_all_flags()
 
+    ###########################################################
+
+    def lookup_flag_id(self, flag_name):
+        if self._flag_lookup is None:
+            self._init_flag_dict()
+
+        if self._flag_lookup is None:
+            self._ios.log_and_print(
+                "Call made to flag_lookup, but flag_lookup could not be initialized.",
+                ios.Severity.WARNING
+            )
+            return None
+
+        return self._flag_lookup.get(flag_name)
+
+    ###########################################################
+
+    def print_flag_names(self):
+        if self._flag_lookup is not None:
+            for flag in self._flag_lookup.keys():
+                ios.print(flag)
+
+    ###########################################################
+
+    # Query the database for all present flag-types. This information is made available
+    # for translating queries utilizing flag names into queries with flag ids. This
+    # functionality is performed on the program-side instead of the database-side
+    # in order to allow the end-user to view what flags exist and write command-
+    # line queries with sensible names. NOTE: Current behavior only runs this
+    # operation and initializes the dictionary as-needed. This means in use cases
+    # where translating flag names to ids is not needed, this table does not get
+    # initialized.
+    def _init_flag_dict(self):
+        self._flag_lookup = dict()
+        df = self.flags.get_full_table()
+
+        if df is None and self.flags.create_table():
+            df = self.flags.get_full_table()
+
+        if df is None:
+            return
+
+        for row in df.itertuples():
+            self._flag_lookup[row.name] = FlagInfo(row.flag_id, row.description)
+
     #######################################################
 
     def _flag_duplicates(self, df, duplicate_instance):
@@ -288,7 +334,7 @@ class _Client():
         try:
             dup_df = duplicate_instance.flag(df, config)
         except ValueError as err:
-            self._ios.log_and_print("", self._ios.Severity.ERRROR, err)
+            self._ios.log_and_print("", self._ios.Severity.ERROR, err)
             return []
 
         dup_df.insert(0, "service_key", 0)

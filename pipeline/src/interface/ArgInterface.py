@@ -12,6 +12,21 @@ class ArgInterface:
         try:
             args = self._parse_cl_args(args)
 
+            if args.flag:
+                query = args.flag
+                args.flag = client.lookup_flag_id(query)
+
+                if args.flag is None:
+                    ios.log_and_print(
+                            "No flag by the name of \"{}\" exists in the database.".format(query),
+                            ios.Severity.ERROR
+                    )
+                    ios.print("Available Flags:")
+                    client.print_flag_names()
+                    return None
+
+                args.flag = args.flag.id
+
             if args.select:
                 df = self._handle_flag_query(flagged, args)
             elif args.date_start:
@@ -36,9 +51,9 @@ class ArgInterface:
     def _handle_flag_query(self, flagged, args):
         if args.flag:
             limit = args.limit if args.limit else 100
-            return flagged.query_flags_by_flag_id(limit, args.flag)
+            return flagged.query_by_flag_id(args.flag, limit)
         elif args.row:
-            return flagged.query_flags_by_row_id("service_periods", args.row, args.year, args.service_period)
+            return flagged.query_by_row_id("service_periods", args.row, args.year, args.service_period)
 
     def _service_date(self, arg):
         try:
@@ -98,7 +113,7 @@ class ArgInterface:
         row = self._is_present(args, "-r", "--row_id")
         parser.add_argument("--daily",
                             help="Process data of the next unprocessed day. No arguments.",
-                            required=not query and not flag and not row and not self._is_present(args, None, "--date-start"),
+                            required=self._is_present(args, None, "--daily") and len(args) == 1,
                             action="store_true")
         parser.add_argument("--date-start",
                             help="Format: --date-start=YYYY-MM-DD (ex. 2020-01-01)",
@@ -110,14 +125,13 @@ class ArgInterface:
                             type=self._service_date)
         parser.add_argument("-s",
                             "--select",
-                            help="Switch to activate handling of flag querying.",
-                            required=False,
+                            help="Switch to activate handling of flag querying for utilizing --flag and --row.",
+                            required=flag or row,
                             action="store_true")
         parser.add_argument("-f",
                             "--flag",
-                            help="Placeholder",
-                            required=not daily and query and not row,
-                            type=int)
+                            help="Specify the name of the flag you wish to query rows for.",
+                            required=not daily and query and not row)
         parser.add_argument("-l",
                             "--limit",
                             help="Sets the number of rows to be returned (default=100).",

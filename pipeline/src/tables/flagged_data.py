@@ -100,9 +100,9 @@ class Flagged_Data(Table):
                        ".",
                        self._table_name,
                        " WHERE flag_id = '",
-                       flag_id,
+                       str(flag_id),
                        "' LIMIT '",
-                       limit,
+                       str(limit),
                        "';"])
 
         return self._query_table(sql)
@@ -200,7 +200,7 @@ class Flagged_Data(Table):
 
     def create_view_for_flag(self, flag):
         # flag is one of flagger's Flags enum.
-        view_name = "view_" + flagger.flag_descriptions[flag]
+        view_name = "view_" + flagger.flag_descriptions[flag].desc
         sql = "".join([
             "CREATE VIEW ", self._schema, ".", view_name, " AS\n",
             "SELECT * FROM ", self._schema, ".", self._table_name,
