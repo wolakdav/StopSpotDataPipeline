@@ -125,7 +125,7 @@ class Flagged_Data(Table):
             value = conn.execute(sql)
         except SQLAlchemyError as error:
             self._ios.log_and_print(
-                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
+                "SQLAlchemyError: "+ str(error), self._ios.Severity.ERROR)
             return None
         
         if value is not None:
@@ -160,7 +160,7 @@ class Flagged_Data(Table):
             conn.execute(sql)
         except SQLAlchemyError as error:
             self._ios.log_and_print(
-                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
+                "SQLAlchemyError: "+ str(error), self._ios.Severity.ERROR)
             return False
 
         return True
@@ -213,7 +213,7 @@ class Flagged_Data(Table):
                 con.execute(sql)
         except SQLAlchemyError as error:
             self._ios.log_and_print(
-                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
+                "SQLAlchemyError: "+ str(error), self._ios.Severity.ERROR)
             return False
         return True
 

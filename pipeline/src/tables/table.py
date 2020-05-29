@@ -25,7 +25,7 @@ class Table(abc.ABC):
         self._chunksize = 1000
 
         if schema is None:
-            self._schema = self._ios._prompt("Enter the table's schema: ")
+            self._schema = self._ios.prompt("Enter the table's schema: ")
         else:
             self._schema = schema
 
@@ -34,13 +34,13 @@ class Table(abc.ABC):
 
         else:
             if user is None:
-                user = self._ios._prompt("Enter username: ")
+                user = self._ios.prompt("Enter username: ")
             if passwd is None:
-                passwd = self._ios._prompt("Enter password: ", hide_input=True)
+                passwd = self._ios.prompt("Enter password: ", hide_input=True)
             if hostname is None:
-                hostname = self._ios._prompt("Enter hostname: ")
+                hostname = self._ios.prompt("Enter hostname: ")
             if db_name is None:
-                db_name = self._ios._prompt("Enter the database's name: ")
+                db_name = self._ios.prompt("Enter the database's name: ")
 
             self._build_engine(user, passwd, hostname, db_name)
 
