@@ -161,14 +161,12 @@ def test_flag_two_flag_arg_without_value_fails(ai):
     assert sys_ext.value.code == 2
 
 
-def test_flag_two_flag_arg_with_wrong_value_fails(ai):
-    with pytest.raises(SystemExit) as sys_ext:
-        ai._parse_cl_args(['-s', '-f=a'])
-    assert sys_ext.value.code == 2
-
-
-def test_flag_only_flag_arg_succeeds(ai):
+def test_flag_only_flag_arg_num_succeeds(ai):
     ai._parse_cl_args(['-s', '-f=1'])
+
+
+def test_flag_only_flag_arg_alpha_succeeds(ai):
+    ai._parse_cl_args(['-s', '-f=a'])
 
 
 def test_flag_limit_arg_with_value_out_of_lower_range_fails(ai):

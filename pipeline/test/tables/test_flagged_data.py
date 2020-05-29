@@ -1,5 +1,7 @@
 import io
 import datetime
+from collections import namedtuple
+
 import pytest
 import pandas
 from sqlalchemy import create_engine
@@ -130,7 +132,7 @@ def test_create_view(monkeypatch, instance_fixture):
 
     mock = mock_connection()
     instance_fixture._engine.connect = lambda: mock
-    monkeypatch.setitem(flagger.flag_descriptions, mock_flag.test, "test")
+    monkeypatch.setitem(flagger.flag_descriptions, mock_flag.test, flagger.FlagInfo("test", "test"))
 
     expected = "".join([
         "CREATE VIEW ", instance_fixture._schema, ".view_test AS\n",

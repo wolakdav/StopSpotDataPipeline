@@ -8,8 +8,8 @@
 # The tag "gui" is searched for as a base image for creating this container.
 
 docker run -d -it \
+	-p 5000:5000	\
 	--name pipeline \
-	--entrypoint "/bin/bash" \
 	--mount type=bind,source="$(pwd)"/pipeline,target=/pipeline \
 	--rm \
 	gui

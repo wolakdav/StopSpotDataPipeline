@@ -55,37 +55,44 @@ class Flagger(abc.ABC):
     # Child classes must return a lit of flags.
     pass
 
+
+class FlagInfo:
+    def __init__(self, name="", desc=""):
+        self.name = name
+        self.desc = desc
+
+
 flag_descriptions = {
-  Flags.ROW_ID_NULL : "ROW_ID_NULL",
-  Flags.SERVICE_DATE_NULL : "SERVICE_DATE_NULL",
-  Flags.VEHICLE_NUMBER_NULL : "VEHICLE_NUMBER_NULL",
-  Flags.LEAVE_TIME_NULL : "LEAVE_TIME_NULL",
-  Flags.TRAIN_NULL : "TRAIN_NULL",
-  Flags.ROUTE_NUMBER_NULL : "ROUTE_NUMBER_NULL",
-  Flags.DIRECTION_NULL : "DIRECTION_NULL",
-  Flags.SERVICE_KEY_NULL : "SERVICE_KEY_NULL",
-  Flags.TRIP_NUMBER_NULL : "TRIP_NUMBER_NULL",
-  Flags.STOP_TIME_NULL : "STOP_TIME_NULL",
-  Flags.ARRIVE_TIME_NULL : "ARRIVE_TIME_NULL",
-  Flags.DWELL_NULL : "DWELL_NULL",
-  Flags.LOCATION_ID_NULL : "LOCATION_ID_NULL",
-  Flags.DOOR_NULL : "DOOR_NULL",
-  Flags.ONS_NULL : "ONS_NULL",
-  Flags.OFFS_NULL : "OFFS_NULL",
-  Flags.ESTIMATED_LOAD_NULL : "ESTIMATED_LOAD_NULL",
-  Flags.LIFT_NULL : "LIFT_NULL",
-  Flags.MAXIMUM_SPEED_NULL : "MAXIMUM_SPEED_NULL",
-  Flags.TRAIN_MILEAGE_NULL : "TRAIN_MILEAGE_NULL",
-  Flags.PATTERN_DISTANCE_NULL : "PATTERN_DISTANCE_NULL",
-  Flags.LOCATION_DISTANCE_NULL : "LOCATION_DISTANCE_NULL",
-  Flags.X_COORDINATE_NULL : "X_COORDINATE_NULL",
-  Flags.Y_COORDINATE_NULL : "Y_COORDINATE_NULL",
-  Flags.DATA_SOURCE_NULL : "DATA_SOURCE_NULL",
-  Flags.SCHEDULE_STATUS_NULL : "SCHEDULE_STATUS_NULL",
-  Flags.TRIP_ID_NULL : "TRIP_ID_NULL",
-  Flags.UNOBSERVED_STOP : "UNOBSERVED_STOP",
-  Flags.UNOPENED_DOOR : "UNOPENED_DOOR",
-  Flags.DUPLICATE : "DUPLICATE",
+  Flags.ROW_ID_NULL: FlagInfo("null-row-id", "ROW_ID_NULL"),
+  Flags.SERVICE_DATE_NULL: FlagInfo("null-service-date", "SERVICE_DATE_NULL"),
+  Flags.VEHICLE_NUMBER_NULL: FlagInfo("null-vehicle-number", "VEHICLE_NUMBER_NULL"),
+  Flags.LEAVE_TIME_NULL: FlagInfo("null-leave-time", "LEAVE_TIME_NULL"),
+  Flags.TRAIN_NULL: FlagInfo("null-train", "TRAIN_NULL"),
+  Flags.ROUTE_NUMBER_NULL: FlagInfo("null-route-number", "ROUTE_NUMBER_NULL"),
+  Flags.DIRECTION_NULL: FlagInfo("null-direction", "DIRECTION_NULL"),
+  Flags.SERVICE_KEY_NULL: FlagInfo("null-service-key", "SERVICE_KEY_NULL"),
+  Flags.TRIP_NUMBER_NULL: FlagInfo("null-trip-number", "TRIP_NUMBER_NULL"),
+  Flags.STOP_TIME_NULL: FlagInfo("null-stop-time", "STOP_TIME_NULL"),
+  Flags.ARRIVE_TIME_NULL: FlagInfo("null-arrive-time", "ARRIVE_TIME_NULL"),
+  Flags.DWELL_NULL: FlagInfo("null-dwell-time", "DWELL_NULL"),
+  Flags.LOCATION_ID_NULL: FlagInfo("null-location-id", "LOCATION_ID_NULL"),
+  Flags.DOOR_NULL: FlagInfo("null-door", "DOOR_NULL"),
+  Flags.ONS_NULL: FlagInfo("null-ons", "ONS_NULL"),
+  Flags.OFFS_NULL: FlagInfo("null-offs", "OFFS_NULL"),
+  Flags.ESTIMATED_LOAD_NULL: FlagInfo("null-estimated-load", "ESTIMATED_LOAD_NULL"),
+  Flags.LIFT_NULL: FlagInfo("null-lift", "LIFT_NULL"),
+  Flags.MAXIMUM_SPEED_NULL: FlagInfo("null-maximum-speed", "MAXIMUM_SPEED_NULL"),
+  Flags.TRAIN_MILEAGE_NULL: FlagInfo("null-train-mileage", "TRAIN_MILEAGE_NULL"),
+  Flags.PATTERN_DISTANCE_NULL: FlagInfo("null-pattern-distance", "PATTERN_DISTANCE_NULL"),
+  Flags.LOCATION_DISTANCE_NULL: FlagInfo("null-location-distance", "LOCATION_DISTANCE_NULL"),
+  Flags.X_COORDINATE_NULL: FlagInfo("null-x-coordinate", "X_COORDINATE_NULL"),
+  Flags.Y_COORDINATE_NULL: FlagInfo("null-y-coordinate", "Y_COORDINATE_NULL"),
+  Flags.DATA_SOURCE_NULL: FlagInfo("null-data-source", "DATA_SOURCE_NULL"),
+  Flags.SCHEDULE_STATUS_NULL: FlagInfo("null-schedule-status", "SCHEDULE_STATUS_NULL"),
+  Flags.TRIP_ID_NULL: FlagInfo("null-trip-id", "TRIP_ID_NULL"),
+  Flags.UNOBSERVED_STOP: FlagInfo("unobserved-stop", "UNOBSERVED_STOP"),
+  Flags.UNOPENED_DOOR: FlagInfo("unopened-door", "UNOPENED_DOOR"),
+  Flags.DUPLICATE: FlagInfo("duplicate", "DUPLICATE"),
 }
 
 flaggers = []
