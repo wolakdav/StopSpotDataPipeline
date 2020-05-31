@@ -152,7 +152,7 @@ class CTran_Data(Table):
 
         except SQLAlchemyError as error:
             self._ios.log_and_print(
-                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
+                "SQLAlchemyError: " + str(error), self._ios.Severity.ERROR)
             return False
         except (KeyError, ValueError) as error:
             self._ios.log_and_print(

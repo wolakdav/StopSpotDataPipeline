@@ -59,7 +59,7 @@ class Service_Periods(Table):
                     return result.first()["service_key"]
         except SQLAlchemyError as error:
             self._ios.log_and_print(
-                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
+                "SQLAlchemyError: " + str(error), self._ios.Severity.ERROR)
             return None
 
 
@@ -88,7 +88,7 @@ class Service_Periods(Table):
                 return result.first()[0]
         except SQLAlchemyError as error:
             self._ios.log_and_print(
-                "SQLAlchemyError: ", str(error), self._ios.Severity.ERROR)
+                "SQLAlchemyError: " + str(error), self._ios.Severity.ERROR)
             return None
 
 
