@@ -44,8 +44,8 @@ class Flagged_Data(Table):
         df = pandas.DataFrame(data, columns=[
             "row_id",
             "service_key",
+            "flag_id",
             "service_date",
-            "flag_id"
             ])
         return self._write_table(df, 
                  conflict_columns=["row_id", "flag_id", "service_key"])
@@ -225,3 +225,24 @@ class Flagged_Data(Table):
             if not self.create_view_for_flag(flag):
                 status = False
         return status
+
+    def write_csv(self, path, data):
+        """
+        Function that saves flagged data to csv: actual saving is done by parent class (Table)
+
+        Args: 
+            path    (String): relative path to where csv will be saved. 
+            data    (Array) : list of flagged rows (flagged data)
+
+        Returns: 
+            Boolean representing state of the operation (successfull write: True, error during process: False)
+        """
+
+        #Append expected cols to beginning of the list to create header row in the csv
+        data.insert(0, self._expected_cols)
+
+        #Create dataframe that will be saved to csv
+        df = pandas.DataFrame(data)
+
+        #Call parent function that does actual saving
+        return super().write_csv(df, path)

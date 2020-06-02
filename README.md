@@ -176,13 +176,16 @@ settings controlled here are as follows.
 
 1. `user_emails`: The list of email(s) to send critical error messages to.
 2. `pipeline_email_passwd`: The password to the Pipeline's email, used for
-   critical email notifications. For obvious reasons, this is not supplied by default.
+critical email notifications. For obvious reasons, this is not supplied by default.
 3. `pipeline_*`: These are credentials for the Hive database.
 4. `portal*`: These are credentials for the Portal database.
 5. `notif_django_path`: The output of the Django file (see section
-   `output/notif.txt` for more).
+`output/notif.txt` for more).
+6. `output_path`: If *output_type* is *csv* or *both*, output will be in form of csv,
+and *output_path* specifies where csv's will go.
+7. `output_type`: specifies where output will be saved. Default is aperture, but output
+to csv is also an option, as well as directing output to both aperture and csv files. 
 
-For more, see `docs/config_readme.md`.
 
 ### `bin/env_data.sh`
 
@@ -204,3 +207,9 @@ This is the general purpose log file.
 
 This is the default output location for critical error messages capable of
 being picked up by a Django application.
+
+##### `output/csv/`
+
+This is default output location when output is meant to be redirected to csv's instead of
+aperture (or output is redirected to both aperture and csv)
+See `assets/config.json` to see *output_path* and *output_type*

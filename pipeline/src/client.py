@@ -24,12 +24,13 @@ class _Option():
         self.msg = msg
         self.func_pointer = func_pointer
 
-
 """ Members:
 self.config
 self. tables
 self._hive_engine
 self._portal_engine
+self._output_path
+self._output_type
 self._ios
 """
 class _Client():
@@ -44,6 +45,9 @@ class _Client():
         self._ios = ios
         self.config = config
         self.config.load(read_env_data=read_env_data)
+
+        self._output_path = config.get_value("output_path")
+        self._output_type = config.get_value("output_type")
 
         portal_user = config.get_value("portal_user")
         portal_passwd = config.get_value("portal_passwd")
@@ -92,6 +96,8 @@ class _Client():
 
         options = [
             _Option("(or ctrl-d) Exit.", lambda: "Exit"),
+            _Option("Choose output type (defaults to aperture).", 
+                        self._output_menu),
             _Option("[dev tool] Create Aperature, the Portal mock DB [dev tool].",
                         self.ctran.create_table),
             _Option("Create Hive, the output point of the Data Pipeline.",
@@ -138,12 +144,21 @@ class _Client():
 
         flagged_rows = []
         skipped_rows = 0
+
+        csv_service_keys = []
+
+        self._ios.print("Processing the queried data.")
+        
         duplicate = None
         self._ios.log_and_print("Processing the queried data.")
         progress_bar = Bar(
             "",
             max=len(ctran_df.index))
         for row_id, row in ctran_df.iterrows():
+
+            if self._output_type == "csv" or self._output_type == "both":
+                if not row.service_date in csv_service_keys:
+                    csv_service_keys.append(row.service_date)
 
             service_key = self.service_periods.query_or_insert(row.service_date)
 
@@ -182,8 +197,8 @@ class _Client():
                 flagged_rows.append([
                     row_id,
                     service_key,
-                    date,
-                    int(flag)
+                    int(flag),
+                    date
                 ])
             progress_bar.next()
 
@@ -198,8 +213,10 @@ class _Client():
                 "This run is not checking for duplicates.",
                 self._ios.Severity.WARNING)
 
-        self.flagged.write_table(flagged_rows)
+        self._save_output(flagged_rows, csv_service_keys)
+
         self._ios.log_and_print("Done executing the pipeline.")
+
         return True
 
     ###########################################################
@@ -341,10 +358,11 @@ class _Client():
         dup_df["service_key"] = dup_df["service_date"].apply(
             lambda date: self.service_periods.query_or_insert(date))
 
+        dup_df.insert(1, "flag_id", 1)
+        dup_df["flag_id"] = flag_enums.DUPLICATE
+
         dup_df["service_date"] = dup_df["service_date"].apply(
             lambda date: "".join([str(date.year), "/", str(date.month), "/", str(date.day)]))
-
-        dup_df["flag_id"] = flag_enums.DUPLICATE
 
         indices = dup_df.index.tolist()
         values = dup_df.values.tolist()
@@ -481,3 +499,38 @@ class _Client():
         else:
             return end_date, start_date
 
+    ###########################################################
+
+    def _output_menu(self):
+
+        def change_to_aperture(): 
+            self._output_type = "aperture"
+            print("Output will be saved to aperture")
+        
+        def change_to_csv(): 
+            self._output_type = "csv"
+            print("Output will be saved to csv's")
+        
+        def change_to_both(): 
+            self._output_type = "both"
+            print("Output will be saved to aperture AND csv's")
+
+        options = [
+           _Option("(or ctrl-d) Exit.", lambda: "Exit"),
+           _Option("Check current output type.", lambda: print("Current output type: " + self._output_type)),
+           _Option("Check current output path.", lambda: print("Current output path: " + self._output_path)),
+           _Option("Change output to Aperture.", change_to_aperture),
+           _Option("Change output to CSV's.", change_to_csv),
+           _Option("Change output to Aperture AND CSV's.", change_to_both)
+        ]
+
+        return self._menu("This is output type sub-menu.", options)
+
+    def _save_output(self, flagged_rows, csv_service_keys):
+        if self._output_type == "aperture" or self._output_type == "both":
+            self.flagged.write_table(flagged_rows)
+
+        if self._output_type == "csv" or self._output_type == "both":
+            self.flags.write_csv(self._output_path)
+            self.flagged.write_csv(self._output_path, flagged_rows)
+            self.service_periods.write_csv(self._output_path, csv_service_keys)

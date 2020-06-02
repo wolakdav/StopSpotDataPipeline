@@ -8,6 +8,7 @@ from src.tables import Flags
 from src.tables import Flagged_Data
 from datetime import datetime
 import json
+import shutil
 
 from src.tables import CTran_Data
 from src.tables import Flagged_Data
@@ -16,6 +17,11 @@ from src.tables import Service_Periods
 
 from src.client import _Client
 from src.config import Config
+
+import pandas
+
+import flaggers.flagger as flagger
+from src.ios import ios
 
 #############################################################################################################
 #FAKE CLASSES###################################################################################FAKE CLASSES#
@@ -46,11 +52,14 @@ def fake_config():
 @pytest.fixture
 def fake_client(fake_config):
 	class Fake_Client(_Client):
-		def __init__(self, verbose=True):
-			self.verbose = verbose
+		def __init__(self, read_env_data=True):
 
+			self._ios = ios
 			self.config = fake_config
 			self.config.load()
+
+			self._output_path = self.config.get_value("output_path")
+			self._output_type = self.config.get_value("output_type")
 
 			portal_user = self.config.get_value("portal_user")
 			portal_passwd = self.config.get_value("portal_passwd")
@@ -58,7 +67,7 @@ def fake_client(fake_config):
 			portal_db_name = self.config.get_value("portal_db_name")
 			portal_schema = self.config.get_value("portal_schema")
 			if portal_user and portal_passwd and portal_hostname and portal_db_name and portal_schema:
-				self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema, verbose=verbose)
+				self.ctran = CTran_Data(portal_user, portal_passwd, portal_hostname, portal_db_name, portal_schema)
 
 			pipe_user = self.config.get_value("pipeline_user")
 			pipe_passwd = self.config.get_value("pipeline_passwd")
@@ -66,11 +75,10 @@ def fake_client(fake_config):
 			pipe_db_name = self.config.get_value("pipeline_db_name")
 			pipe_schema = self.config.get_value("pipeline_schema")
 			if pipe_user and pipe_passwd and pipe_hostname and pipe_db_name and pipe_schema:
-				self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+				self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
 
-
-			self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
-			self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema, verbose=verbose)
+			self.flags = Flags(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
+			self.service_periods = Service_Periods(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name, pipe_schema)
 
 	return Fake_Client()
 
@@ -98,6 +106,16 @@ def flagged(client):
 @pytest.fixture
 def flags(client):
 	return client.flags
+
+#Returns service_periods instance
+@pytest.fixture
+def service_periods(client):
+	return client.service_periods
+
+#Returns number of flags specified in flagger
+@pytest.fixture
+def num_of_flags():
+	return len(flagger.Flags)
 
 #***********************************************************************************************************#
 #CREATION, PROCESSING, AND REMOVAL##########################################CREATION, PROCESSING AND REMOVAL#
@@ -180,6 +198,10 @@ def test_flagged(flagged):
 def test_flags(flags):
 	assert isinstance(flags, Flags)
 
+#Test valid service_periods instance creation
+def test_service_periods(service_periods):
+	assert isinstance(service_periods, Service_Periods)
+
 #Tests saving test data to aperture
 def test_save_ctran_test_data(save_ctran_test_data):
 	assert save_ctran_test_data == True
@@ -203,9 +225,9 @@ def test_pull_flagged_data(flagged_data):
 	assert len(flagged_data) > 0
 
 #Test pulling flags data
-def test_pull_flags(flags_data):
+def test_pull_flags(flags_data, num_of_flags):
 	assert not type(flags_data) is bool
-	assert len(flags_data) > 0
+	assert len(flags_data) == num_of_flags
 
 #***********************************************************************************************************#
 #ACTUAL TESTS###################################################################################ACTUAL TESTS#
@@ -310,6 +332,96 @@ def test_row_6(flagged_data):
 	assert len(sixth_row) == 0
 
 #***********************************************************************************************************#
+#CSV OUTPUT TESTS###########################################################################CSV OUTPUT TESTS#
+#############################################################################################################	
+
+#At this point all aperture output has either passed or failed. No need to test both outputs, can foxus on csv output
+
+#Changes output type from aperture to csv
+@pytest.fixture
+def change_output_to_csv(client):
+	try:
+		client._output_type = "csv"
+	except:
+		return False
+
+	return True
+
+@pytest.fixture
+def process_and_save_to_csv(client, change_output_to_csv):
+	start = datetime(1900, 1, 1)
+	end = datetime(2100, 1, 1)
+	return client.process_data(start_date=start, end_date=end)
+
+#Reads created flags.csv
+@pytest.fixture
+def read_flags_csv(client, flags):
+	try:
+		path = client._output_path + flags._table_name + ".csv"
+		#When panda reads, it numberates columns, thus we skip first numerate column
+		flags = pandas.read_csv(path, skiprows=1)
+		return flags
+	except FileNotFoundError:
+		return []
+
+@pytest.fixture 
+def read_flagged_csv(client, flagged):
+	try:
+		path = client._output_path + flagged._table_name + ".csv"
+		#When panda reads, it numberates columns, thus we skip first numerate column
+		flagged = pandas.read_csv(path, skiprows=1)
+		return flagged
+	except FileNotFoundError:
+		return []
+
+@pytest.fixture
+def read_service_periods_csv(client, service_periods):
+	try:
+		path = client._output_path + service_periods._table_name + ".csv"
+		#When panda reads, it numberates columns, thus we skip first numerate column
+		flagged = pandas.read_csv(path, skiprows=1)
+		return flagged
+	except FileNotFoundError:
+		return []
+
+@pytest.fixture
+def remove_csv_directory(client):
+	try:
+		shutil.rmtree(client._output_path, ignore_errors=True)
+	except:
+		return False
+
+	return True
+
+#Process data
+
+#Tests successful output type change
+def test_output_is_csv(change_output_to_csv, client):
+	assert change_output_to_csv == True
+	assert client._output_type == "csv"
+
+#AT THIS POINT WE CAN TEST PROCESSING OUTPUT
+
+def test_csv_process_and_save(process_and_save_to_csv):
+	#assert save_ctran_test_data == True
+	assert process_and_save_to_csv == True
+
+#Tests that tables.csv contains correct info
+def test_flags_csv_output(read_flags_csv, num_of_flags, flags):
+	assert len(read_flags_csv) == num_of_flags
+	cols = list(read_flags_csv.columns.values)
+	assert cols == flags._expected_cols
+
+def test_flagged_csv_output(read_flagged_csv, flagged):
+	assert len(read_flagged_csv) == 29
+	cols = list(read_flagged_csv.columns.values)
+	assert cols == flagged._expected_cols
+
+def test_service_periods_csv_output(read_service_periods_csv, service_periods):
+	cols = list(read_service_periods_csv.columns.values)
+	assert cols == service_periods._expected_cols
+
+#***********************************************************************************************************#
 #RECYCLE#############################################################################################RECYCLE#
 #############################################################################################################
 
@@ -330,3 +442,7 @@ def test_output_information_removal(remove_output_information, flagged_data):
 
 	#Step 2: Try to access table: should return False
 	assert flagged_data == None
+
+#Tests successful removal of test_csv directory
+def test_csv_directory_removal(remove_csv_directory):
+	assert remove_csv_directory == True

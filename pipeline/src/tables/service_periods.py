@@ -127,3 +127,15 @@ class Service_Periods(Table):
             return dt.datetime.combine(date, dt.datetime.min.time())
         else:
             return date
+
+    def write_csv(self, path, dates):
+        data = []
+        data.append(self._expected_cols)
+        for date in dates:
+            date = self.convert_date_to_datetime(date)
+            start_date, end_date = self.get_service_period(date)
+            data.append([start_date.strftime("'%Y-%m-%d'"), end_date.strftime("'%Y-%m-%d'")])
+
+        df = pandas.DataFrame(data)
+
+        return super().write_csv(df, path)

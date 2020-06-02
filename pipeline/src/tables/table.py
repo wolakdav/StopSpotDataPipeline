@@ -5,7 +5,10 @@ import pandas
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
+import os
+
 from ..ios import ios
+
 
 
 """ Extending Table
@@ -278,3 +281,39 @@ class Table(abc.ABC):
         
         self._ios.log_and_print("Your engine has been created: ", obj=self._engine)
         return True
+
+    ###########################################################################
+
+    def write_csv(self, df, path):
+        """
+        Function is meant to be called by a subclass: saves passed in data to a csv file.
+
+        Args: 
+            df      (Object): pandas DataFrame that contains data to be saved to a csv.
+            path    (String): relative path to where csv will be saved. 
+
+        Returns: 
+            Boolean representing state of the operation (successfull write: True, error during process: False)
+        """
+
+        #Check that function is called by a subclass
+        if not self._table_name:
+            self._print("ERROR: write_csv not called by a subclass.")
+            return False
+
+        #Pandas to_csv doesn't take care of path creation, thus check if path actually exists, and if not: create it
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+        #Create full path to where data will be saved
+        full_path = "" + path + self._table_name + ".csv"
+
+        #Attempt saving
+        try:
+            df.to_csv(full_path, index=False, encoding='utf-8')
+        except:
+            self._print("ERROR: write_csv couldn't save data to " + full_path)
+            return False
+
+        return True
+
