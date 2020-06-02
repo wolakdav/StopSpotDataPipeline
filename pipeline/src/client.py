@@ -150,8 +150,6 @@ class _Client():
 
         csv_service_keys = []
 
-        self._ios.print("Processing the queried data.")
-        
         duplicate = None
         self._ios.log_and_print("Processing the queried data.")
         progress_bar = Bar(
@@ -168,7 +166,9 @@ class _Client():
             if restart:
                 if config.get_value("max_skipped_rows"):
                     if skipped_rows > config.get_value("max_skipped_rows"):
-                        msg = self._ios.print("Exceeded maximum number of skipped service rows.")
+                        msg = self._ios.log_and_print(
+                            "Exceeded maximum number of skipped service rows.",
+                            self._ios.Severity.DEBUG)
                         restarter.critical_error(msg)
 
             # If this fails, it's very likely a sqlalchemy error.
