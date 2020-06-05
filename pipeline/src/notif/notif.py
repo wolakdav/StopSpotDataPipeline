@@ -43,8 +43,8 @@ class _Notif():
         return self._get_config_value("pipeline_email_passwd", "Please enter this pipeline's email password: ", True)
 
     def _email_user(self, user_email, msg, password):
-        self._ios.log_and_print("TO:   ", user_email)
-        self._ios.log_and_print("FROM: ", self.pipeline_email)
+        self._ios.log_and_print("TO:   " + user_email)
+        self._ios.log_and_print("FROM: " + self.pipeline_email)
         self._ios.log_and_print(msg)
 
         try:

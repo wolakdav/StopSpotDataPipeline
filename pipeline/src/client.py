@@ -41,8 +41,9 @@ class _Client():
         except KeyError as err:
             pass
 
-        self._flag_lookup = None
         self._ios = ios
+        self._ios.log_and_print("The client is starting initialization.")
+        self._flag_lookup = None
         self.config = config
         self.config.load(read_env_data=read_env_data)
 
@@ -75,6 +76,7 @@ class _Client():
                 engine_url = self._hive_engine.url
                 self.flags = Flags(schema=pipe_schema, engine=engine_url)
                 self.service_periods = Service_Periods(schema=pipe_schema, engine=engine_url)
+                self._ios.log_and_print("The client has finished initializing.")
                 return
             else:
                 self.flagged = Flagged_Data(pipe_user, pipe_passwd, pipe_hostname, pipe_db_name)
@@ -86,6 +88,7 @@ class _Client():
         engine_url = self._hive_engine.url
         self.flags = Flags(engine=engine_url)
         self.service_periods = Service_Periods(engine=engine_url)
+        self._ios.log_and_print("The client has finished initializing.")
 
     #######################################################
 
@@ -147,8 +150,6 @@ class _Client():
 
         csv_service_keys = []
 
-        self._ios.print("Processing the queried data.")
-        
         duplicate = None
         self._ios.log_and_print("Processing the queried data.")
         progress_bar = Bar(
@@ -165,7 +166,9 @@ class _Client():
             if restart:
                 if config.get_value("max_skipped_rows"):
                     if skipped_rows > config.get_value("max_skipped_rows"):
-                        msg = self._ios.print("Exceeded maximum number of skipped service rows.")
+                        msg = self._ios.log_and_print(
+                            "Exceeded maximum number of skipped service rows.",
+                            self._ios.Severity.DEBUG)
                         restarter.critical_error(msg)
 
             # If this fails, it's very likely a sqlalchemy error.

@@ -32,7 +32,7 @@ class ArgInterface:
             elif args.date_start:
                 df = self._handle_range_query(client, args)
             elif args.daily:
-                client.process_next_day(True)
+                client.process_next_day(restart=True)
                 return None
             else:
                 ios.print("Insufficient arguments.")
@@ -112,7 +112,7 @@ class ArgInterface:
         flag = self._is_present(args, "-f", "--flag")
         row = self._is_present(args, "-r", "--row_id")
         parser.add_argument("--daily",
-                            help="Process data of the next unprocessed day. No arguments.",
+                            help="Process data of the next unprocessed day. No arguments. This will restart on failure.",
                             required=self._is_present(args, None, "--daily") and len(args) == 1,
                             action="store_true")
         parser.add_argument("--date-start",
