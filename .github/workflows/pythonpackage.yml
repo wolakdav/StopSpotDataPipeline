@@ -13,6 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+        working-directory: ./pipeline
     strategy:
       matrix:
         python-version: [3.7]
@@ -28,6 +30,8 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pipenv
         pipenv install
+      working-directory: ${{env.working-directory}}
     - name: Test with pytest
       run: |
         pipenv run pytest
+      working-directory: ${{env.working-directory}}
